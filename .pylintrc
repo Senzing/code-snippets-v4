@@ -1,0 +1,9 @@
+[pylint]
+disable=
+    line-too-long,
+good-names=
+    code-snippets-v4
+ignore=
+    __init__.py,
+notes=
+    FIXME,
