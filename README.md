@@ -9,7 +9,7 @@ To find the Senzing API V3 version of this repository, visit [code-snippets-v3].
 
 ## Overview
 
-Succinct examples of how you might use the Senzing APIs for operational tasks.
+Succinct examples of how you might use the Senzing SDK for operational tasks.
 
 ## Contents
 
@@ -63,7 +63,7 @@ The JSON configuration string is set via the environment variable `SENZING_ENGIN
 
 ## Senzing APIs Bare Metal Usage
 
-You may already have installed the Senzing APIs and created a Senzing project by following the [Quickstart Guide]. If not, and you would like to install the Senzing APIs directly on a machine, follow the steps in the [Quickstart Guide]. Be sure to review the API [Quickstart Roadmap], especially the [System Requirements].
+You may already have installed the Senzing and created a Senzing project by following the [Quickstart Guide]. If not, and you would like to install Senzing directly on a machine, follow the steps in the [Quickstart Guide]. Be sure to review the [Quickstart Roadmap], especially the [System Requirements].
 
 ### Configuration
 
@@ -71,7 +71,7 @@ When using a bare metal install, the initialization parameters used by the Senzi
 
 🤔To convert an existing Senzing project G2Module.ini file to a JSON string use one of the following methods:
 
-- [G2ModuleIniToJson.py]
+- [g2_module_ini_to_json.py]
 
   - Modify the path to your projects G2Module.ini file.
 
@@ -85,12 +85,6 @@ When using a bare metal install, the initialization parameters used by the Senzi
 
   - ```python
     python3 -c $'import configparser; ini_file_name = "<project_path>/etc/G2Module.ini";engine_config_json = {};cfgp = configparser.ConfigParser();cfgp.optionxform = str;cfgp.read(ini_file_name)\nfor section in cfgp.sections(): engine_config_json[section] = dict(cfgp.items(section))\nprint(engine_config_json)'
-    ```
-
-- [SenzingGo.py]
-
-  - ```console
-    <project_path>/python/SenzingGo.py --iniToJson
     ```
 
 :pencil2: `<project_path>` in the above example should point to your project.
@@ -120,51 +114,11 @@ The included Dockerfile leverages the [Senzing API runtime] image to provide an 
 
 ### Configuration for Docker usage
 
-When used with a container, the JSON configuration is relative to the paths within the container. The JSON configuration should look like:
+Coming soon...
 
-```json
-{
-  "PIPELINE": {
-    "CONFIGPATH": "/etc/opt/senzing",
-    "RESOURCEPATH": "/opt/senzing/g2/resources",
-    "SUPPORTPATH": "/opt/senzing/data"
-  },
-  "SQL": {
-    "CONNECTION": "postgresql://senzing:password@myhost:5432:g2"
-  }
-}
-```
+### Usage for Docker
 
-✏️You only need to modify the `CONNECTION` string to point to your Senzing database.
-
-### Usage for Dccker usage
-
-1. Clone this repository
-1. Export the engine configuration environment variable
-
-```console
-  export SENZING_ENGINE_CONFIGURATION_JSON='{"PIPELINE": {"CONFIGPATH": "/etc/opt/senzing", "RESOURCEPATH": "/opt/senzing/g2/resources", "SUPPORTPATH": "/opt/senzing/data"}, "SQL": {"CONNECTION": "postgresql://user:password@host:5432:g2"}}'
-```
-
-1. Build the Docker image
-
-```console
-cd <repository_dir>
-docker build --tag senzing/code-snippets-v4 .
-```
-
-1. Run a container
-
-```console
-docker run \
-  --env SENZING_ENGINE_CONFIGURATION_JSON \
-  --interactive \
-  --tty \
-  --rm \
-  senzing/code-snippets-v4
-```
-
-✏️You only need to modify the `CONNECTION` string to point to your Senzing database.
+Coming soon...
 
 ## Items of Note
 
@@ -190,7 +144,7 @@ The AFFECTED_ENTITIES object contains a list of all entity IDs affected. Separat
 
 ### Parallel Processing
 
-Many of the example tasks demonstrate concurrent execution with threads. The entity resolution process involves IO operations, the use of concurrent processes and threads when calling the Senzing APIs provides scalability and performance. If using multiple processes, each process should have its own instance of a Senzing engine, for example G2Engine. Each engine object can support multiple threads.
+Many of the example tasks demonstrate concurrent execution with threads. The entity resolution process involves IO operations, the use of concurrent processes and threads when calling the Senzing APIs provides scalability and performance.
 
 ### Scalability
 
@@ -212,19 +166,19 @@ To run the same example again and see representative performance, first [purge] 
 
 ### Input Load File Sizes
 
-There are different sized load files within the [Data] path that can be used to decrease or increase the volume of data loaded depending on the specification of your hardware. The files are named loadx.json, where the x specifies the number of records in the file.
+There are different sized load files within the [data] path that can be used to increase the volume of data loaded depending on the specification of your hardware. Note, Senzing V4 comes with a default license that allows up to 500 source records to be loaded, without a larger license you will not be able to load these larger files.
 
 [code-snippets-v3]: https://github.com/Senzing/code-snippets-v3
 [Configuration]: #configuration
-[Data]: Resources/Data/
+[data]: resources/data/
 [Docker Usage]: #docker-usage
-[G2ModuleIniToJson.py]: Python/Tasks/Initialization/
+[g2_module_ini_to_json.py]: python/initialization/g2_module_ini_to_json.py
 [Input Load File Sizes]: #input-load-file-sizes
 [Items of Note]: #items-of-note
 [jc]: https://github.com/kellyjonbrazil/jc
 [Legend]: #legend
 [Parallel Processing]: #parallel-processing
-[purge]: Python/Tasks/Initialization/PurgeRepository.py
+[purge]: python/initialization/purge_repository.py
 [Purging Senzing Repository Between Examples]: #purging-senzing-repository-between-examples
 [Quickstart Guide]: https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide
 [Quickstart Roadmap]: https://senzing.zendesk.com/hc/en-us/articles/115001579954-API-Quickstart-Roadmap

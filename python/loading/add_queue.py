@@ -78,7 +78,7 @@ try:
     sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
 
-    input_queue = Queue(maxsize=200)
+    input_queue = Queue(maxsize=200)  # type: ignore
     producer_proc = Process(target=producer, args=(INPUT_FILE, input_queue))
     producer_proc.start()
     consumer_proc = Process(target=consumer, args=(sz_engine, input_queue))
