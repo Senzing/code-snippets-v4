@@ -168,9 +168,9 @@ docker run \
 
 ## Items of Note
 
-### With Info
+### SZ_WITH_INFO flag
 
-A feature of Senzing is the capability to pass changes from data manipulation API calls to downstream systems for analysis, consolidation and replication. Any API that can change the outcome of entity resolution have a "WithInfo" version of the API. For example, addRecord and addRecordWithInfo. The "WithInfo" version of the API returns a response message detailing any entities that were affected by the API. In the following example (from addRecordWithInfo) a single entity with the ID 7903 was affected.
+A feature of Senzing is the capability to pass changes from data manipulation SDK calls to downstream systems for analysis, consolidation and replication. SDK methods `add_record()`, `delete_record()` and `process_redo_record()` accept a `flags=` argument that when set to SzEngineFlags.SZ_WITH_INFO will return a response message detailing any entities affected by the method. In the following example (from `add_record("TEST", "10945", flags=SzEngineFlags.SZ_WITH_INFO)` a single entity with the ID 7903 was affected.
 
 ```json
 {
