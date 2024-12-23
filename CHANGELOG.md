@@ -5,11 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
-## [1.0.0] - 2024-11-28
+### Added to 0.0.1
 
-### Added to 1.0.0
-
-- Initial
+- Initial for V4
 
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [markdownlint]: https://dlaa.me/markdownlint/
