@@ -1,8 +1,9 @@
 [pylint]
 disable=
     line-too-long,
-good-names=
-    code-snippets-v4
+    missing-function-docstring,
+    missing-module-docstring,
+    protected-access
 ignore=
     __init__.py,
 notes=
