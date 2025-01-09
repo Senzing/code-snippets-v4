@@ -5,7 +5,8 @@ import os
 import sys
 from pathlib import Path
 
-from senzing_core import SzAbstractFactory, SzEngineFlags, SzError
+from senzing import SzEngineFlags, SzError
+from senzing_core import SzAbstractFactory
 
 ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
@@ -18,7 +19,7 @@ Before proceeding, all instances of Senzing (custom code, tools, etc.) must be s
 
 *****************************************************************************************
 
-Are you sure you want to continue and purge the Senzing datastore? (y/n) """
+Are you sure you want to continue and purge the Senzing datastore? Type YESPURGESENZING to purge: """
 
 RECORDS = [
     {
@@ -46,7 +47,7 @@ RECORDS = [
     },
 ]
 
-if input(PURGE_MSG) not in ["y", "Y", "yes", "YES"]:
+if input(PURGE_MSG) != "YESPURGESENZING":
     sys.exit()
 
 try:
@@ -72,7 +73,7 @@ try:
         get_json = json.loads(response1)
         print(f"Record {record_id} currently resolves to entity" f" {get_json['RESOLVED_ENTITY']['ENTITY_ID']}")
 
-    print("\nUpdating records with TRUSTED_ID to force unmerge...\n")
+    print("\nUpdating records with TRUSTED_ID to force unresolve...\n")
     record1 = sz_engine.get_record("TEST", "4")
     record2 = sz_engine.get_record("TEST", "6")
     get1_json = json.loads(record1)

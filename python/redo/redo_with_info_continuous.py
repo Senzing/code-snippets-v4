@@ -1,22 +1,28 @@
 #! /usr/bin/env python3
 
 import os
+import signal
 import sys
 import time
 from pathlib import Path
 
-from senzing_core import (
-    SzAbstractFactory,
+from senzing import (
     SzBadInputError,
     SzEngineFlags,
     SzError,
     SzRetryableError,
     SzUnrecoverableError,
 )
+from senzing_core import SzAbstractFactory
 
 ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 OUTPUT_FILE = Path("../../resources/output/redo_with_info_continuous.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
+
+
+def signal_handler(signum, frame):
+    print(f"\nWith info responses written to {OUTPUT_FILE}")
+    sys.exit()
 
 
 def mock_logger(level, error, error_record=None):
@@ -59,6 +65,8 @@ def process_redo(engine, output_file):
             mock_logger("CRITICAL", err, redo_record)
             raise err
 
+
+signal.signal(signal.SIGINT, signal_handler)
 
 try:
     sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)

@@ -4,7 +4,8 @@ import os
 import sys
 from pathlib import Path
 
-from senzing_core import SzAbstractFactory, SzError
+from senzing import SzError
+from senzing_core import SzAbstractFactory
 
 ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
@@ -17,15 +18,15 @@ Before proceeding, all instances of Senzing (custom code, tools, etc.) must be s
 
 *****************************************************************************************
 
-Are you sure you want to continue and purge the Senzing datastore? (y/n) """
+Are you sure you want to continue and purge the Senzing datastore? Type YESPURGESENZING to purge: """
 
-if input(PURGE_MSG) not in ["y", "Y", "yes", "YES"]:
+if input(PURGE_MSG) != "YESPURGESENZING":
     sys.exit()
 
 try:
     sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
     sz_diagnostic = sz_factory.create_diagnostic()
     sz_diagnostic.purge_repository()
-    print("\nSenzing repository purged")
+    print("\nSenzing datastore purged")
 except SzError as err:
     print(f"\n{err.__class__.__name__} - {err}")

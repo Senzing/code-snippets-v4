@@ -7,14 +7,14 @@ import os
 import sys
 from pathlib import Path
 
-from senzing_core import (
-    SzAbstractFactory,
+from senzing import (
     SzBadInputError,
     SzEngineFlags,
     SzError,
     SzRetryableError,
     SzUnrecoverableError,
 )
+from senzing_core import SzAbstractFactory
 
 ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INPUT_FILE = Path("../../resources/data/load-500-with-errors.jsonl").resolve()

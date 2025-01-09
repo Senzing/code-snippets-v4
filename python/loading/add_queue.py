@@ -7,13 +7,8 @@ import sys
 from multiprocessing import Process, Queue
 from pathlib import Path
 
-from senzing_core import (
-    SzAbstractFactory,
-    SzBadInputError,
-    SzError,
-    SzRetryableError,
-    SzUnrecoverableError,
-)
+from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableError
+from senzing_core import SzAbstractFactory
 
 ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INPUT_FILE = Path("../../resources/data/load-500.jsonl").resolve()
