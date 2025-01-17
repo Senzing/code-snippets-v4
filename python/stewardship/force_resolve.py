@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from senzing import SzEngineFlags, SzError
-from senzing_core import SzAbstractFactory
+from senzing_core import SzAbstractFactoryCore
 
 ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
@@ -52,7 +52,7 @@ if input(PURGE_MSG) != "YESPURGESENZING":
     sys.exit()
 
 try:
-    sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
     sz_diagnostic = sz_factory.create_diagnostic()
     sz_engine = sz_factory.create_engine()
     sz_diagnostic.purge_repository()

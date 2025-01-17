@@ -14,7 +14,7 @@ from senzing import (
     SzRetryableError,
     SzUnrecoverableError,
 )
-from senzing_core import SzAbstractFactory
+from senzing_core import SzAbstractFactoryCore
 
 ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INPUT_FILE = Path("../../resources/data/load-500-with-errors.jsonl").resolve()
@@ -92,7 +92,7 @@ def futures_add(engine, input_file, output_file):
 
 
 try:
-    sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
     futures_add(sz_engine, INPUT_FILE, OUTPUT_FILE)
 except SzError as err:
