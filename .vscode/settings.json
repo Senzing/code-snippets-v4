@@ -23,4 +23,10 @@
         "/home/ant/Work/Senzing/git/sz-sdk-python/src/senzing"
     ],
     "pylint.importStrategy": "useBundled",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.sourcePaths": [
+        "."
+    ],
+    "java.project.referencedLibraries": [],
+    "java.format.settings.url": ".vscode/java-formatter.xml",
 }
