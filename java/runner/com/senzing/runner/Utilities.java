@@ -20,7 +20,7 @@ public class Utilities {
      * Constant for the UTF-8 {@link Charset}.
      */
     public static final Charset UTF_8_CHARSET = Charset.forName(UTF_8);
-    
+
     /**
      * Pretty printing {@link JsonWriterFactory}.
      */
@@ -36,8 +36,9 @@ public class Utilities {
      * @return The parsed {@link JsonObject}.
      */
     public static JsonObject parseJsonObject(String jsonText) {
-        if (jsonText == null)
+        if (jsonText == null) {
             return null;
+        }
         StringReader sr = new StringReader(jsonText);
         JsonReader jsonReader = Json.createReader(sr);
         return jsonReader.readObject();

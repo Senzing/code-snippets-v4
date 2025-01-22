@@ -17,8 +17,7 @@ import static com.senzing.sdk.SzFlag.*;
 public class AddRecords {
     public static void main(String[] args) {
         // get the senzing repository settings
-        String settings = (args.length > 0) ? args[0]
-            : System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
+        String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
         if (settings == null) {
             System.err.println("Unable to get settings.");
             throw new IllegalArgumentException("Unable to get settings");
