@@ -42,6 +42,11 @@
   </properties>
   <build>
     <sourceDirectory>snippets</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/runner/resources</directory>
+      </resource>
+    </resources>
     <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
@@ -67,7 +72,7 @@
                   </goals>
                   <configuration>
                       <sources>
-                          <source>runner</source>
+                          <source>${project.basedir}/runner/java</source>
                       </sources>
                   </configuration>
               </execution>

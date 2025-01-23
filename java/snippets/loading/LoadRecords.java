@@ -1,20 +1,16 @@
 package loading;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 
-import com.senzing.sdk.SzEnvironment;
+import com.senzing.sdk.*;
 import com.senzing.sdk.core.SzCoreEnvironment;
-import com.senzing.sdk.SzEngine;
-import com.senzing.sdk.SzException;
-import com.senzing.sdk.SzRecordKey;
 
 import static com.senzing.sdk.SzFlag.*;
 
 /**
  * Provides a simple example of adding records to the Senzing repository.
  */
-public class AddRecords {
+public class LoadRecords {
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -24,7 +20,7 @@ public class AddRecords {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = AddRecords.class.getSimpleName();
+        String instanceName = LoadRecords.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()

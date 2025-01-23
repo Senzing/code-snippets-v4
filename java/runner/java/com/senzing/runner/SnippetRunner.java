@@ -1,7 +1,6 @@
 package com.senzing.runner;
 
 import java.io.*;
-import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
 import java.util.zip.*;
@@ -16,6 +15,8 @@ import static com.senzing.runner.Utilities.*;
  * Helper class to run each of the snippetts.
  */
 public class SnippetRunner {
+    public static final String SOURCES_KEY = "sources";
+
     private static final long ONE_MILLION = 1000000L;
 
     private static final String JAR_PATH = getJarPath();
@@ -125,14 +126,52 @@ public class SnippetRunner {
             for (String snippet : snippets) {
                 System.out.println();
                 long start = System.nanoTime();
+                Properties snippetProperties = new Properties();
+                String resourceName = "/" + snippet.replaceAll("\\.", "/")
+                    + ".properties";
+                InputStream is = SnippetRunner.class.getResourceAsStream(resourceName);
+                if (is != null) {
+                    snippetProperties.load(is);
+                }
+                String sourceList = snippetProperties.getProperty(SOURCES_KEY);
+            
                 System.out.println("Preparing repository for " + snippet + "...");
                 env = SzCoreEnvironment.newBuilder().settings(settings).build();
                 try {
-                    SzConfigManager configMgr = env.getConfigManager();
-                    configMgr.setDefaultConfigId(defaultConfigId);
-
+                    // first purge the repository
                     SzDiagnostic diagnostic = env.getDiagnostic();
                     diagnostic.purgeRepository();
+
+                    // now set the configuration
+                    SzConfigManager configMgr = env.getConfigManager();
+                    // check if we need to configure sources
+                    if (sourceList != null) {
+                        SzConfig    config          = env.getConfig();
+                        long        handle          = config.createConfig();
+                        String      snippetConfig   = null;                        
+                        try {
+                            String[] sources = sourceList.split(",");
+                            for (String source : sources) {
+                                source = source.trim();
+                                System.out.println("Adding data source: " + source);
+                                config.addDataSource(handle, source);
+                            }
+                            snippetConfig = config.exportConfig(handle);
+
+                        } finally {
+                            config.closeConfig(handle);
+                        }
+
+                        // register the config
+                        long configId = configMgr.addConfig(snippetConfig, snippet);
+
+                        // set the default config to the snippet config
+                        configMgr.setDefaultConfigId(configId);
+
+                    } else {
+                        // set the default config to the initial default
+                        configMgr.setDefaultConfigId(defaultConfigId);
+                    }
 
                 } catch (SzException e) {
                     e.printStackTrace();

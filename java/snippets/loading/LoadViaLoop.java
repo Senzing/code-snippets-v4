@@ -10,8 +10,11 @@ import static com.senzing.sdk.SzFlag.*;
 /**
  * Provides a simple example of adding records to the Senzing repository.
  */
-public class AddRecordsLoop {
+public class LoadViaLoop {
     private static final String DEFAULT_FILE_PATH = "../resources/data/load-500.jsonl";
+
+    private static final String UTF_8 = "UTF-8";
+
     private static final String RETRY_PREFIX = "retry-";
     private static final String RETRY_SUFFIX = ".jsonl";
 
@@ -37,7 +40,7 @@ public class AddRecordsLoop {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = AddRecordsLoop.class.getSimpleName();
+        String instanceName = LoadViaLoop.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
@@ -49,7 +52,7 @@ public class AddRecordsLoop {
         String filePath = (args.length > 0) ? args[0] : DEFAULT_FILE_PATH;
 
         try (FileInputStream    fis = new FileInputStream(filePath);
-             InputStreamReader  isr = new InputStreamReader(fis, "UTF-8");
+             InputStreamReader  isr = new InputStreamReader(fis, UTF_8);
              BufferedReader     br  = new BufferedReader(isr)) 
         {
             // get the engine from the environment
@@ -98,7 +101,7 @@ public class AddRecordsLoop {
                     if (retryFile == null) {
                         retryFile = File.createTempFile(RETRY_PREFIX, RETRY_SUFFIX);
                         retryWriter = new PrintWriter(
-                            new OutputStreamWriter(new FileOutputStream(retryFile)));
+                            new OutputStreamWriter(new FileOutputStream(retryFile), UTF_8));
                     }
                     retryWriter.println(line);
 
