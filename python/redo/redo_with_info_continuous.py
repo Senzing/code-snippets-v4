@@ -15,9 +15,9 @@ from senzing import (
 )
 from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
-OUTPUT_FILE = Path("../../resources/output/redo_with_info_continuous.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
+OUTPUT_FILE = Path("../../resources/output/redo_with_info_continuous.jsonl").resolve()
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 def signal_handler(signum, frame):
@@ -69,7 +69,7 @@ def process_redo(engine, output_file):
 signal.signal(signal.SIGINT, signal_handler)
 
 try:
-    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
     process_redo(sz_engine, OUTPUT_FILE)
 except SzError as err:

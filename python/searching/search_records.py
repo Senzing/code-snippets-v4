@@ -8,8 +8,8 @@ from pathlib import Path
 from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableError
 from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 search_records = [
     {
@@ -54,7 +54,7 @@ def searcher(engine):
 
 
 try:
-    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
     searcher(sz_engine)
 except SzError as err:

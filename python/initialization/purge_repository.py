@@ -7,9 +7,7 @@ from pathlib import Path
 from senzing import SzError
 from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
-
 PURGE_MSG = """
 **************************************** WARNING ****************************************
 
@@ -19,12 +17,14 @@ Before proceeding, all instances of Senzing (custom code, tools, etc.) must be s
 *****************************************************************************************
 
 Are you sure you want to continue and purge the Senzing datastore? Type YESPURGESENZING to purge: """
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
+
 
 if input(PURGE_MSG) != "YESPURGESENZING":
     sys.exit()
 
 try:
-    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_diagnostic = sz_factory.create_diagnostic()
     sz_diagnostic.purge_repository()
     print("\nSenzing datastore purged")

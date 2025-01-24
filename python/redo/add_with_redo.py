@@ -8,9 +8,13 @@ from pathlib import Path
 from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableError
 from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
-INPUT_FILE = Path("../../resources/data/load-500.jsonl").resolve()
+INPUT_FILES = [
+    Path("../../resources/data/truthset/customers.jsonl").resolve(),
+    Path("../../resources/data/truthset/reference.jsonl").resolve(),
+    Path("../../resources/data/truthset/watchlist.jsonl").resolve(),
+]
 INSTANCE_NAME = Path(__file__).stem
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 def mock_logger(level, error, error_record=None):
@@ -63,7 +67,7 @@ def process_redo(engine):
             engine.process_redo_record(response)
 
             success_recs += 1
-            if success_recs % 100 == 0:
+            if success_recs % 1 == 0:
                 print(f"Processed {success_recs:,} redo records, with" f" {error_recs:,} errors")
         except SzBadInputError as err:
             mock_logger("ERROR", err)
@@ -79,9 +83,10 @@ def process_redo(engine):
 
 
 try:
-    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
-    add_records_from_file(sz_engine, INPUT_FILE)
+    for load_file in INPUT_FILES:
+        add_records_from_file(sz_engine, load_file)
     redo_count = sz_engine.count_redo_records()
 
     if redo_count:

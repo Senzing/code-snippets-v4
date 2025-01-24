@@ -8,13 +8,13 @@ from pathlib import Path
 from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableError
 from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INPUT_FILES = [
-    Path("../../resources/data/truthset/customers.json").resolve(),
-    Path("../../resources/data/truthset/reference.json").resolve(),
-    Path("../../resources/data/truthset/watchlist.json").resolve(),
+    Path("../../resources/data/truthset/customers.jsonl").resolve(),
+    Path("../../resources/data/truthset/reference.jsonl").resolve(),
+    Path("../../resources/data/truthset/watchlist.jsonl").resolve(),
 ]
 INSTANCE_NAME = Path(__file__).stem
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 def mock_logger(level, error, error_record=None):
@@ -55,7 +55,7 @@ def add_records_from_file(engine, input_file):
 
 
 try:
-    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
     for load_file in INPUT_FILES:
         add_records_from_file(sz_engine, load_file)
