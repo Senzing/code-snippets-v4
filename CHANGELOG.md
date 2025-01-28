@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning].
 
 ### Changed in 0.0.2
 
-- Modify imports to use senzing and senzing_core
+- Modify Python imports to use senzing and senzing_core
+
+### Added to 0.0.1
+
+- Couple of new examples
+
 
 ### Added to 0.0.1
 
