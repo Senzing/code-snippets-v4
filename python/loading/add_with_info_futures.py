@@ -7,19 +7,19 @@ import os
 import sys
 from pathlib import Path
 
-from senzing_core import (
-    SzAbstractFactory,
+from senzing import (
     SzBadInputError,
     SzEngineFlags,
     SzError,
     SzRetryableError,
     SzUnrecoverableError,
 )
+from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INPUT_FILE = Path("../../resources/data/load-500-with-errors.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
 OUTPUT_FILE = Path("../../resources/output/add_file_with_info.jsonl").resolve()
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 def mock_logger(level, error, error_record=None):
@@ -92,7 +92,7 @@ def futures_add(engine, input_file, output_file):
 
 
 try:
-    sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
     futures_add(sz_engine, INPUT_FILE, OUTPUT_FILE)
 except SzError as err:

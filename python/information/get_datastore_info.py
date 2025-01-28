@@ -3,13 +3,14 @@
 import os
 from pathlib import Path
 
-from senzing_core import SzAbstractFactory, SzError
+from senzing import SzError
+from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
 
 try:
-    sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_diagnostic = sz_factory.create_diagnostic()
     print(sz_diagnostic.get_datastore_info())
 except SzError as err:

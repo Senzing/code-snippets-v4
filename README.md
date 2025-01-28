@@ -84,7 +84,7 @@ When using a bare metal install, the initialization parameters used by the Senzi
 - Python one liner
 
   - ```python
-    python3 -c $'import configparser; ini_file_name = "<project_path>/etc/G2Module.ini";engine_config_json = {};cfgp = configparser.ConfigParser();cfgp.optionxform = str;cfgp.read(ini_file_name)\nfor section in cfgp.sections(): engine_config_json[section] = dict(cfgp.items(section))\nprint(engine_config_json)'
+    python3 -c $'import configparser; ini_file_name = "<project_path>/etc/G2Module.ini";settings = {};cfgp = configparser.ConfigParser();cfgp.optionxform = str;cfgp.read(ini_file_name)\nfor section in cfgp.sections(): settings[section] = dict(cfgp.items(section))\nprint(settings)'
     ```
 
 :pencil2: `<project_path>` in the above example should point to your project.

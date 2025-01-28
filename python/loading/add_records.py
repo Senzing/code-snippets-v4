@@ -4,9 +4,9 @@ import json
 import os
 from pathlib import Path
 
-from senzing_core import SzAbstractFactory, SzError
+from senzing import SzError
+from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
 RECORDS = [
     {
@@ -17,13 +17,10 @@ RECORDS = [
         "PRIMARY_NAME_FIRST": "Robert",
         "DATE_OF_BIRTH": "12/11/1978",
         "ADDR_TYPE": "MAILING",
-        "ADDR_LINE1": "123 Main Street, Las Vegas NV 89132",
+        "ADDR_FULL": "123 Main Street, Las Vegas NV 89132",
         "PHONE_TYPE": "HOME",
         "PHONE_NUMBER": "702-919-1300",
         "EMAIL_ADDRESS": "bsmith@work.com",
-        "DATE": "1/2/18",
-        "STATUS": "Active",
-        "AMOUNT": "100",
     },
     {
         "DATA_SOURCE": "TEST",
@@ -39,9 +36,6 @@ RECORDS = [
         "ADDR_POSTAL_CODE": "89111",
         "PHONE_TYPE": "MOBILE",
         "PHONE_NUMBER": "702-919-1300",
-        "DATE": "3/10/17",
-        "STATUS": "Inactive",
-        "AMOUNT": "200",
     },
     {
         "DATA_SOURCE": "TEST",
@@ -52,9 +46,6 @@ RECORDS = [
         "PRIMARY_NAME_MIDDLE": "J",
         "DATE_OF_BIRTH": "12/11/1978",
         "EMAIL_ADDRESS": "bsmith@work.com",
-        "DATE": "4/9/16",
-        "STATUS": "Inactive",
-        "AMOUNT": "300",
     },
     {
         "DATA_SOURCE": "TEST",
@@ -68,9 +59,6 @@ RECORDS = [
         "ADDR_STATE": "NV",
         "ADDR_POSTAL_CODE": "89132",
         "EMAIL_ADDRESS": "bsmith@work.com",
-        "DATE": "1/5/15",
-        "STATUS": "Inactive",
-        "AMOUNT": "400",
     },
     {
         "DATA_SOURCE": "TEST",
@@ -86,14 +74,12 @@ RECORDS = [
         "ADDR_CITY": "Henderson",
         "ADDR_STATE": "NV",
         "ADDR_POSTAL_CODE": "89132",
-        "DATE": "7/16/19",
-        "STATUS": "Active",
-        "AMOUNT": "500",
     },
 ]
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 try:
-    sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
 
     for record in RECORDS:

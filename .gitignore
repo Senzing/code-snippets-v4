@@ -128,3 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .history
+
+# VSCode
+.vscode/
+.history
+
+# Output folder used by examples
+resources/output/

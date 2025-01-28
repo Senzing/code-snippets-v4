@@ -4,14 +4,15 @@ import os
 import sys
 from pathlib import Path
 
-from senzing_core import SzAbstractFactory, SzError
+from senzing import SzError
+from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 try:
-    sz_factory = SzAbstractFactory("add_records", ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore("add_records", SETTINGS, verbose_logging=False)
     sz_config = sz_factory.create_config()
     sz_configmanager = sz_factory.create_configmanager()
 
