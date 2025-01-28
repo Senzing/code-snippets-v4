@@ -1,4 +1,4 @@
-package loading;
+package deleting;
 
 import java.io.*;
 import javax.json.*;
@@ -12,8 +12,8 @@ import static com.senzing.sdk.SzFlag.*;
 /**
  * Provides a simple example of adding records to the Senzing repository.
  */
-public class LoadViaFutures {
-    private static final String DEFAULT_FILE_PATH = "../resources/data/load-500.jsonl";
+public class DeleteWithInfoViaFutures {
+    private static final String DEFAULT_FILE_PATH = "../resources/data/del-500.jsonl";
 
     private static final String UTF_8 = "UTF-8";
 
@@ -28,8 +28,10 @@ public class LoadViaFutures {
 
     private static final long PAUSE_TIMEOUT = 100L;
 
-    private static final String DATA_SOURCE = "DATA_SOURCE";
-    private static final String RECORD_ID   = "RECORD_ID";
+    private static final String DATA_SOURCE         = "DATA_SOURCE";
+    private static final String RECORD_ID           = "RECORD_ID";
+    private static final String AFFECTED_ENTITIES   = "AFFECTED_ENTITIES";
+    private static final String ENTITY_ID           = "ENTITY_ID";
 
     private static final String ERROR       = "ERROR";
     private static final String WARNING     = "WARNING";
@@ -42,6 +44,7 @@ public class LoadViaFutures {
     private static int         retryCount      = 0;
     private static File        retryFile       = null;
     private static PrintWriter retryWriter     = null;
+    private static final Set<Long> entityIdSet = new HashSet<>();
 
     public static void main(String[] args) {
         // get the senzing repository settings
@@ -52,7 +55,7 @@ public class LoadViaFutures {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = LoadViaFutures.class.getSimpleName();
+        String instanceName = DeleteWithInfoViaFutures.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
@@ -67,7 +70,7 @@ public class LoadViaFutures {
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
 
         // keep track of pending futures and don't backlog too many for memory's sake
-        Map<Future<?>, Record> pendingFutures = new IdentityHashMap<>();
+        Map<Future<String>, Record> pendingFutures = new IdentityHashMap<>();
 
         try (FileInputStream    fis = new FileInputStream(filePath);
              InputStreamReader  isr = new InputStreamReader(fis, UTF_8);
@@ -115,15 +118,12 @@ public class LoadViaFutures {
                         String      recordId        = recordJson.getString(RECORD_ID, null);
                         SzRecordKey recordKey       = SzRecordKey.of(dataSourceCode, recordId);
 
-                        Future<?> future = executor.submit(() -> {
+                        Future<String> future = executor.submit(() -> {
                             // call the addRecord() function with no flags
-                            engine.addRecord(recordKey, record.line, SZ_NO_FLAGS);
-                            
-                            // return null since we have no "info" to return
-                            return null;
+                            return engine.deleteRecord(recordKey, SZ_WITH_INFO_FLAGS);
                         });
 
-                        // add the future to the pending future list
+                        // add the futures to the pending future list
                         pendingFutures.put(future, record);
 
                     } catch (JsonException e) {
@@ -134,7 +134,7 @@ public class LoadViaFutures {
 
                 do {
                     // handle any pending futures WITHOUT blocking to reduce the backlog
-                    handlePendingFutures(pendingFutures, false);
+                    handlePendingFutures(engine, pendingFutures, false);
 
                     // if we still have exceeded the backlog size then pause
                     // briefly before trying again
@@ -154,7 +154,7 @@ public class LoadViaFutures {
 
             // after we have submitted all records we need to handle the remaining
             // pending futures so this time we block on each future
-            handlePendingFutures(pendingFutures, true);
+            handlePendingFutures(engine, pendingFutures, true);
 
         } catch (Exception e) {
             System.err.println();
@@ -175,8 +175,9 @@ public class LoadViaFutures {
             env.destroy();
 
             System.out.println();
-            System.out.println("Records successfully added : " + successCount);
-            System.out.println("Records failed with errors : " + errorCount);
+            System.out.println("Successful delete operations : " + successCount);
+            System.out.println("Total entities deleted       : " + entityIdSet.size());
+            System.out.println("Failed delete operations     : " + errorCount);
 
             // check on any retry records
             if (retryWriter != null) {
@@ -184,7 +185,7 @@ public class LoadViaFutures {
                 retryWriter.close();
             }
             if (retryCount > 0) {
-                System.out.println(retryCount + " records to be retried in " + retryFile);
+                System.out.println(retryCount + " deletions to be retried in " + retryFile);
             }
             System.out.flush();
 
@@ -192,19 +193,21 @@ public class LoadViaFutures {
 
     }
 
-    private static void handlePendingFutures(Map<Future<?>, Record> pendingFutures, boolean blocking)
+    private static void handlePendingFutures(SzEngine                       engine,
+                                             Map<Future<String>, Record>    pendingFutures,
+                                             boolean                        blocking)
         throws Exception
     {
         // check for completed futures
-        Iterator<Map.Entry<Future<?>,Record>> iter
+        Iterator<Map.Entry<Future<String>,Record>> iter
         = pendingFutures.entrySet().iterator();
         
         // loop through the pending futures
         while (iter.hasNext()) {
             // get the next pending future
-            Map.Entry<Future<?>,Record> entry = iter.next();
-            Future<?> future  = entry.getKey();
-            Record              record  = entry.getValue();
+            Map.Entry<Future<String>,Record> entry = iter.next();
+            Future<String>  future  = entry.getKey();
+            Record          record  = entry.getValue();
             
             // if not blocking and this one is not done then continue
             if (!blocking && !future.isDone()) continue;
@@ -215,10 +218,13 @@ public class LoadViaFutures {
             try {
                 try {
                     // get the value to see if there was an exception
-                    future.get();
+                    String info = future.get();
 
                     // if we get here then increment the success count
                     successCount++;
+
+                    // process the info
+                    processInfo(engine, info);
 
                 } catch (InterruptedException e) {
                     // this could only happen if blocking is true, just
@@ -264,6 +270,38 @@ public class LoadViaFutures {
     }
 
     /**
+     * Example method for parsing and handling the INFO message (formatted
+     * as JSON).  This example implementation simply tracks all entity ID's
+     * that appear as <code>"AFFECTED_ENTITIES"<code> to count the number
+     * of entities created for the records -- essentially a contrived
+     * data mart.
+     * 
+     * @param info The info message.
+     */
+    private static void processInfo(SzEngine engine, String info) {
+        JsonObject jsonObject = Json.createReader(new StringReader(info)).readObject();
+        if (!jsonObject.containsKey(AFFECTED_ENTITIES)) return;
+        JsonArray affectedArr = jsonObject.getJsonArray(AFFECTED_ENTITIES);
+        for (JsonObject affected : affectedArr.getValuesAs(JsonObject.class)) {
+            JsonNumber number = affected.getJsonNumber(ENTITY_ID);
+            long entityId = number.longValue();
+
+            try {
+                engine.getEntity(entityId, null);
+                entityIdSet.remove(entityId);
+            } catch (SzNotFoundException e) {
+                entityIdSet.add(entityId);
+            } catch (SzException e) {
+                // simply log the exception, do not rethrow
+                System.err.println();
+                System.err.println("**** FAILED TO RETRIEVE ENTITY: " + entityId);
+                System.err.println(e.toString());
+                System.err.flush();
+            }
+        }
+    }
+
+    /**
      * Example method for logging failed records.
      * 
      * @param errorType The error type description.
@@ -278,7 +316,7 @@ public class LoadViaFutures {
     {
         System.err.println();
         System.err.println(
-            "** " + errorType + " ** FAILED TO ADD RECORD AT LINE " + lineNumber + ": ");
+            "** " + errorType + " ** FAILED TO DELETE RECORD AT LINE " + lineNumber + ": ");
         System.err.println(recordJson);
         System.err.println(exception);
         System.err.flush();

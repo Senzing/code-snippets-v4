@@ -1,4 +1,4 @@
-package loading;
+package searching;
 
 import java.io.*;
 import javax.json.*;
@@ -12,8 +12,8 @@ import static com.senzing.sdk.SzFlag.*;
 /**
  * Provides a simple example of adding records to the Senzing repository.
  */
-public class LoadViaFutures {
-    private static final String DEFAULT_FILE_PATH = "../resources/data/load-500.jsonl";
+public class SearchViaFutures {
+    private static final String DEFAULT_FILE_PATH = "../resources/data/search-5K.jsonl";
 
     private static final String UTF_8 = "UTF-8";
 
@@ -35,13 +35,15 @@ public class LoadViaFutures {
     private static final String WARNING     = "WARNING";
     private static final String CRITICAL    = "CRITICAL";
     
-    public record Record(int lineNumber, String line) { }
+    public record Criteria(int lineNumber, String line) { }
 
     private static int         errorCount      = 0;
     private static int         successCount    = 0;
     private static int         retryCount      = 0;
     private static File        retryFile       = null;
     private static PrintWriter retryWriter     = null;
+
+    private static Set<Long> foundEntities = new HashSet<>();
 
     public static void main(String[] args) {
         // get the senzing repository settings
@@ -52,7 +54,7 @@ public class LoadViaFutures {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = LoadViaFutures.class.getSimpleName();
+        String instanceName = SearchViaFutures.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
@@ -67,7 +69,7 @@ public class LoadViaFutures {
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
 
         // keep track of pending futures and don't backlog too many for memory's sake
-        Map<Future<?>, Record> pendingFutures = new IdentityHashMap<>();
+        Map<Future<String>, Criteria> pendingFutures = new IdentityHashMap<>();
 
         try (FileInputStream    fis = new FileInputStream(filePath);
              InputStreamReader  isr = new InputStreamReader(fis, UTF_8);
@@ -103,31 +105,20 @@ public class LoadViaFutures {
                     if (line.startsWith("#")) continue;
 
                     // construct the Record instance
-                    Record record = new Record(lineNumber, line);
+                    Criteria criteria = new Criteria(lineNumber, line);
 
                     try {
-                        // parse the line as a JSON object
-                        JsonObject recordJson 
-                            = Json.createReader(new StringReader(line)).readObject();            
-                    
-                        // extract the data source code and record ID
-                        String      dataSourceCode  = recordJson.getString(DATA_SOURCE, null);
-                        String      recordId        = recordJson.getString(RECORD_ID, null);
-                        SzRecordKey recordKey       = SzRecordKey.of(dataSourceCode, recordId);
-
-                        Future<?> future = executor.submit(() -> {
-                            // call the addRecord() function with no flags
-                            engine.addRecord(recordKey, record.line, SZ_NO_FLAGS);
-                            
-                            // return null since we have no "info" to return
-                            return null;
+                        Future<String> future = executor.submit(() -> {
+                            // call the searchByAttributes() function with default flags
+                            return engine.searchByAttributes(
+                                criteria.line, SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS);
                         });
 
                         // add the future to the pending future list
-                        pendingFutures.put(future, record);
+                        pendingFutures.put(future, criteria);
 
                     } catch (JsonException e) {
-                        logFailedRecord(ERROR, e, lineNumber, line);
+                        logFailedSearch(ERROR, e, lineNumber, line);
                         errorCount++;   // increment the error count          
                     }
                 }
@@ -175,8 +166,12 @@ public class LoadViaFutures {
             env.destroy();
 
             System.out.println();
-            System.out.println("Records successfully added : " + successCount);
-            System.out.println("Records failed with errors : " + errorCount);
+            System.out.println(
+                "Searches successfully completed   : " + successCount);
+            System.out.println(
+                "Total entities found via searches : " + foundEntities.size());
+            System.out.println(
+                "Searches failed with errors       : " + errorCount);
 
             // check on any retry records
             if (retryWriter != null) {
@@ -192,19 +187,20 @@ public class LoadViaFutures {
 
     }
 
-    private static void handlePendingFutures(Map<Future<?>, Record> pendingFutures, boolean blocking)
+    private static void handlePendingFutures(Map<Future<String>, Criteria>  pendingFutures,
+                                             boolean                        blocking)
         throws Exception
     {
         // check for completed futures
-        Iterator<Map.Entry<Future<?>,Record>> iter
-        = pendingFutures.entrySet().iterator();
+        Iterator<Map.Entry<Future<String>,Criteria>> iter
+            = pendingFutures.entrySet().iterator();
         
         // loop through the pending futures
         while (iter.hasNext()) {
             // get the next pending future
-            Map.Entry<Future<?>,Record> entry = iter.next();
-            Future<?> future  = entry.getKey();
-            Record              record  = entry.getValue();
+            Map.Entry<Future<String>,Criteria> entry = iter.next();
+            Future<String>  future      = entry.getKey();
+            Criteria        criteria    = entry.getValue();
             
             // if not blocking and this one is not done then continue
             if (!blocking && !future.isDone()) continue;
@@ -214,11 +210,24 @@ public class LoadViaFutures {
 
             try {
                 try {
-                    // get the value to see if there was an exception
-                    future.get();
+                    // get the value and check for an exception
+                    String results = future.get();
 
                     // if we get here then increment the success count
                     successCount++;
+
+                    // parse the results
+                    JsonObject jsonObj = Json.createReader(
+                        new StringReader(results)).readObject();
+                    
+                    JsonArray jsonArr = jsonObj.getJsonArray("RESOLVED_ENTITIES");
+                    for (JsonObject obj : jsonArr.getValuesAs(JsonObject.class)) {
+                        obj = obj.getJsonObject("ENTITY");
+                        obj = obj.getJsonObject("RESOLVED_ENTITY");
+                        long entityId = obj.getJsonNumber("ENTITY_ID").longValue();
+                        foundEntities.add(entityId);
+                    }
+    
 
                 } catch (InterruptedException e) {
                     // this could only happen if blocking is true, just
@@ -237,12 +246,12 @@ public class LoadViaFutures {
                 }
 
             } catch (SzBadInputException e) {
-                logFailedRecord(ERROR, e, record.lineNumber, record.line);
+                logFailedSearch(ERROR, e, criteria.lineNumber, criteria.line);
                 errorCount++;   // increment the error count
 
             } catch (SzRetryableException|InterruptedException|CancellationException e) {
                 // handle thread interruption and cancellation as retries
-                logFailedRecord(WARNING, e, record.lineNumber, record.line);
+                logFailedSearch(WARNING, e, criteria.lineNumber, criteria.line);
                 errorCount++;   // increment the error count
                 retryCount++;   // increment the retry count
 
@@ -252,11 +261,11 @@ public class LoadViaFutures {
                     retryWriter = new PrintWriter(
                         new OutputStreamWriter(new FileOutputStream(retryFile), UTF_8));
                 }
-                retryWriter.println(record.line);
+                retryWriter.println(criteria.line);
 
             } catch (Exception e) {
                 // catch any other exception (incl. SzException) here
-                logFailedRecord(CRITICAL, e, record.lineNumber, record.line);
+                logFailedSearch(CRITICAL, e, criteria.lineNumber, criteria.line);
                 errorCount++;
                 throw e; // rethrow since exception is critical
             }
@@ -269,17 +278,17 @@ public class LoadViaFutures {
      * @param errorType The error type description.
      * @param exception The exception itself.
      * @param lineNumber The line number of the failed record in the JSON input file.
-     * @param recordJson The JSON text for the failed record.
+     * @param criteriaJson The JSON text for the failed search criteria.
      */
-    private static void logFailedRecord(String      errorType,
+    private static void logFailedSearch(String      errorType,
                                         Exception   exception, 
                                         int         lineNumber, 
-                                        String      recordJson) 
+                                        String      criteriaJson) 
     {
         System.err.println();
         System.err.println(
-            "** " + errorType + " ** FAILED TO ADD RECORD AT LINE " + lineNumber + ": ");
-        System.err.println(recordJson);
+            "** " + errorType + " ** FAILED TO SEARCH CRITERIA AT LINE " + lineNumber + ": ");
+        System.err.println(criteriaJson);
         System.err.println(exception);
         System.err.flush();
     }

@@ -3,6 +3,7 @@ package com.senzing.runner;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.*;
 import javax.json.*;
 
@@ -10,16 +11,29 @@ import com.senzing.sdk.*;
 import com.senzing.sdk.core.*;
 
 import static com.senzing.runner.Utilities.*;
+import static com.senzing.sdk.SzFlag.SZ_NO_FLAGS;
 
 /**
  * Helper class to run each of the snippetts.
  */
 public class SnippetRunner {
-    public static final String SOURCES_KEY = "sources";
+    public static final String SOURCE_KEY_PREFIX = "source.";
+
+    public static final String LOAD_KEY_PREFIX = "load.";
+
+    public static final String INPUT_KEY_PREFIX = "input.";
+
+    public static final String DESTROY_AFTER_KEY = "destroyAfter";
+
+    private static final String DATA_SOURCE = "DATA_SOURCE";
+    private static final String RECORD_ID = "RECORD_ID";
+    private static final String TEST_SOURCE = "TEST";
 
     private static final long ONE_MILLION = 1000000L;
 
     private static final String JAR_PATH = getJarPath();
+
+    private static final int SIGTERM_EXIT_CODE = 143;
 
     /**
      * Harness for running one or more of the code snippets.
@@ -126,14 +140,14 @@ public class SnippetRunner {
             for (String snippet : snippets) {
                 System.out.println();
                 long start = System.nanoTime();
-                Properties snippetProperties = new Properties();
+                Properties properties = new Properties();
                 String resourceName = "/" + snippet.replaceAll("\\.", "/")
                     + ".properties";
-                InputStream is = SnippetRunner.class.getResourceAsStream(resourceName);
-                if (is != null) {
-                    snippetProperties.load(is);
+                try (InputStream is = SnippetRunner.class.getResourceAsStream(resourceName)) {
+                    if (is != null) {
+                        properties.load(is);
+                    }
                 }
-                String sourceList = snippetProperties.getProperty(SOURCES_KEY);
             
                 System.out.println("Preparing repository for " + snippet + "...");
                 env = SzCoreEnvironment.newBuilder().settings(settings).build();
@@ -145,13 +159,17 @@ public class SnippetRunner {
                     // now set the configuration
                     SzConfigManager configMgr = env.getConfigManager();
                     // check if we need to configure sources
-                    if (sourceList != null) {
+                    if (properties.containsKey(SOURCE_KEY_PREFIX + 0)) {
                         SzConfig    config          = env.getConfig();
                         long        handle          = config.createConfig();
                         String      snippetConfig   = null;                        
                         try {
-                            String[] sources = sourceList.split(",");
-                            for (String source : sources) {
+                            for (int index = 0; 
+                                 properties.containsKey(SOURCE_KEY_PREFIX + index);
+                                 index++) 
+                            {
+                                String sourceKey = SOURCE_KEY_PREFIX + index;
+                                String source = properties.getProperty(sourceKey);
                                 source = source.trim();
                                 System.out.println("Adding data source: " + source);
                                 config.addDataSource(handle, source);
@@ -173,6 +191,38 @@ public class SnippetRunner {
                         configMgr.setDefaultConfigId(defaultConfigId);
                     }
 
+                    // check if there are files we need to load
+                    if (properties.containsKey(LOAD_KEY_PREFIX + 0)) {
+                        SzEngine engine = env.getEngine();
+                        for (int index = 0; properties.containsKey(LOAD_KEY_PREFIX + index); index++) 
+                        {
+                            String loadKey = LOAD_KEY_PREFIX + index;
+                            String fileName = properties.getProperty(loadKey);
+                            fileName = fileName.trim();
+                            System.out.println("Loading records from file resource: " + fileName);
+                            try (InputStream is = SnippetRunner.class.getResourceAsStream(fileName)) 
+                            {
+                                if (is == null) {
+                                    throw new IllegalArgumentException(
+                                        "Missing resource (" + fileName + ") for load file ("
+                                        + loadKey + ") for snippet (" + snippet + ")");
+                                }
+                                InputStreamReader isr = new InputStreamReader(is, UTF_8);
+                                BufferedReader br = new BufferedReader(isr);
+                                for (String line = br.readLine(); line != null; line = br.readLine()) {
+                                    line = line.trim();
+                                    if (line.length() == 0) continue;
+                                    if (line.startsWith("#")) continue;
+                                    JsonObject record = Json.createReader(new StringReader(line)).readObject();
+                                    String dataSource = record.getString(DATA_SOURCE, TEST_SOURCE);
+                                    String recordId = record.getString(RECORD_ID, null);
+                                    SzRecordKey recordKey = SzRecordKey.of(dataSource, recordId);
+                                    engine.addRecord(recordKey, line, SZ_NO_FLAGS);
+                                }
+                            }
+                        }
+                    }                    
+
                 } catch (SzException e) {
                     e.printStackTrace();
                 } finally {
@@ -181,7 +231,7 @@ public class SnippetRunner {
                 long duration = (System.nanoTime() - start) / ONE_MILLION;
                 System.out.println("Prepared repository for " + snippet + ". (" + duration + "ms)");
 
-                executeSnippet(snippet, installLocations, settings);
+                executeSnippet(snippet, installLocations, settings, properties);
             }
             System.out.println();
 
@@ -219,8 +269,12 @@ public class SnippetRunner {
         return thread;
     }
 
-    private static void executeSnippet(String snippet, InstallLocations senzingInstall, String settings)
-            throws Exception {
+    private static void executeSnippet(String           snippet, 
+                                       InstallLocations senzingInstall,
+                                       String           settings,
+                                       Properties       properties)
+            throws Exception 
+    {
         String[] cmdArray = new String[] { "java", "-cp", JAR_PATH, snippet };
 
         String[] runtimeEnv = createRuntimeEnv(senzingInstall, settings);
@@ -228,14 +282,58 @@ public class SnippetRunner {
         System.out.println();
         System.out.println("Executing " + snippet + "...");
         long start = System.nanoTime();
-        Process process = Runtime.getRuntime().exec(cmdArray, runtimeEnv);
+        Runtime runtime = Runtime.getRuntime();
+        Process process = runtime.exec(cmdArray, runtimeEnv);
         Thread errThread = startOutputThread(process.getErrorStream(), System.err);
         Thread outThread = startOutputThread(process.getInputStream(), System.out);
-        int exitValue = process.waitFor();
+        if (properties != null && properties.containsKey(INPUT_KEY_PREFIX + 0)) {
+            try {
+                // sleep for 1 second to give the process a chance to start up
+                Thread.sleep(1000L);
+            } catch (InterruptedException ignore) {
+                // ignore interruptions
+            }
+            PrintWriter pw = new PrintWriter(
+                new OutputStreamWriter(process.getOutputStream(), UTF_8));
+            for (int index = 0;
+                 properties.containsKey(INPUT_KEY_PREFIX + index);
+                 index++) 
+            {
+                String inputLine = properties.getProperty(INPUT_KEY_PREFIX + index);
+                System.out.println(inputLine);
+                System.out.flush();
+                inputLine = (inputLine == null) ? "" : inputLine.trim();
+                pw.println(inputLine);
+                pw.flush();
+            }
+        }
+        int exitValue = 0;
+        int expectedExitValue = 0;
+        if (properties.containsKey(DESTROY_AFTER_KEY)) {
+            String propValue = properties.getProperty(DESTROY_AFTER_KEY);
+            long delay = Long.parseLong(propValue);
+            boolean exited = process.waitFor(delay, TimeUnit.MILLISECONDS);
+            if (!exited && process.isAlive()) {
+                expectedExitValue = SIGTERM_EXIT_CODE;
+                System.out.println();
+                System.out.println("Runner destroying " + snippet + " process...");
+                // NOTE: using process.destroy() does not trigger the registered
+                // shutdown hooks in the snippet sub-process for some reason
+                Process killer = runtime.exec("kill " + process.pid());
+                killer.waitFor();  // wait for the kill process to complete
+            }
+            exitValue = process.waitFor();
+
+        } else {
+            // wait indefinitely for the process to terminate
+            exitValue = process.waitFor();
+        }
+
         errThread.join();
         outThread.join();
-        if (exitValue != 0) {
-            throw new Exception("Failed to execute snippet; " + snippet);
+        if (exitValue != expectedExitValue) {
+            throw new Exception("Failed to execute snippet; " + snippet 
+                                + " (" + exitValue + ")");
         }
         long duration = (System.nanoTime() - start) / ONE_MILLION;
         System.out.println("Executed " + snippet + ". (" + duration + "ms)");

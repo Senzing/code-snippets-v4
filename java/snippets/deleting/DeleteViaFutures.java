@@ -1,4 +1,4 @@
-package loading;
+package deleting;
 
 import java.io.*;
 import javax.json.*;
@@ -12,8 +12,8 @@ import static com.senzing.sdk.SzFlag.*;
 /**
  * Provides a simple example of adding records to the Senzing repository.
  */
-public class LoadViaFutures {
-    private static final String DEFAULT_FILE_PATH = "../resources/data/load-500.jsonl";
+public class DeleteViaFutures {
+    private static final String DEFAULT_FILE_PATH = "../resources/data/del-500.jsonl";
 
     private static final String UTF_8 = "UTF-8";
 
@@ -52,7 +52,7 @@ public class LoadViaFutures {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = LoadViaFutures.class.getSimpleName();
+        String instanceName = DeleteViaFutures.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
@@ -117,13 +117,12 @@ public class LoadViaFutures {
 
                         Future<?> future = executor.submit(() -> {
                             // call the addRecord() function with no flags
-                            engine.addRecord(recordKey, record.line, SZ_NO_FLAGS);
+                            engine.deleteRecord(recordKey, SZ_NO_FLAGS);
                             
-                            // return null since we have no "info" to return
                             return null;
                         });
 
-                        // add the future to the pending future list
+                        // add the futures to the pending future list
                         pendingFutures.put(future, record);
 
                     } catch (JsonException e) {
@@ -175,8 +174,8 @@ public class LoadViaFutures {
             env.destroy();
 
             System.out.println();
-            System.out.println("Records successfully added : " + successCount);
-            System.out.println("Records failed with errors : " + errorCount);
+            System.out.println("Successful delete operations : " + successCount);
+            System.out.println("Failed delete operations     : " + errorCount);
 
             // check on any retry records
             if (retryWriter != null) {
@@ -184,7 +183,7 @@ public class LoadViaFutures {
                 retryWriter.close();
             }
             if (retryCount > 0) {
-                System.out.println(retryCount + " records to be retried in " + retryFile);
+                System.out.println(retryCount + " deletions to be retried in " + retryFile);
             }
             System.out.flush();
 
