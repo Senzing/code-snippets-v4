@@ -340,7 +340,7 @@ public class SnippetRunner {
     }
 
     private static void printUsage(SortedMap<String, SortedSet<String>> snippetMap) {
-        System.err.println("java -jar sz-sdk-snippets.jar [ all | <group> | <snippet> ]* ]");
+        System.err.println("java -jar sz-sdk-snippets.jar [ all | <group> | <snippet> ]*");
         System.err.println();
         System.err.println("  - Specifying no arguments will print this message");
         System.err.println("  - Specifying \"all\" will run all snippets");
@@ -351,9 +351,9 @@ public class SnippetRunner {
         System.err.println();
         System.err.println("  java -jar sz-sdk-snippets.jar all");
         System.err.println();
-        System.err.println("  java -jar sz-sdk-snippets.jar loading.AddRecords loading.AddFutures");
+        System.err.println("  java -jar sz-sdk-snippets.jar loading.LoadRecords loading.LoadViaFutures");
         System.err.println();
-        System.err.println("  java -jar sz-sdk-snippets.jar initialization deleting loading.AddRecords");
+        System.err.println("  java -jar sz-sdk-snippets.jar initialization deleting loading.LoadRecords");
         System.err.println();
         System.err.println("Snippet Group Names:");
         snippetMap.keySet().forEach(group -> {

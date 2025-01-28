@@ -61,7 +61,7 @@ public class ForceResolve {
                     "Record " + recordKey + " originally resolves to entity " + entityId);
             }
             System.out.println();
-            System.out.println("Updating records with TRUSTED_ID_NUMBER to force resolve...");
+            System.out.println("Updating records with TRUSTED_ID to force resolve...");
             SzRecordKey key1 = SzRecordKey.of(TEST, "1");
             SzRecordKey key3 = SzRecordKey.of(TEST, "3");
             

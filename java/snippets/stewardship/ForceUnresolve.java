@@ -61,7 +61,7 @@ public class ForceUnresolve {
                     "Record " + recordKey + " originally resolves to entity " + entityId);
             }
             System.out.println();
-            System.out.println("Updating records with TRUSTED_ID_NUMBER to force unresolve...");
+            System.out.println("Updating records with TRUSTED_ID to force unresolve...");
             SzRecordKey key4 = SzRecordKey.of(TEST, "4");
             SzRecordKey key6 = SzRecordKey.of(TEST, "6");
             
