@@ -129,6 +129,9 @@ dmypy.json
 .pyre/
 .history
 
-# VS Code
+# VSCode
 .vscode/
+.history
 
+# Output folder used by examples
+resources/output/

@@ -2,6 +2,8 @@
 
 ## Snippets
 
+- **abstract_factory_parameters.py**
+  - Used to create a dictionary that can be unpacked when creating an SzAbstractFactoryCore, also useful for type annotations
 - **engine_priming.py**
   - Priming the Senzing engine before use loads resource intensive assets upfront. Without priming the first SDK call to the engine will appear slower than usual as it causes these assets to be loaded
 - **factory_and_engines.py**

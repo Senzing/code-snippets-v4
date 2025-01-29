@@ -7,17 +7,12 @@ import sys
 from multiprocessing import Process, Queue
 from pathlib import Path
 
-from senzing_core import (
-    SzAbstractFactory,
-    SzBadInputError,
-    SzError,
-    SzRetryableError,
-    SzUnrecoverableError,
-)
+from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableError
+from senzing_core import SzAbstractFactoryCore
 
-ENGINE_CONFIG_JSON = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INPUT_FILE = Path("../../resources/data/load-500.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 def mock_logger(level, error, error_record=None):
@@ -75,7 +70,7 @@ def consumer(engine, queue):
 
 
 try:
-    sz_factory = SzAbstractFactory(INSTANCE_NAME, ENGINE_CONFIG_JSON, verbose_logging=False)
+    sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
 
     input_queue = Queue(maxsize=200)  # type: ignore
