@@ -10,41 +10,10 @@ import com.senzing.sdk.core.SzCoreEnvironment;
 import static com.senzing.sdk.SzFlag.*;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides a simple example of searching for entities in the Senzing repository
+ * using futures.
  */
 public class SearchViaFutures {
-    private static final String DEFAULT_FILE_PATH = "../resources/data/search-5K.jsonl";
-
-    private static final String UTF_8 = "UTF-8";
-
-    private static final String RETRY_PREFIX = "retry-";
-    private static final String RETRY_SUFFIX = ".jsonl";
-    
-    private static final int THREAD_COUNT = 8;
-
-    private static final int BACKLOG_FACTOR = 10;
-
-    private static final int MAXIMUM_BACKLOG = THREAD_COUNT * BACKLOG_FACTOR;
-
-    private static final long PAUSE_TIMEOUT = 100L;
-
-    private static final String DATA_SOURCE = "DATA_SOURCE";
-    private static final String RECORD_ID   = "RECORD_ID";
-
-    private static final String ERROR       = "ERROR";
-    private static final String WARNING     = "WARNING";
-    private static final String CRITICAL    = "CRITICAL";
-    
-    public record Criteria(int lineNumber, String line) { }
-
-    private static int         errorCount      = 0;
-    private static int         successCount    = 0;
-    private static int         retryCount      = 0;
-    private static File        retryFile       = null;
-    private static PrintWriter retryWriter     = null;
-
-    private static Set<Long> foundEntities = new HashSet<>();
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -179,7 +148,7 @@ public class SearchViaFutures {
                 retryWriter.close();
             }
             if (retryCount > 0) {
-                System.out.println(retryCount + " records to be retried in " + retryFile);
+                System.out.println(retryCount + " searches to be retried in " + retryFile);
             }
             System.out.flush();
 
@@ -293,4 +262,32 @@ public class SearchViaFutures {
         System.err.flush();
     }
 
+    private static final String DEFAULT_FILE_PATH = "../resources/data/search-5K.jsonl";
+
+    private static final String UTF_8 = "UTF-8";
+
+    private static final String RETRY_PREFIX = "retry-";
+    private static final String RETRY_SUFFIX = ".jsonl";
+    
+    private static final int THREAD_COUNT = 8;
+
+    private static final int BACKLOG_FACTOR = 10;
+
+    private static final int MAXIMUM_BACKLOG = THREAD_COUNT * BACKLOG_FACTOR;
+
+    private static final long PAUSE_TIMEOUT = 100L;
+
+    private static final String ERROR       = "ERROR";
+    private static final String WARNING     = "WARNING";
+    private static final String CRITICAL    = "CRITICAL";
+    
+    public record Criteria(int lineNumber, String line) { }
+
+    private static int         errorCount      = 0;
+    private static int         successCount    = 0;
+    private static int         retryCount      = 0;
+    private static File        retryFile       = null;
+    private static PrintWriter retryWriter     = null;
+
+    private static Set<Long> foundEntities = new HashSet<>();
 }

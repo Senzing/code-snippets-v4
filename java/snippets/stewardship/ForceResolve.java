@@ -10,12 +10,10 @@ import com.senzing.sdk.core.SzCoreEnvironment;
 import static com.senzing.sdk.SzFlag.*;
 
 /**
- * Provides a simple example of force-resolving records that
+ * Provides a simple example of forcibly resolving records that
  * otherwise will not resolve to one another.
  */
 public class ForceResolve {
-    private static final String TEST = "TEST";
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -107,6 +105,8 @@ public class ForceResolve {
             throw new RuntimeException(e);
 
         } catch (Exception e) {
+            System.err.println();
+            System.err.println("*** Terminated due to critical error ***");
             e.printStackTrace();
             if (e instanceof RuntimeException) {
                 throw ((RuntimeException) e);
@@ -169,4 +169,6 @@ public class ForceResolve {
        
         return records;
     }
+
+    private static final String TEST = "TEST";
 }

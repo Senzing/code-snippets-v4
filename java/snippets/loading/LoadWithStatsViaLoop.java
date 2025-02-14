@@ -11,29 +11,6 @@ import static com.senzing.sdk.SzFlag.*;
  * Provides a simple example of adding records to the Senzing repository.
  */
 public class LoadWithStatsViaLoop {
-    private static final String DEFAULT_FILE_PATH = "../resources/data/load-500.jsonl";
-
-    private static final String UTF_8 = "UTF-8";
-
-    private static final int STATS_INTERVAL = 100;
-    private static final int STATS_TRUNCATE = 70;
-
-    private static final String RETRY_PREFIX = "retry-";
-    private static final String RETRY_SUFFIX = ".jsonl";
-
-    private static final String DATA_SOURCE = "DATA_SOURCE";
-    private static final String RECORD_ID   = "RECORD_ID";
-
-    private static final String ERROR       = "ERROR";
-    private static final String WARNING     = "WARNING";
-    private static final String CRITICAL    = "CRITICAL";
-
-    private static int         errorCount      = 0;
-    private static int         successCount    = 0;
-    private static int         retryCount      = 0;
-    private static File        retryFile       = null;
-    private static PrintWriter retryWriter     = null;
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -184,4 +161,26 @@ public class LoadWithStatsViaLoop {
         System.err.flush();
     }
 
+    private static final String DEFAULT_FILE_PATH = "../resources/data/load-500.jsonl";
+
+    private static final String UTF_8 = "UTF-8";
+
+    private static final int STATS_INTERVAL = 100;
+    private static final int STATS_TRUNCATE = 70;
+
+    private static final String RETRY_PREFIX = "retry-";
+    private static final String RETRY_SUFFIX = ".jsonl";
+
+    private static final String DATA_SOURCE = "DATA_SOURCE";
+    private static final String RECORD_ID   = "RECORD_ID";
+
+    private static final String ERROR       = "ERROR";
+    private static final String WARNING     = "WARNING";
+    private static final String CRITICAL    = "CRITICAL";
+
+    private static int         errorCount      = 0;
+    private static int         successCount    = 0;
+    private static int         retryCount      = 0;
+    private static File        retryFile       = null;
+    private static PrintWriter retryWriter     = null;
 }

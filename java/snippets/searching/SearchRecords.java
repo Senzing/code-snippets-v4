@@ -10,7 +10,7 @@ import com.senzing.sdk.core.SzCoreEnvironment;
 import static com.senzing.sdk.SzFlag.*;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides a simple example of searching for entities in the Senzing repository.
  */
 public class SearchRecords {
     public static void main(String[] args) {
