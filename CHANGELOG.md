@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
+### Added to 0.0.3
+
+- Java examples
+
 ### Changed in 0.0.2
 
 - Modify Python imports to use senzing and senzing_core
@@ -12,7 +16,6 @@ and this project adheres to [Semantic Versioning].
 ### Added to 0.0.1
 
 - Couple of new examples
-
 
 ### Added to 0.0.1
 
