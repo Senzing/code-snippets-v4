@@ -1,12 +1,18 @@
 # Java Snippets
 
-The Java snippets are contained in the `snippets` directory under various Java package directories.  They can built using the `pom.xml` in this directory using `mvn package`.  The result will be the `sz-sdk-snippets.jar` file ni the `target` directory.
+The Java snippets are contained in the `snippets` directory under various Java package directories.
+
+## Building
+The Java snippets can built using the `pom.xml` in this directory using `mvn package`.  The result will be the `sz-sdk-snippets.jar` file in the `target` directory.
+
+
+## Running
 
 There are several ways to run the code snippets.
 
-## Run Directly
+### Run Directly
 
-You may run any individual Snippet class directly providing you have a Senzing repository to run it with and the `SENZING_ENGINE_CONFIGURATION_JSON` environment variable set for connecting to that repository.  Many of the snippets will find a default data file to run with if run from this directory, but also allow the caller to use a different data file if given by the first command-line arguemnt.
+You may run any individual Snippet class directly providing you have a Senzing repository to run it with and the `SENZING_ENGINE_CONFIGURATION_JSON` environment variable set for connecting to that repository.  Many of the snippets will find a default data file to run with if run from this directory, but also allow the caller to use a different data file if given by the first command-line argument.
 
 1. Run a snippet that takes no command-line arguments.
     ```
@@ -18,7 +24,7 @@ You may run any individual Snippet class directly providing you have a Senzing r
     java -cp target/sz-sdk-snippets.jar loading.LoadRecordsViaLoop ../../resources/data/load-500-with-errors.jsonl
     ```
 
-# Run Individually via Runner
+### Run via Runner
 
 The `com.senzing.runner.SnippetRunner` class will run one or more snippets for you and create a temporary Senzing repository to run
 then against.  This is the `Main-Class` of the `sz-sdk-snippets.jar` file so it can be executed using `java -jar target/sz-sdk-snippets.jar`.

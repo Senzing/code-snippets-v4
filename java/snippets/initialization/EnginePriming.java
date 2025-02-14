@@ -4,11 +4,10 @@ import com.senzing.sdk.*;
 import com.senzing.sdk.core.SzCoreEnvironment;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides an example of priming the engine to improve the performance
+ * of subsequent engine function calls.
  */
 public class EnginePriming {
-    private static final long ONE_MILLION = 1000000L;
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -46,6 +45,8 @@ public class EnginePriming {
             throw new RuntimeException(e);
 
         } catch (Exception e) {
+            System.err.println();
+            System.err.println("*** Terminated due to critical error ***");
             e.printStackTrace();
             if (e instanceof RuntimeException) {
                 throw ((RuntimeException) e);
@@ -56,6 +57,7 @@ public class EnginePriming {
             // IMPORTANT: make sure to destroy the environment
             env.destroy();
         }
-
     }
+
+    private static final long ONE_MILLION = 1000000L;
 }

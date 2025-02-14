@@ -10,33 +10,10 @@ import com.senzing.sdk.core.SzCoreEnvironment;
 import static com.senzing.sdk.SzFlag.*;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides a simple example of processing redo records while 
+ * loading records to the Senzing repository.
  */
 public class LoadWithRedoViaLoop {
-    private static final List<String> INPUT_FILES = List.of(
-        "../resources/data/truthset/customers.jsonl",
-        "../resources/data/truthset/reference.jsonl",
-        "../resources/data/truthset/watchlist.jsonl");
-
-    private static final String UTF_8 = "UTF-8";
-
-    private static final String RETRY_PREFIX = "retry-";
-    private static final String RETRY_SUFFIX = ".jsonl";
-
-    private static final String DATA_SOURCE = "DATA_SOURCE";
-    private static final String RECORD_ID   = "RECORD_ID";
-
-    private static final String ERROR       = "ERROR";
-    private static final String WARNING     = "WARNING";
-    private static final String CRITICAL    = "CRITICAL";
-
-    private static int         errorCount      = 0;
-    private static int         successCount    = 0;
-    private static int         redoneCount     = 0;
-    private static int         retryCount      = 0;
-    private static File        retryFile       = null;
-    private static PrintWriter retryWriter     = null;
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -205,8 +182,7 @@ public class LoadWithRedoViaLoop {
      * 
      * @param errorType The error type description.
      * @param exception The exception itself.
-     * @param lineNumber The line number of the failed record in the JSON input file.
-     * @param recordJson The JSON text for the failed record.
+     * @param redoRecord The JSON text for the failed record.
      */
     private static void logFailedRedo(String      errorType,
                                       Exception   exception,  
@@ -239,4 +215,28 @@ public class LoadWithRedoViaLoop {
         }
         retryWriter.println(recordJson);        
     }
+    
+    private static final List<String> INPUT_FILES = List.of(
+        "../resources/data/truthset/customers.jsonl",
+        "../resources/data/truthset/reference.jsonl",
+        "../resources/data/truthset/watchlist.jsonl");
+
+    private static final String UTF_8 = "UTF-8";
+
+    private static final String RETRY_PREFIX = "retry-";
+    private static final String RETRY_SUFFIX = ".jsonl";
+
+    private static final String DATA_SOURCE = "DATA_SOURCE";
+    private static final String RECORD_ID   = "RECORD_ID";
+
+    private static final String ERROR       = "ERROR";
+    private static final String WARNING     = "WARNING";
+    private static final String CRITICAL    = "CRITICAL";
+
+    private static int         errorCount      = 0;
+    private static int         successCount    = 0;
+    private static int         redoneCount     = 0;
+    private static int         retryCount      = 0;
+    private static File        retryFile       = null;
+    private static PrintWriter retryWriter     = null;
 }

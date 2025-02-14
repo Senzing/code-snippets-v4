@@ -74,7 +74,6 @@ public class SnippetRunner {
                 } catch (Exception e) {
                     System.err.println("The provided Senzing settings were not valid JSON:");
                     System.err.println();
-                    System.err.println(toJsonText(settingsJson, true));
                     System.exit(1);
                 }
             }
@@ -131,6 +130,8 @@ public class SnippetRunner {
 
             } catch (SzException e) {
                 e.printStackTrace();
+                System.exit(1);
+                
             } finally {
                 env.destroy();
                 env = null;
@@ -280,6 +281,7 @@ public class SnippetRunner {
         String[] runtimeEnv = createRuntimeEnv(senzingInstall, settings);
 
         System.out.println();
+        System.out.println("---------------------------------------");
         System.out.println("Executing " + snippet + "...");
         long start = System.nanoTime();
         Runtime runtime = Runtime.getRuntime();

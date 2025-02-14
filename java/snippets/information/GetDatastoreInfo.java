@@ -4,7 +4,8 @@ import com.senzing.sdk.*;
 import com.senzing.sdk.core.SzCoreEnvironment;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides an example of obtaining the datastore information
+ * from the diagnostic hub.
  */
 public class GetDatastoreInfo {
     public static void main(String[] args) {
@@ -40,6 +41,8 @@ public class GetDatastoreInfo {
             throw new RuntimeException(e);
 
         } catch (Exception e) {
+            System.err.println();
+            System.err.println("*** Terminated due to critical error ***");
             e.printStackTrace();
             if (e instanceof RuntimeException) {
                 throw ((RuntimeException) e);

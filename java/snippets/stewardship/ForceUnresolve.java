@@ -10,12 +10,10 @@ import com.senzing.sdk.core.SzCoreEnvironment;
 import static com.senzing.sdk.SzFlag.*;
 
 /**
- * Provides a simple example of force-unresolving records that
+ * Provides a simple example of forcibly unresolving records that
  * otherwise will not resolve to one another.
  */
 public class ForceUnresolve {
-    private static final String TEST = "TEST";
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -169,4 +167,6 @@ public class ForceUnresolve {
        
         return records;
     }
+
+    private static final String TEST = "TEST";
 }

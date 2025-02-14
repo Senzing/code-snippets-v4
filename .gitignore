@@ -135,3 +135,9 @@ dmypy.json
 
 # Output folder used by examples
 resources/output/
+
+csharp/snippets/**/bin
+csharp/snippets/**/obj
+csharp/runner/**/bin
+csharp/runner/**/obj
+

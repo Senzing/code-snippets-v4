@@ -4,7 +4,7 @@ import com.senzing.sdk.*;
 import com.senzing.sdk.core.SzCoreEnvironment;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides an example of getting the Senzing product version.
  */
 public class GetVersion {
     public static void main(String[] args) {

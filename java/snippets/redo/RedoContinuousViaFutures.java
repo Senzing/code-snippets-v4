@@ -10,35 +10,11 @@ import com.senzing.sdk.core.SzCoreEnvironment;
 import static com.senzing.sdk.SzFlag.*;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides an example of a process that continuously processes
+ * the pending redo records in the Senzing repository using
+ * futures.
  */
 public class RedoContinuousViaFutures {
-    private static final String UTF_8 = "UTF-8";
-
-    private static final String RETRY_PREFIX = "retry-";
-    private static final String RETRY_SUFFIX = ".jsonl";
-
-    private static final int THREAD_COUNT = 8;
-
-    private static final int BACKLOG_FACTOR = 10;
-
-    private static final int MAXIMUM_BACKLOG = THREAD_COUNT * BACKLOG_FACTOR;
-
-    private static final long HANDLE_PAUSE_TIMEOUT = 100L;
-
-    private static final long REDO_PAUSE_TIMEOUT = 30000L;
-
-    private static final String REDO_PAUSE_DESCRIPTION = "30 seconds";
-
-    private static final String WARNING     = "WARNING";
-    private static final String CRITICAL    = "CRITICAL";
-
-    private static int         errorCount      = 0;
-    private static int         redoneCount     = 0;
-    private static int         retryCount      = 0;
-    private static File        retryFile       = null;
-    private static PrintWriter retryWriter     = null;
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -277,4 +253,30 @@ public class RedoContinuousViaFutures {
         }
         retryWriter.println(recordJson);        
     }
+    
+    private static final String UTF_8 = "UTF-8";
+
+    private static final String RETRY_PREFIX = "retry-";
+    private static final String RETRY_SUFFIX = ".jsonl";
+
+    private static final int THREAD_COUNT = 8;
+
+    private static final int BACKLOG_FACTOR = 10;
+
+    private static final int MAXIMUM_BACKLOG = THREAD_COUNT * BACKLOG_FACTOR;
+
+    private static final long HANDLE_PAUSE_TIMEOUT = 100L;
+
+    private static final long REDO_PAUSE_TIMEOUT = 30000L;
+
+    private static final String REDO_PAUSE_DESCRIPTION = "30 seconds";
+
+    private static final String WARNING     = "WARNING";
+    private static final String CRITICAL    = "CRITICAL";
+
+    private static int         errorCount      = 0;
+    private static int         redoneCount     = 0;
+    private static int         retryCount      = 0;
+    private static File        retryFile       = null;
+    private static PrintWriter retryWriter     = null;
 }

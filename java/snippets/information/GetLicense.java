@@ -4,7 +4,8 @@ import com.senzing.sdk.*;
 import com.senzing.sdk.core.SzCoreEnvironment;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides an example of obtaining the license information
+ * from the product hub.
  */
 public class GetLicense {
     public static void main(String[] args) {

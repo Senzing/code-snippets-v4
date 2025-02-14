@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
+### Added to 0.0.4
+
+- C# examples
+- Updated Java examples to move declarations to the bottom
+
 ### Added to 0.0.3
 
 - Java examples

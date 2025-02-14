@@ -4,11 +4,10 @@ import com.senzing.sdk.*;
 import com.senzing.sdk.core.SzCoreEnvironment;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides an example of checking database performance via the 
+ * diagnostic hub.
  */
 public class CheckDatastorePerformance {
-    private static final int SECONDS_TO_RUN = 3;
-
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -42,6 +41,8 @@ public class CheckDatastorePerformance {
             throw new RuntimeException(e);
 
         } catch (Exception e) {
+            System.err.println();
+            System.err.println("*** Terminated due to critical error ***");
             e.printStackTrace();
             if (e instanceof RuntimeException) {
                 throw ((RuntimeException) e);
@@ -52,6 +53,7 @@ public class CheckDatastorePerformance {
             // IMPORTANT: make sure to destroy the environment
             env.destroy();
         }
-
     }
+
+    private static final int SECONDS_TO_RUN = 3;
 }

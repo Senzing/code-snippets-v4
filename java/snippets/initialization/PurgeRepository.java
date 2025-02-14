@@ -7,7 +7,10 @@ import com.senzing.sdk.*;
 import com.senzing.sdk.core.SzCoreEnvironment;
 
 /**
- * Provides a simple example of adding records to the Senzing repository.
+ * Provides an example of purging the entity repository.
+ * NOTE: purging the repository should be done with great care and with
+ * no processes actively accessing the repository with the exception of
+ * the one doing the purging.
  */
 public class PurgeRepository {
     private static final String PURGE_MESSAGE = """
@@ -73,6 +76,8 @@ public class PurgeRepository {
             throw new RuntimeException(e);
 
         } catch (Exception e) {
+            System.err.println();
+            System.err.println("*** Terminated due to critical error ***");
             e.printStackTrace();
             if (e instanceof RuntimeException) {
                 throw ((RuntimeException) e);

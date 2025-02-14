@@ -93,7 +93,7 @@ public class LoadTruthSetWithInfoViaLoop {
                             String  dataSourceCode  = recordJson.getString(DATA_SOURCE, null);
                             String  recordId        = recordJson.getString(RECORD_ID, null);
 
-                            // call the addRecord() function with no flags
+                            // call the addRecord() function with info flags
                             String info = engine.addRecord(
                                 SzRecordKey.of(dataSourceCode, recordId), line, SZ_WITH_INFO_FLAGS);
 
@@ -166,6 +166,7 @@ public class LoadTruthSetWithInfoViaLoop {
      * of entities created for the records -- essentially a contrived
      * data mart.
      * 
+     * @param engine The {@link SzEngine} to use.
      * @param info The info message.
      */
     private static void processInfo(SzEngine engine, String info) {
