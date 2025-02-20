@@ -41,7 +41,7 @@ jobs:
           SENZING_DIR: "/opt/senzing/er"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
-          mvn clean install -Dsenzing.support.dir="/opt/senzing/data"
+          mvn clean install -B -Dsenzing.support.dir="/opt/senzing/data"
 
       - name: run java snippets
         run: |

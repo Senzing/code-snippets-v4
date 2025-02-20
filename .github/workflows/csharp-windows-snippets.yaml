@@ -31,15 +31,14 @@ jobs:
 
       - name: configure local nuget repo
         run: |
-          sdk_package=$(grep -Rl "Senzing.Sdk*" /opt/senzing/er/lib/ | xargs -L 1 basename)
-          mkdir -p ~/dev/nuget/packages
-          dotnet nuget add source ~/dev/nuget/packages -n dev
-          dotnet nuget push /opt/senzing/er/lib/"${sdk_package}" --source dev
+          sdk_package=$( Get-ChildItem -Path C:\Program Files\Senzing\er\lib\ -Recurse | Where-Object {$_.Name -match "^Senzing.SDK*"} | Select-Object -ExpandProperty Name)
+          mkdir %USERPROFILE%\dev\nuget\packages
+          dotnet nuget add source %USERPROFILE%\dev\nuget\packages -n dev
+          dotnet nuget push C:\Program Files\Senzing\er\lib\"${sdk_package}" --source dev
 
       - name: run csharp snippets
         env:
-          LD_LIBRARY_PATH: "/opt/senzing/er/lib"
-          SENZING_DATA_DIR: "/opt/senzing/data"
+          SENZING_DATA_DIR: 'C:\Program Files\Senzing\er\data'
         run: |
           cd "${GITHUB_WORKSPACE}"/csharp/runner
           dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
