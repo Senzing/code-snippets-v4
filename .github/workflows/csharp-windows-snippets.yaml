@@ -7,7 +7,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  maven-windows:
+  csharp-windows-snippets:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -31,5 +31,5 @@ jobs:
 
       - name: run csharp snippets
         run: |
-          cd ${GITHUB_WORKSPACE}/csharp/runner
+          cd "${GITHUB_WORKSPACE}"/csharp/runner
           dotnet run --project SnippetRunner all

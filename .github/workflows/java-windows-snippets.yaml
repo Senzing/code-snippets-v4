@@ -7,14 +7,12 @@ permissions:
   pull-requests: write
 
 jobs:
-  maven-windows:
+  java-windows-snippets:
     runs-on: windows-latest
     strategy:
       matrix:
-        include:
-          - java-version: "17"
-            java-distribution: "temurin"
-            senzingsdk-version: "staging-v4"
+        java-version: ["17", "21"]
+        java-distribution: ["temurin"]
 
     steps:
       - name: checkout repository
@@ -34,10 +32,10 @@ jobs:
 
       - name: build with Maven
         run: |
-          cd ${GITHUB_WORKSPACE}/java
+          cd "${GITHUB_WORKSPACE}"/java
           mvn clean install
 
       - name: run java snippets
         run: |
-          cd ${GITHUB_WORKSPACE}/java
+          cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all
