@@ -140,4 +140,5 @@ csharp/snippets/**/bin
 csharp/snippets/**/obj
 csharp/runner/**/bin
 csharp/runner/**/obj
+*.sln
 
