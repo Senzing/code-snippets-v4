@@ -38,7 +38,7 @@ jobs:
 
       - name: build with Maven
         env:
-          SENZING_DIR: "/opt/senzing"
+          SENZING_DIR: "/opt/senzing/er"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           mvn clean install
