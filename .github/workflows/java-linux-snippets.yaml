@@ -46,4 +46,4 @@ jobs:
       - name: run java snippets
         run: |
           cd "${GITHUB_WORKSPACE}"/java
-          java -jar target/sz-sdk-snippets.jar all
+          java -jar target/sz-sdk-snippets.jar all -Dsenzing.support.dir=/opt/senzing
