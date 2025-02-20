@@ -1,0 +1,48 @@
+name: java linux snippets
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  maven-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - java-version: ["17", "21"]
+            java-distribution: "temurin"
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: ${{ matrix.java-distribution }}
+
+      - name: install Senzing runtime
+        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        with:
+          packages-to-install: "senzingsdk-runtime senzingsdk-setup"
+          senzingsdk-repository-package: ${{ secrets.SENZING_APT_BETA_STAGING_REPOSITORY_PACKAGE }}
+          senzingsdk-repository-path: ${{ secrets.SENZING_APT_BETA_STAGING_REPOSITORY_URL }}
+
+      - name: build with Maven
+        run: |
+          cd ${GITHUB_WORKSPACE}/java
+          mvn clean install
+
+      - name: run java snippets
+        run: |
+          cd ${GITHUB_WORKSPACE}/java
+          java -jar target/sz-sdk-snippets.jar all
