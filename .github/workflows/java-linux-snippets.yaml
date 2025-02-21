@@ -44,6 +44,8 @@ jobs:
           mvn clean package
 
       - name: run java snippets
+        env:
+          LD_LIBRARY_PATH: "/opt/senzing/er/lib:${LD_LIBRARY_PATH}"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all
