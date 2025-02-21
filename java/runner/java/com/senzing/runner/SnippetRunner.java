@@ -35,6 +35,26 @@ public class SnippetRunner {
 
     private static final int SIGTERM_EXIT_CODE = 143;
 
+    private static final boolean WINDOWS;
+    private static final boolean MACOS;
+
+    static {
+        final String osName = System.getProperty("os.name");
+
+        boolean windows = false;
+        boolean macOS = false;
+
+        String lowerOSName = osName.toLowerCase().trim();
+        if (lowerOSName.startsWith("windows")) {
+            windows = true;
+        } else if (lowerOSName.startsWith("mac") || lowerOSName.indexOf("darwin") >= 0) {
+            macOS = true;
+        }
+
+        WINDOWS = windows;
+        MACOS   = macOS;
+    }
+
     /**
      * Harness for running one or more of the code snippets.
      * 
@@ -321,7 +341,8 @@ public class SnippetRunner {
                 System.out.println("Runner destroying " + snippet + " process...");
                 // NOTE: using process.destroy() does not trigger the registered
                 // shutdown hooks in the snippet sub-process for some reason
-                Process killer = runtime.exec("kill " + process.pid());
+                Process killer = runtime.exec(
+                    ((WINDOWS) ? "taskkill /F /PID " : "kill ") + process.pid());
                 Thread killerr = startOutputThread(killer.getErrorStream(), System.err);
                 Thread killout = startOutputThread(killer.getInputStream(), System.out);
                 killer.waitFor();  // wait for the kill process to complete
@@ -377,27 +398,15 @@ public class SnippetRunner {
 
     private static String getJarPath() throws RuntimeException {
         try {
-            final String osName = System.getProperty("os.name");
-
-            boolean windows = false;
-            boolean macOS = false;
-
-            String lowerOSName = osName.toLowerCase().trim();
-            if (lowerOSName.startsWith("windows")) {
-                windows = true;
-            } else if (lowerOSName.startsWith("mac") || lowerOSName.indexOf("darwin") >= 0) {
-                macOS = true;
-            }
-
             String resourceName = SnippetRunner.class.getSimpleName() + ".class";
             String url = SnippetRunner.class.getResource(resourceName).toString();
             String jarPath = url.replaceAll("jar:file:(.*\\.jar)\\!/.*\\.class", "$1");
 
-            if (windows && jarPath.startsWith("/")) {
+            if (WINDOWS && jarPath.startsWith("/")) {
                 jarPath = jarPath.replaceAll("[/]+([^/].*)", "$1");
             }
 
-            if (windows && jarPath.startsWith("/")) {
+            if (WINDOWS && jarPath.startsWith("/")) {
                 jarPath = jarPath.substring(1);
             }
             return jarPath;
