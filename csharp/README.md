@@ -3,6 +3,12 @@
 The C# snippets are contained in the `snippets` directory under various
 directories -- each as its own assembly/project.
 
+## Prerequisites
+
+Before attempting to build the snippets you will need to make the make the
+`Senzing.Sdk.[version].nupkg` file available to the `dotnet` executable so
+it can be used as a dependency.  This is done via these [instructions](https://github.com/senzing-garage/sz-sdk-csharp/blob/main/README.md#Usage).
+
 ## Building
 
 The C# snippets can built using the `dotnet build [project-name]` command under each directory.  They can be run using `dotnet run --project [project-name]` command.  Attempting to run a snippet will also trigger building it.
