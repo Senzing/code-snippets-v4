@@ -33,6 +33,8 @@ jobs:
         run: |
           $Env:sdk_package = Get-ChildItem -Path "C:\Program Files\Senzing\er\lib\" -Recurse | Where-Object {$_.Name -match "^Senzing.SDK*"} | Select-Object -ExpandProperty Name
           mkdir $Env:HOMEPATH\dev\nuget\packages
+          cd $Env:HOMEPATH\dev\nuget\packages
+          dir
           dotnet nuget add source $Env:HOMEPATH\dev\nuget\packages -n dev
           dotnet nuget push "C:\Program Files\Senzing\er\lib\${Env:sdk_package}" --source dev
           dotnet nuget list source
