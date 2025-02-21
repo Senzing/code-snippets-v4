@@ -40,6 +40,6 @@ jobs:
         env:
           SENZING_DATA_DIR: 'C:\Program Files\Senzing\er\data'
         run: |
-          cd "${$Env:GITHUB_WORKSPACE}"/csharp/runner
+          cd "${Env:GITHUB_WORKSPACE}"/csharp/runner
           dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
           dotnet run --project SnippetRunner all
