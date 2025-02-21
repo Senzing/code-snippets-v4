@@ -475,7 +475,7 @@ public class SnippetRunner {
         String supportPath = senzingInstall.getSupportDirectory().getCanonicalPath().replace("\\", "\\\\");
         String configPath = configDir.getCanonicalPath().replace("\\", "\\\\");
         String resourcePath = resourcesDir.toString().replace("\\", "\\\\");
-        String databasePath = databaseFile.getCanonicalPath().replace('\\','/');
+        String databasePath = databaseFile.getCanonicalPath().replace("\\", "\\\\");
         String baseConfig = readTextFileAsString(configFile, UTF_8);
         String settings = """
                 {
