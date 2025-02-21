@@ -45,7 +45,6 @@ jobs:
       - name: run csharp snippets
         env:
           LD_LIBRARY_PATH: "/opt/senzing/er/lib"
-          SENZING_DATA_DIR: "/opt/senzing/data"
         run: |
           cd "${GITHUB_WORKSPACE}"/csharp/runner
           dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
