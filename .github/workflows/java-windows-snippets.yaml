@@ -39,5 +39,6 @@ jobs:
 
       - name: run java snippets
         run: |
+          Add-Content $env:GITHUB_PATH 'C:\Program Files\Senzing\er\lib'
           cd "${Env:GITHUB_WORKSPACE}/java"
           java -jar target/sz-sdk-snippets.jar all
