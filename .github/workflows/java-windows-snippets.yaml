@@ -38,6 +38,8 @@ jobs:
           mvn clean install
 
       - name: run java snippets
+        env:
+          LD_LIBRARY_PATH: 'C:\Program Files\Senzing\er\lib'
         run: |
           Add-Content $env:GITHUB_PATH 'C:\Program Files\Senzing\er\lib'
           cd "${Env:GITHUB_WORKSPACE}/java"
