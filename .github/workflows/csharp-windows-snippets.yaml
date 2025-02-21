@@ -35,11 +35,11 @@ jobs:
           mkdir $Env:HOMEPATH\dev\nuget\packages
           dotnet nuget add source $Env:HOMEPATH\dev\nuget\packages -n dev
           dotnet nuget push "C:\Program Files\Senzing\er\lib\${Env:sdk_package}" --source dev
+          dotnet nuget list source
 
       - name: run csharp snippets
         env:
           SENZING_DATA_DIR: 'C:\Program Files\Senzing\er\data'
         run: |
           cd "${Env:GITHUB_WORKSPACE}"/csharp/runner
-          dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
           dotnet run --project SnippetRunner all
