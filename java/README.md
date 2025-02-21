@@ -6,6 +6,26 @@ The Java snippets are contained in the `snippets` directory under various Java p
 
 The Java snippets can built using the `pom.xml` in this directory using `mvn package`.  The result will be the `sz-sdk-snippets.jar` file in the `target` directory.
 
+1. First, set the `SENZING_DIR` environment variable so the `pom.xml` can locate
+the `sz-sdk.jar`.
+    - Linux/macOS:
+
+        ```console
+        export SENZING_DIR=/opt/senzing/er
+        ```
+
+    - Windows:
+
+        ```console
+        set SENZING_DIR=C:\Program Files\Senzing\er
+        ```
+
+1. Run the maven build:
+
+    ```console
+    mvn package
+    ```
+
 ## Running
 
 There are several ways to run the code snippets.
