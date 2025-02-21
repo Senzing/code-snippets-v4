@@ -37,10 +37,11 @@ jobs:
           cd "${Env:GITHUB_WORKSPACE}/java"
           mvn clean install
 
-      - name: run java snippets
-        env:
-          LD_LIBRARY_PATH: 'C:\Program Files\Senzing\er\lib'
+      - name: Add to "Path" environment variable
         run: |
-          Add-Content $env:GITHUB_PATH 'C:\Program Files\Senzing\er\lib'
+          Add-Content $env:GITHUB_PATH "C:\Program Files\Senzing\er\lib"
+
+      - name: run java snippets
+        run: |
           cd "${Env:GITHUB_WORKSPACE}/java"
           java -jar target/sz-sdk-snippets.jar all
