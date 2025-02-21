@@ -497,6 +497,10 @@ public class SnippetRunner {
             long configId = configMgr.addConfig(baseConfig, "Default Config");
             configMgr.setDefaultConfigId(configId);
 
+        } catch (SzException e) {
+            System.err.println(settings);
+            throw e;
+            
         } finally {
             env.destroy();
         }
