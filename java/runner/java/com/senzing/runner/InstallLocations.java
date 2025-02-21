@@ -165,14 +165,18 @@ public class InstallLocations {
         try {
             String defaultInstallPath;
             String defaultConfigPath = null;
+            String defaultSupportPath = null;
 
             if (windows) {
-                defaultInstallPath = "C:\\\\Program Files\\Senzing\\er";
+                defaultInstallPath = "C:\\Program Files\\Senzing\\er";
+                defaultSupportPath = "C:\\Program Files\\Senzing\\er\\data";
             } else if (macOS) {
                 defaultInstallPath = "/opt/senzing/er";
+                defaultSupportPath = "/opt/senzing/er/data";
             } else {
                 defaultInstallPath = "/opt/senzing/er";
-                defaultConfigPath = "/etc/opt/senzing";
+                defaultConfigPath  = "/etc/opt/senzing";
+                defaultSupportPath = "/opt/senzing/data";
             }
 
             // set the install path if one has been provided
@@ -249,65 +253,15 @@ public class InstallLocations {
                 return null;
             }
 
+            // check if an explicit support path has been specified
             if (supportPath == null || supportPath.trim().length() == 0) {
-                // try to determine the support path
-                File installParent = installDir.getParentFile();
-                File dataRoot = new File(installParent, "data");
-                if (dataRoot.exists() && dataRoot.isDirectory()) {
-                    File versionFile = new File(installDir, "szBuildVersion.json");
-                    String dataVersion = null;
-                    if (versionFile.exists()) {
-                        String text = readTextFileAsString(versionFile, UTF_8);
-                        JsonObject jsonObject = parseJsonObject(text);
-                        dataVersion = (jsonObject.containsKey("DATA_VERSION")
-                            ? jsonObject.getString("DATA_VERSION") : null);
-                    }
-
-                    // try the data version directory
-                    supportDir = (dataVersion == null) ? null : new File(dataRoot, dataVersion.trim());
-
-                    // check if data version was not found
-                    if (supportDir == null || !supportDir.exists()) {
-                        // look to see if we only have one data version installed
-                        File[] versionDirs = dataRoot.listFiles(f -> {
-                            return f.getName().matches("\\d+\\.\\d+\\.\\d+");
-                        });
-                        if (versionDirs.length == 1 && supportDir == null) {
-                            // use the single data version found
-                            supportDir = versionDirs[0];
-
-                        } else if (versionDirs.length > 1) {
-                            System.err.println(
-                                    "Could not infer support directory.  Multiple data "
-                                    + "directory versions at: ");
-                            System.err.println("     " + dataRoot);
-                            if (supportDir != null) {
-                                System.err.println();
-                                System.err.println("Expected to find: " + supportDir);
-                            }
-                            throw new IllegalStateException(
-                                    ((supportDir == null) ? "Could not infer support directory."
-                                            : "Could not find support directory (" + supportDir + ").")
-                                            + "  Multiple data directory versions found at: " + dataRoot);
-                        } else {
-                            // no version directories were found, maybe the data root is
-                            // the actual support directory (mapped in a docker image)
-                            File[] ibmFiles = dataRoot.listFiles(f -> {
-                                return f.getName().toLowerCase().endsWith(".ibm");
-                            });
-                            File libPostalDir = new File(dataRoot, "libpostal");
-
-                            // require the .ibm files and libpostal to exist
-                            if (ibmFiles.length > 0 && libPostalDir.exists()) {
-                                supportDir = dataRoot;
-                            }
-                        }
-                    }
-
-                }
-                if (supportDir == null) {
-                    // use the default path
+                // check if using a dev build
+                if ("dist".equals(installDir.getName())) {
+                    // use the "data" sub-directory of the dev build
                     supportDir = new File(installDir, "data");
+                } else {
+                    // no explicit path, try the default support path
+                    supportDir = new File(defaultSupportPath);
                 }
 
             } else {
