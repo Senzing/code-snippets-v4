@@ -31,6 +31,8 @@ jobs:
           senzingsdk-repository-path: ${{ secrets.SENZING_WIN_BETA_REPOSITORY }}
 
       - name: build with Maven
+        env:
+          SENZING_DIR: 'C:\Program Files\Senzing\er'
         run: |
           cd "${Env:GITHUB_WORKSPACE}/java"
           mvn clean install
