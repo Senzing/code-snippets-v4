@@ -43,5 +43,5 @@ jobs:
         env:
           SENZING_DATA_DIR: 'C:\Program Files\Senzing\er\data'
         run: |
-          cd "${Env:GITHUB_WORKSPACE}"/csharp/runner
+          cd ${Env:GITHUB_WORKSPACE}/csharp/runner
           dotnet run --project SnippetRunner all
