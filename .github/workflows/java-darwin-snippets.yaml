@@ -10,6 +10,7 @@ jobs:
   java-darwin-snippets:
     runs-on: macos-latest
     strategy:
+      fail-fast: false
       matrix:
         java-version: ["17", "21"]
         java-distribution: ["temurin"]
