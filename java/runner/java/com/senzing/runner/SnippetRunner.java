@@ -336,7 +336,7 @@ public class SnippetRunner {
             long delay = Long.parseLong(propValue);
             boolean exited = process.waitFor(delay, TimeUnit.MILLISECONDS);
             if (!exited && process.isAlive()) {
-                expectedExitValue = SIGTERM_EXIT_CODE;
+                expectedExitValue = (WINDOWS) ? 1 : SIGTERM_EXIT_CODE;
                 System.out.println();
                 System.out.println("Runner destroying " + snippet + " process...");
                 // NOTE: using process.destroy() does not trigger the registered
