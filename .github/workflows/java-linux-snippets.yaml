@@ -41,9 +41,9 @@ jobs:
           SENZING_DIR: "/opt/senzing/er"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
-          mvn clean install -B -Dsenzing.support.dir="/opt/senzing/data"
+          mvn clean package
 
       - name: run java snippets
         run: |
           cd "${GITHUB_WORKSPACE}"/java
-          java -jar target/sz-sdk-snippets.jar all -Dsenzing.support.dir="/opt/senzing/data"
+          java -jar target/sz-sdk-snippets.jar all

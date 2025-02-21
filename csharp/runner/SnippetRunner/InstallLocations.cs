@@ -201,9 +201,9 @@ public class InstallLocations
                 defaultSupportPath = "/opt/senzing/er/data";
                 break;
             case PlatformID.Unix:
-                defaultInstallPath  = "/opt/senzing/er";
-                defaultConfigPath   = "/etc/opt/senzing";
-                defaultSupportPath  = "/opt/senzing/data";
+                defaultInstallPath = "/opt/senzing/er";
+                defaultConfigPath = "/etc/opt/senzing";
+                defaultSupportPath = "/opt/senzing/data";
                 break;
             default:
                 throw new NotSupportedException(
@@ -291,18 +291,24 @@ public class InstallLocations
         }
 
         // check if an explicit support path has been specified
-        if (supportPath == null || supportPath.Trim().Length == 0) {
+        if (supportPath == null || supportPath.Trim().Length == 0)
+        {
             // check if using a dev build
-            if ("dist".Equals(installDir.Name, OrdinalIgnoreCase)) {
+            if ("dist".Equals(installDir.Name, OrdinalIgnoreCase))
+            {
                 // use the "data" sub-directory of the dev build
                 supportDir = new DirectoryInfo(
                     Path.Combine(installDir.FullName, "data"));
-            } else {
+            }
+            else
+            {
                 // no explicit path, try the default support path
                 supportDir = new DirectoryInfo(defaultSupportPath);
             }
 
-        } else {
+        }
+        else
+        {
             // use the specified explicit path
             supportDir = new DirectoryInfo(supportPath);
         }
