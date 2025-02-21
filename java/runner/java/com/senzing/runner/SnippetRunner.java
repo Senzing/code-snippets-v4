@@ -322,7 +322,11 @@ public class SnippetRunner {
                 // NOTE: using process.destroy() does not trigger the registered
                 // shutdown hooks in the snippet sub-process for some reason
                 Process killer = runtime.exec("kill " + process.pid());
+                Thread killerr = startOutputThread(killer.getErrorStream(), System.err);
+                Thread killout = startOutputThread(killer.getInputStream(), System.out);
                 killer.waitFor();  // wait for the kill process to complete
+                killerr.join();
+                killout.join();
             }
             exitValue = process.waitFor();
 
