@@ -32,10 +32,10 @@ jobs:
 
       - name: build with Maven
         run: |
-          cd "${GITHUB_WORKSPACE}"/java
+          cd "${GITHUB_WORKSPACE}"\java
           mvn clean install
 
       - name: run java snippets
         run: |
-          cd "${GITHUB_WORKSPACE}"/java
+          cd "${GITHUB_WORKSPACE}"\java
           java -jar target/sz-sdk-snippets.jar all

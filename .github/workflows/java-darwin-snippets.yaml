@@ -31,6 +31,8 @@ jobs:
           senzingsdk-repository-path: ${{ secrets.SENZING_OSX_BETA_REPOSITORY }}
 
       - name: build with Maven
+        env:
+          SENZING_DIR: "/opt/senzing/er"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           mvn clean install
