@@ -38,6 +38,8 @@ jobs:
           mvn clean install
 
       - name: run java snippets
+        env:
+          DYLD_LIBRARY_PATH: "/opt/senzing/er/lib"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all

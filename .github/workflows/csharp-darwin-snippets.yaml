@@ -32,7 +32,7 @@ jobs:
       - name: configure local nuget repo
         run: |
           find /opt/senzing/er/lib/ -name "Senzing.Sdk*" | xargs -0 -L 1 basename
-          sdk_package=$(find /opt/senzing/er/lib/ -name "Senzing.Sdk*" | xargs -L 1 basename)
+          sdk_package=$(find /opt/senzing/er/lib/ -name "Senzing.Sdk*" | xargs -0 -L 1 basename)
           mkdir -p ~/dev/nuget/packages
           dotnet nuget add source ~/dev/nuget/packages -n dev
           dotnet nuget push /opt/senzing/er/lib/"${sdk_package}" --source dev
