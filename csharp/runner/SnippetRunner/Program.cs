@@ -130,7 +130,8 @@ try
         try
         {
             settingsJson = JsonNode.Parse(settings)?.AsObject();
-            if (settingsJson == null) {
+            if (settingsJson == null)
+            {
                 throw new Exception("Setting must be a JSON object: " + settings);
             }
         }
@@ -548,10 +549,13 @@ static void ExecuteSnippet(string snippet,
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.UseShellExecute = false;
             Process? killer = Process.Start(killStartInfo);
-            if (killer == null) {
+            if (killer == null)
+            {
                 process.Kill(true);
-                process.WaitForExit();        
-            } else {
+                process.WaitForExit();
+            }
+            else
+            {
                 killer.WaitForExit();
                 process.WaitForExit();
             }
@@ -630,9 +634,9 @@ static string SetupTempRepository(InstallLocations senzingInstall)
     }
 
     string supportPath = supportDir.FullName.Replace("\\", "\\\\");
-    string configPath = configDir.FullName.Replace("\\", "\\\\");;
-    string resourcePath = resourcesDir.FullName.Replace("\\", "\\\\");;
-    string baseConfig = File.ReadAllText(configFile).Replace("\\", "\\\\");;
+    string configPath = configDir.FullName.Replace("\\", "\\\\"); ;
+    string resourcePath = resourcesDir.FullName.Replace("\\", "\\\\"); ;
+    string baseConfig = File.ReadAllText(configFile).Replace("\\", "\\\\"); ;
     string settings = $$"""
             {
                 "PIPELINE": {
@@ -654,6 +658,11 @@ static string SetupTempRepository(InstallLocations senzingInstall)
         long configID = configMgr.AddConfig(baseConfig, "Default Config");
         configMgr.SetDefaultConfigID(configID);
 
+    }
+    catch (Exception)
+    {
+        Console.Error.WriteLine(settings);
+        throw;
     }
     finally
     {
