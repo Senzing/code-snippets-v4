@@ -636,7 +636,8 @@ static string SetupTempRepository(InstallLocations senzingInstall)
     string supportPath = supportDir.FullName.Replace("\\", "\\\\");
     string configPath = configDir.FullName.Replace("\\", "\\\\"); ;
     string resourcePath = resourcesDir.FullName.Replace("\\", "\\\\"); ;
-    string baseConfig = File.ReadAllText(configFile).Replace("\\", "\\\\"); ;
+    string baseConfig = File.ReadAllText(configFile).Replace("\\", "\\\\");
+    string databasePath = databaseFile.Replace("\\", "\\\\");
     string settings = $$"""
             {
                 "PIPELINE": {
@@ -645,7 +646,7 @@ static string SetupTempRepository(InstallLocations senzingInstall)
                     "RESOURCEPATH": "{{resourcePath}}"
                 },
                 "SQL": {
-                    "CONNECTION": "sqlite3://na:na@{{databaseFile}}"
+                    "CONNECTION": "sqlite3://na:na@{{databasePath}}"
                 }
             }
             """.Trim();
