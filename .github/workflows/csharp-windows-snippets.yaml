@@ -39,6 +39,12 @@ jobs:
           dotnet nuget push "C:\Program Files\Senzing\er\lib\${Env:sdk_package}" --source senzing
           dotnet nuget list source
 
+      - name: Add to "Path" environment variable
+        run: |
+          Add-Content $env:GITHUB_PATH "C:\Program Files\PowerShell\7"
+          Add-Content $env:GITHUB_PATH "C:\Program Files\dotnet"
+          Add-Content $env:GITHUB_PATH "C:\Program Files\Senzing\er\lib"
+
       - name: run csharp snippets
         env:
           Path: C:\Program Files\Senzing\er\lib;$Env:Path
