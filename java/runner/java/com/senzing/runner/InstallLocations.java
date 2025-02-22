@@ -1,13 +1,10 @@
 package com.senzing.runner;
 
-import javax.json.JsonObject;
 import java.io.File;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.senzing.runner.Utilities.*;
 
 /**
  * Describes the directories on disk used to find the Senzing product
