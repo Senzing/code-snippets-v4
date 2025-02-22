@@ -41,7 +41,7 @@ jobs:
 
       - name: run csharp snippets
         env:
-          Path: 'C:\Program Files\Senzing\er\lib;${Path}'
+          Path: C:\Program Files\Senzing\er\lib;$Env:Path
         run: |
           echo $Env:Path
           cd ${Env:GITHUB_WORKSPACE}/csharp/runner
