@@ -629,10 +629,10 @@ static string SetupTempRepository(InstallLocations senzingInstall)
         }
     }
 
-    string supportPath = supportDir.FullName;
-    string configPath = configDir.FullName;
-    string resourcePath = resourcesDir.FullName;
-    string baseConfig = File.ReadAllText(configFile);
+    string supportPath = supportDir.FullName.Replace("\\", "\\\\");
+    string configPath = configDir.FullName.Replace("\\", "\\\\");;
+    string resourcePath = resourcesDir.FullName.Replace("\\", "\\\\");;
+    string baseConfig = File.ReadAllText(configFile).Replace("\\", "\\\\");;
     string settings = $$"""
             {
                 "PIPELINE": {
