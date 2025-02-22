@@ -43,5 +43,6 @@ jobs:
         env:
           Path: 'C:\Program Files\Senzing\er\lib;${Path}'
         run: |
+          echo $Env:Path
           cd ${Env:GITHUB_WORKSPACE}/csharp/runner
           dotnet run --project SnippetRunner all
