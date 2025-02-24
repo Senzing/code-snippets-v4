@@ -32,10 +32,9 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 
 string filePath = (args.Length > 0) ? args[0] : DefaultFilePath;
 
-FileStream fs = new FileStream(filePath, FileMode.Open);
 Thread producer = new Thread(() =>
 {
-    FileStream fs = new FileStream(filePath, FileMode.Open);
+    FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
     try
     {
         StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
@@ -71,6 +70,7 @@ Thread producer = new Thread(() =>
     }
     finally
     {
+        fs.Close();
         recordQueue.CompleteAdding();
     }
 });

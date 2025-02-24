@@ -256,9 +256,11 @@ public class InstallLocations {
                 if ("dist".equals(installDir.getName())) {
                     // use the "data" sub-directory of the dev build
                     supportDir = new File(installDir, "data");
+                } else if (windows || macOS) {
+                    supportDir = new File(installDir, "data");
                 } else {
                     // no explicit path, try the default support path
-                    supportDir = new File(defaultSupportPath);
+                     supportDir = new File(defaultSupportPath);
                 }
 
             } else {
