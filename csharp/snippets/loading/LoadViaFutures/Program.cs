@@ -49,7 +49,7 @@ TaskFactory factory = new TaskFactory(taskScheduler);
 // keep track of the pending tasks and don't backlog too many for memory's sake
 IList<(Task, Record)> pendingFutures = new List<(Task, Record)>(MaximumBacklog);
 
-FileStream fs = new FileStream(filePath, FileMode.Open);
+FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 try
 {
     // create a reader
@@ -159,6 +159,9 @@ catch (Exception e)
 }
 finally
 {
+    // close the file stream
+    fs.Close();
+
     // IMPORTANT: make sure to destroy the environment
     env.Destroy();
 

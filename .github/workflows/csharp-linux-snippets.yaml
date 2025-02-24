@@ -1,0 +1,51 @@
+name: csharp linux snippets
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  csharp-linux-snippets:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - dotnet-version: "8"
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: install Senzing runtime
+        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        with:
+          packages-to-install: "senzingsdk-runtime senzingsdk-setup"
+          senzingsdk-repository-package: ${{ secrets.SENZING_APT_BETA_STAGING_REPOSITORY_PACKAGE }}
+          senzingsdk-repository-path: ${{ secrets.SENZING_APT_BETA_STAGING_REPOSITORY_URL }}
+
+      - name: configure local nuget repo
+        run: |
+          sdk_package=$(grep -Rl "Senzing.Sdk" /opt/senzing/er/sdk/dotnet/ | xargs -L 1 basename)
+          mkdir -p ~/dev/nuget/packages
+          dotnet nuget add source ~/dev/nuget/packages -n dev
+          dotnet nuget push /opt/senzing/er/sdk/dotnet/"${sdk_package}" --source dev
+
+      - name: run csharp snippets
+        env:
+          LD_LIBRARY_PATH: "/opt/senzing/er/lib"
+        run: |
+          cd "${GITHUB_WORKSPACE}"/csharp/runner
+          dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
+          dotnet run --project SnippetRunner all

@@ -1,0 +1,48 @@
+name: java windows snippets
+
+on: [pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  java-windows-snippets:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: ["17", "21"]
+        java-distribution: ["temurin"]
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: ${{ matrix.java-distribution }}
+
+      - name: install Senzing SDK
+        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        with:
+          senzingsdk-repository-path: ${{ secrets.SENZING_WIN_BETA_REPOSITORY }}
+
+      - name: build with Maven
+        env:
+          SENZING_DIR: 'C:\Program Files\Senzing\er'
+        run: |
+          cd "${Env:GITHUB_WORKSPACE}/java"
+          mvn clean install
+
+      - name: Add to "Path" environment variable
+        run: |
+          Add-Content $env:GITHUB_PATH "C:\Program Files\Senzing\er\lib"
+
+      - name: run java snippets
+        run: |
+          cd "${Env:GITHUB_WORKSPACE}/java"
+          java -jar target/sz-sdk-snippets.jar all

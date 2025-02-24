@@ -31,7 +31,7 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 
 string filePath = (args.Length > 0) ? args[0] : DefaultFilePath;
 
-FileStream fs = new FileStream(filePath, FileMode.Open);
+FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 try
 {
     // create a reader
@@ -130,6 +130,8 @@ catch (Exception e)
 }
 finally
 {
+    fs.Close();
+
     // IMPORTANT: make sure to destroy the environment
     env.Destroy();
 

@@ -1,0 +1,50 @@
+name: csharp windows snippets
+
+on: [pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  csharp-windows-snippets:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - dotnet-version: "8"
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: install Senzing SDK
+        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        with:
+          senzingsdk-repository-path: ${{ secrets.SENZING_WIN_BETA_REPOSITORY }}
+
+      - name: configure local nuget repo
+        run: |
+          $Env:sdk_package = Get-ChildItem -Path "C:\Program Files\Senzing\er\sdk\dotnet\" -Recurse | Where-Object {$_.Name -match "^Senzing.SDK*"} | Select-Object -ExpandProperty Name
+          mkdir $Env:USERPROFILE\dev\nuget\packages
+          cd $Env:USERPROFILE\dev\nuget\packages
+          dir
+          dotnet nuget add source $Env:USERPROFILE\dev\nuget\packages -n senzing
+          dotnet nuget push "C:\Program Files\Senzing\er\sdk\dotnet\${Env:sdk_package}" --source senzing
+          dotnet nuget list source
+
+      - name: Add to "Path" environment variable
+        run: |
+          Add-Content $env:GITHUB_PATH "C:\Program Files\Senzing\er\lib"
+
+      - name: run csharp snippets
+        run: |
+          echo $Env:Path
+          cd ${Env:GITHUB_WORKSPACE}/csharp/runner
+          dotnet run --project SnippetRunner all

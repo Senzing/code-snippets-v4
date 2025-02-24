@@ -160,6 +160,8 @@ catch (Exception e)
 }
 finally
 {
+    fs.Close();
+    
     // IMPORTANT: make sure to destroy the environment
     env.Destroy();
 

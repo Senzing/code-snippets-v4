@@ -188,46 +188,22 @@ public class InstallLocations
 
         string defaultInstallPath;
         string? defaultConfigPath = null;
-
-        // check if we are building within the dev structure
-        string[] directoryStructure = ["net8.0", "*", "bin", "Senzing.Sdk.Tests", "sz-sdk-csharp", "csharp", "g2", "apps", "dev"];
-        DirectoryInfo? workingDir = new DirectoryInfo(Environment.CurrentDirectory);
-        DirectoryInfo? previousDir = null;
-        bool devStructure = true;
-        foreach (var dirName in directoryStructure)
-        {
-            if (workingDir == null) break;
-            if (!dirName.Equals("*", OrdinalIgnoreCase) && !workingDir.Name.Equals(dirName, OrdinalIgnoreCase))
-            {
-                devStructure = false;
-                break;
-            }
-            previousDir = workingDir;
-            workingDir = workingDir.Parent;
-        }
-        DirectoryInfo? devDistDir = (devStructure && previousDir != null)
-            ? new DirectoryInfo(Path.Combine(previousDir.FullName, "dist")) : null;
+        string defaultSupportPath;
 
         switch (Environment.OSVersion.Platform)
         {
             case PlatformID.Win32NT:
-                defaultInstallPath = (devDistDir == null)
-                    ? "C:\\Program Files\\Senzing\\er" : devDistDir.FullName;
+                defaultInstallPath = "C:\\Program Files\\Senzing\\er";
+                defaultSupportPath = "C:\\Program Files\\Senzing\\er\\data";
                 break;
             case PlatformID.MacOSX:
-                defaultInstallPath = (devDistDir == null)
-                    ? "/opt/senzing/er" : devDistDir.FullName;
+                defaultInstallPath = "/opt/senzing/er";
+                defaultSupportPath = "/opt/senzing/er/data";
                 break;
             case PlatformID.Unix:
-                if (devDistDir == null)
-                {
-                    defaultInstallPath = "/opt/senzing/er";
-                    defaultConfigPath = "/etc/opt/senzing";
-                }
-                else
-                {
-                    defaultInstallPath = devDistDir.FullName;
-                }
+                defaultInstallPath = "/opt/senzing/er";
+                defaultConfigPath = "/etc/opt/senzing";
+                defaultSupportPath = "/opt/senzing/data";
                 break;
             default:
                 throw new NotSupportedException(
@@ -314,104 +290,36 @@ public class InstallLocations
             return null;
         }
 
+        // check if an explicit support path has been specified
         if (supportPath == null || supportPath.Trim().Length == 0)
         {
-            // try to determine the support path
-            DirectoryInfo? installParent = installDir.Parent;
-            DirectoryInfo? dataRoot = (installParent != null)
-                ? new DirectoryInfo(Path.Combine(installParent.FullName, "data"))
-                : null;
-
-            if (dataRoot != null && dataRoot.Exists && IsDirectory(dataRoot.FullName))
+            // check if using a dev build
+            if ("dist".Equals(installDir.Name, OrdinalIgnoreCase))
             {
-                DirectoryInfo? versionFile
-                    = new DirectoryInfo(
-                        Path.Combine(installDir.FullName, "szBuildVersion.json"));
-
-                string? dataVersion = null;
-                if (versionFile != null && versionFile.Exists)
-                {
-
-                    String text = File.ReadAllText(versionFile.FullName, UTF8);
-                    JsonDocument jsonDoc = JsonDocument.Parse(text);
-                    JsonElement rootElem = jsonDoc.RootElement;
-                    JsonElement dataVerElem = rootElem.GetProperty("DATA_VERSION");
-                    dataVersion = dataVerElem.GetString();
-                }
-
-                // try the data version directory
-                supportDir = (dataVersion == null)
-                    ? null
-                    : new DirectoryInfo(
-                        Path.Combine(dataRoot.FullName, dataVersion.Trim()));
-
-                // check if data version was not found
-                if (supportDir == null || !supportDir.Exists)
-                {
-                    Regex regex = new Regex("\\d+\\.\\d+\\.\\d+");
-                    // look to see if we only have one data version installed
-                    string[] dirs = Directory.GetDirectories(dataRoot.FullName);
-                    List<DirectoryInfo> versionDirs
-                        = new List<DirectoryInfo>();
-                    foreach (string dir in dirs)
-                    {
-                        DirectoryInfo versionDir = new DirectoryInfo(dir);
-                        if (!regex.IsMatch(versionDir.Name)) continue;
-                        versionDirs.Add(versionDir);
-                    }
-                    if (versionDirs.Count == 1 && supportDir == null)
-                    {
-                        // use the single data version found
-                        supportDir = versionDirs[0];
-                    }
-                    else if (versionDirs.Count > 1)
-                    {
-                        Console.Error.WriteLine(
-                            "Could not infer support directory.  Multiple data "
-                                + "directory versions at: ");
-                        Console.Error.WriteLine("     " + dataRoot);
-                        if (supportDir != null)
-                        {
-                            Console.Error.WriteLine();
-                            Console.Error.WriteLine("Expected to find: " + supportDir);
-                        }
-                        throw new InvalidOperationException(
-                            ((supportDir == null)
-                                ? "Could not infer support directory."
-                                : "Could not find support directory (" + supportDir + ").")
-                                + "  Multiple data directory versions found at: "
-                                + dataRoot);
-                    }
-                    else
-                    {
-                        // no version directories were found, maybe the data root is
-                        // the actual support directory (mapped in a docker image)
-                        string[] files = Directory.GetFiles(dataRoot.FullName);
-                        List<FileInfo> ibmFiles = new List<FileInfo>();
-                        foreach (string file in files)
-                        {
-                            if (file.EndsWith(".ibm", OrdinalIgnoreCase))
-                            {
-                                ibmFiles.Add(new FileInfo(file));
-                            }
-                        }
-                        DirectoryInfo? libPostalDir = new DirectoryInfo(
-                            Path.Combine(dataRoot.FullName, "libpostal"));
-
-                        // require the .ibm files and libpostal to exist
-                        if (ibmFiles.Count > 0 && libPostalDir.Exists)
-                        {
-                            supportDir = dataRoot;
-                        }
-                    }
-                }
-
-            }
-            if (supportDir == null)
-            {
-                // use the default path
+                // use the "data" sub-directory of the dev build
                 supportDir = new DirectoryInfo(
                     Path.Combine(installDir.FullName, "data"));
+            }
+            else
+            {
+                switch (Environment.OSVersion.Platform)
+                {
+                    case PlatformID.Win32NT:
+                        defaultSupportPath = Path.Combine(installDir.FullName, "data");
+                        break;
+                    case PlatformID.MacOSX:
+                        defaultSupportPath = Path.Combine(installDir.FullName, "data");
+                        break;
+                    case PlatformID.Unix:
+                        break;
+                    default:
+                        throw new NotSupportedException(
+                             "Unsupported Operating System: "
+                             + Environment.OSVersion.Platform);
+                }
+
+                // no explicit path, try the default support path
+                supportDir = new DirectoryInfo(defaultSupportPath);
             }
 
         }
