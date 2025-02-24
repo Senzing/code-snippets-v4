@@ -306,16 +306,16 @@ public class InstallLocations
                 {
                     case PlatformID.Win32NT:
                         defaultSupportPath = Path.Combine(installDir.FullName, "data");
-                    break;
+                        break;
                     case PlatformID.MacOSX:
                         defaultSupportPath = Path.Combine(installDir.FullName, "data");
                         break;
                     case PlatformID.Unix:
                         break;
                     default:
-                       throw new NotSupportedException(
-                            "Unsupported Operating System: "
-                            + Environment.OSVersion.Platform);
+                        throw new NotSupportedException(
+                             "Unsupported Operating System: "
+                             + Environment.OSVersion.Platform);
                 }
 
                 // no explicit path, try the default support path

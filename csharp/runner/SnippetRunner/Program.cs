@@ -544,7 +544,9 @@ static void ExecuteSnippet(string snippet,
 
 
             ProcessStartInfo killStartInfo
-                = new ProcessStartInfo("kill", "" + process.Id);
+                = (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                ? new ProcessStartInfo("taskkill", ["/F", "/PID", "" + process.Id])
+                : new ProcessStartInfo("kill", "" + process.Id);
 
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.UseShellExecute = false;
