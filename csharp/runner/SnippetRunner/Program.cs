@@ -28,6 +28,8 @@ const string TestSource = "TEST_SOURCE";
 
 const int SigtermExitCode = 143;
 
+Console.Error.WriteLine("ARCHITECTURE: " + System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture);
+
 DirectoryInfo dir = new DirectoryInfo(Directory.GetCurrentDirectory());
 DirectoryInfo? csharpDir = null;
 DirectoryInfo? snippetDir = null;
