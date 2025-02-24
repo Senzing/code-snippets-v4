@@ -538,7 +538,8 @@ static void ExecuteSnippet(string snippet,
         bool exited = process.WaitForExit(delay);
         if (!exited && !process.HasExited)
         {
-            expectedExitValue = SigtermExitCode;
+            expectedExitValue = (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                ? 1 : SigtermExitCode;
             Console.WriteLine();
             Console.WriteLine("Runner destroying " + snippet + " process...");
 
