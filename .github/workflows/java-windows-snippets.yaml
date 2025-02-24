@@ -36,7 +36,7 @@ jobs:
           SENZING_DIR: 'C:\Program Files\Senzing\er'
         run: |
           cd "${Env:GITHUB_WORKSPACE}/java"
-          mvn clean install
+          mvn clean install -Pcheckstyle,spotbugs -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
       - name: Add to "Path" environment variable
         run: |

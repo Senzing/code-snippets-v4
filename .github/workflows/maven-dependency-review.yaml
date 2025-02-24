@@ -1,0 +1,26 @@
+name: maven dependency review
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-submission-maven:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - java-version: "17"
+            java-distribution: "temurin"
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Dependency Review"
+        uses: actions/dependency-review-action@v4
