@@ -37,10 +37,10 @@ jobs:
 
       - name: configure local nuget repo
         run: |
-          sdk_package=$(grep -Rl "Senzing.Sdk" /opt/senzing/er/lib/ | xargs -L 1 basename)
+          sdk_package=$(grep -Rl "Senzing.Sdk" /opt/senzing/er/sdk/dotnet/ | xargs -L 1 basename)
           mkdir -p ~/dev/nuget/packages
           dotnet nuget add source ~/dev/nuget/packages -n dev
-          dotnet nuget push /opt/senzing/er/lib/"${sdk_package}" --source dev
+          dotnet nuget push /opt/senzing/er/sdk/dotnet/"${sdk_package}" --source dev
 
       - name: run csharp snippets
         env:
