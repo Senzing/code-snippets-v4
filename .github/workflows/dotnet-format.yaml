@@ -27,6 +27,20 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
+      - name: install Senzing runtime
+        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        with:
+          packages-to-install: "senzingsdk-runtime senzingsdk-setup"
+          senzingsdk-repository-package: ${{ secrets.SENZING_APT_BETA_STAGING_REPOSITORY_PACKAGE }}
+          senzingsdk-repository-path: ${{ secrets.SENZING_APT_BETA_STAGING_REPOSITORY_URL }}
+
+      - name: configure local nuget repo
+        run: |
+          sdk_package=$(grep -Rl "Senzing.Sdk" /opt/senzing/er/sdk/dotnet/ | xargs -L 1 basename)
+          mkdir -p ~/dev/nuget/packages
+          dotnet nuget add source ~/dev/nuget/packages -n dev
+          dotnet nuget push /opt/senzing/er/sdk/dotnet/"${sdk_package}" --source dev
+
       - name: dotnet format all
         run: |
           projects=$(find . -name "*.csproj")
