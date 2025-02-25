@@ -32,7 +32,7 @@ jobs:
           projects=$(find . -name "*.csproj")
           echo "[INFO] projects are: $projects"
           for project in $projects; do
-            cd $project
+            cd "$(dirname "$project")"
             dotnet restore
             dotnet format --verify-no-changes --verbosity diagnostic
           done
