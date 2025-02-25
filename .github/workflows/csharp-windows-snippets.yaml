@@ -31,17 +31,17 @@ jobs:
 
       - name: configure local nuget repo
         run: |
-          $Env:sdk_package = Get-ChildItem -Path "C:\Program Files\Senzing\er\sdk\dotnet\" -Recurse | Where-Object {$_.Name -match "^Senzing.SDK*"} | Select-Object -ExpandProperty Name
+          $Env:sdk_package = Get-ChildItem -Path "$Env:USERPROFILE\Senzing\er\sdk\dotnet\" -Recurse | Where-Object {$_.Name -match "^Senzing.SDK*"} | Select-Object -ExpandProperty Name
           mkdir $Env:USERPROFILE\dev\nuget\packages
           cd $Env:USERPROFILE\dev\nuget\packages
           dir
           dotnet nuget add source $Env:USERPROFILE\dev\nuget\packages -n senzing
-          dotnet nuget push "C:\Program Files\Senzing\er\sdk\dotnet\${Env:sdk_package}" --source senzing
+          dotnet nuget push "$Env:USERPROFILE\Senzing\er\sdk\dotnet\${Env:sdk_package}" --source senzing
           dotnet nuget list source
 
       - name: Add to "Path" environment variable
         run: |
-          Add-Content $env:GITHUB_PATH "C:\Program Files\Senzing\er\lib"
+          Add-Content $env:GITHUB_PATH "$Env:USERPROFILE\Senzing\er\lib"
 
       - name: run csharp snippets
         run: |

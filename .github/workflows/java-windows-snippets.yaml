@@ -32,15 +32,14 @@ jobs:
           senzingsdk-repository-path: ${{ secrets.SENZING_WIN_BETA_REPOSITORY }}
 
       - name: build with Maven
-        env:
-          SENZING_DIR: 'C:\Program Files\Senzing\er'
         run: |
+          $Env:SENZING_DIR = "$Env:USERPROFILE\Senzing\er"
           cd "${Env:GITHUB_WORKSPACE}/java"
           mvn clean install
 
       - name: Add to "Path" environment variable
         run: |
-          Add-Content $env:GITHUB_PATH "C:\Program Files\Senzing\er\lib"
+          Add-Content $env:GITHUB_PATH "$Env:USERPROFILE\Senzing\er\lib"
 
       - name: run java snippets
         run: |

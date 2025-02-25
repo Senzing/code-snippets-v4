@@ -32,15 +32,13 @@ jobs:
           senzingsdk-repository-path: ${{ secrets.SENZING_OSX_BETA_REPOSITORY }}
 
       - name: build with Maven
-        env:
-          SENZING_DIR: "/opt/senzing/er"
         run: |
+          SENZING_DIR="${HOME}/senzing/er"
           cd "${GITHUB_WORKSPACE}"/java
           mvn clean install
 
       - name: run java snippets
-        env:
-          DYLD_LIBRARY_PATH: "/opt/senzing/er/lib"
         run: |
+          DYLD_LIBRARY_PATH="${HOME}/senzing/er/lib"
           cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all
