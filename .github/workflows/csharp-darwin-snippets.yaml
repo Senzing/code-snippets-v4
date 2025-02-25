@@ -39,8 +39,12 @@ jobs:
 
       - name: run csharp snippets
         run: |
+          # shellcheck disable=SC2034
           DYLD_LIBRARY_PATH="${HOME}/senzing/er/lib"
+          # shellcheck disable=SC2034
           SENZING_DATA_DIR="${HOME}/senzing/er/data"
+          # shellcheck disable=SC2034
+          SENZING_DIR="${HOME}/senzing/er"
           cd "${GITHUB_WORKSPACE}"/csharp/runner
           dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
           dotnet run --project SnippetRunner all

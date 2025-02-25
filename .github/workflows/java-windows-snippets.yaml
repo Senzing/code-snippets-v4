@@ -44,4 +44,4 @@ jobs:
       - name: run java snippets
         run: |
           cd "${Env:GITHUB_WORKSPACE}/java"
-          java -jar target/sz-sdk-snippets.jar all
+          java -jar -Dsenzing.install.dir="$Env:USERPROFILE\Senzing\er" target/sz-sdk-snippets.jar all
