@@ -29,5 +29,10 @@ jobs:
 
       - name: dotnet format all
         run: |
-          dotnet restore
-          dotnet format --verify-no-changes --verbosity diagnostic
+          projects=$(find . -name "*.csproj")
+          echo "[INFO] projects are: $projects"
+          for project in $projects; do
+            cd $project
+            dotnet restore
+            dotnet format --verify-no-changes --verbosity diagnostic
+          done
