@@ -34,7 +34,7 @@ jobs:
       - name: build with Maven
         run: |
           # shellcheck disable=SC2034
-          SENZING_DIR="${HOME}/senzing/er"
+          export SENZING_DIR="${HOME}/senzing/er"
           echo "[INFO] SENZING_DIR is: $SENZING_DIR"
           ls -tlc $SENZING_DIR
           echo "-- SDK LISTING"
@@ -47,7 +47,7 @@ jobs:
       - name: run java snippets
         run: |
           # shellcheck disable=SC2034
-          SENZING_DIR="${HOME}/senzing/er"
+          export SENZING_DIR="${HOME}/senzing/er"
           export DYLD_LIBRARY_PATH="${SENZING_DIR}/lib:${SENZING_DIR}/lib/macos"
           cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all
