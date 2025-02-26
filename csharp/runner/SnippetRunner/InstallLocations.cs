@@ -201,7 +201,6 @@ public class InstallLocations
 
         switch (Environment.OSVersion.Platform)
         {
-            case Pl
             case PlatformID.Win32NT:
                 defaultInstallPath = homeInstall.FullName;
                 defaultSupportPath = homeSupport.FullName;
