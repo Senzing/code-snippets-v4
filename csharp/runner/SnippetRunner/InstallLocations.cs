@@ -201,6 +201,7 @@ public class InstallLocations
 
         switch (Environment.OSVersion.Platform)
         {
+            case Pl
             case PlatformID.Win32NT:
                 defaultInstallPath = homeInstall.FullName;
                 defaultSupportPath = homeSupport.FullName;
@@ -222,6 +223,7 @@ public class InstallLocations
 
         Console.Error.WriteLine();
         Console.Error.WriteLine("---------------------------------");
+        Console.Error.WriteLine("IS MACOS: " + OperatingSystem.IsMacOS());
         Console.Error.WriteLine("PLATFORM ID: " + Environment.OSVersion.Platform);
         Console.Error.WriteLine("DEFAULT SUPPORT PATH: " + defaultSupportPath);
         Console.Error.WriteLine("HOME SUPPORT PATH: " + homeSupport.FullName);
