@@ -220,6 +220,13 @@ public class InstallLocations
                     + Environment.OSVersion.Platform);
         }
 
+        Console.Error.WriteLine();
+        Console.Error.WriteLine("---------------------------------");
+        Console.Error.WriteLine("PLATFORM ID: " + PlatformID.MacOSX);
+        Console.Error.WriteLine("DEFAULT SUPPORT PATH: " + defaultSupportPath);
+        Console.Error.WriteLine("---------------------------------");
+        Console.Error.WriteLine();
+
         // check for senzing system properties
         string? installPath = Environment.GetEnvironmentVariable(
             "SENZING_DIR");
@@ -311,22 +318,6 @@ public class InstallLocations
             }
             else
             {
-                switch (Environment.OSVersion.Platform)
-                {
-                    case PlatformID.Win32NT:
-                        defaultSupportPath = Path.Combine(installDir.FullName, "data");
-                        break;
-                    case PlatformID.MacOSX:
-                        defaultSupportPath = Path.Combine(installDir.FullName, "data");
-                        break;
-                    case PlatformID.Unix:
-                        break;
-                    default:
-                        throw new NotSupportedException(
-                             "Unsupported Operating System: "
-                             + Environment.OSVersion.Platform);
-                }
-
                 // no explicit path, try the default support path
                 supportDir = new DirectoryInfo(defaultSupportPath);
             }
