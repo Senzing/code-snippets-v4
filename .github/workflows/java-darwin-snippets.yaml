@@ -47,6 +47,6 @@ jobs:
       - name: run java snippets
         run: |
           # shellcheck disable=SC2034
-          DYLD_LIBRARY_PATH="${HOME}/senzing/er/lib"
+          DYLD_LIBRARY_PATH="${HOME}/senzing/er/lib:${HOME}/senzing/er/lib/macos"
           cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all
