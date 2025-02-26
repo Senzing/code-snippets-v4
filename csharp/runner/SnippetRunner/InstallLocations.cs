@@ -224,6 +224,7 @@ public class InstallLocations
         Console.Error.WriteLine("---------------------------------");
         Console.Error.WriteLine("PLATFORM ID: " + PlatformID.MacOSX);
         Console.Error.WriteLine("DEFAULT SUPPORT PATH: " + defaultSupportPath);
+        Console.Error.WriteLine("HOME SUPPORT PATH: " + homeSupport.FullName);
         Console.Error.WriteLine("---------------------------------");
         Console.Error.WriteLine();
 
