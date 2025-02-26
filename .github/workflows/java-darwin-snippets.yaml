@@ -36,6 +36,7 @@ jobs:
           # shellcheck disable=SC2034
           SENZING_DIR="${HOME}/senzing/er"
           echo "[INFO] SENZING_DIR is: $SENZING_DIR"
+          ls -tlc "${SENZING_DIR}"/sdk/java
           cd "${GITHUB_WORKSPACE}"/java
           mvn clean install
 
