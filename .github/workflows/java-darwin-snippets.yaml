@@ -34,8 +34,10 @@ jobs:
       - name: configure environment
         run: |
           SENZING_DIR="${HOME}/senzing/er"
-          echo "SENZING_DIR=${SENZING_DIR}" >> "$GITHUB_ENV"
-          echo "DYLD_LIBRARY_PATH=${SENZING_DIR}/lib:${SENZING_DIR}/lib/macos" >> "$GITHUB_ENV"
+          {
+            echo "SENZING_DIR=${SENZING_DIR}"
+            echo "DYLD_LIBRARY_PATH=${SENZING_DIR}/lib:${SENZING_DIR}/lib/macos"
+          } >> "$GITHUB_ENV"
 
       - name: build with Maven
         run: |
