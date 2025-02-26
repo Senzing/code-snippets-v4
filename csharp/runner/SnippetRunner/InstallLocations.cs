@@ -222,13 +222,6 @@ public class InstallLocations
                 + Environment.OSVersion.Platform);
         }
 
-        Console.Error.WriteLine();
-        Console.Error.WriteLine("---------------------------------");
-        Console.Error.WriteLine("DEFAULT SUPPORT PATH: " + defaultSupportPath);
-        Console.Error.WriteLine("HOME SUPPORT PATH: " + homeSupport.FullName);
-        Console.Error.WriteLine("---------------------------------");
-        Console.Error.WriteLine();
-
         // check for senzing system properties
         string? installPath = Environment.GetEnvironmentVariable(
             "SENZING_DIR");
@@ -238,6 +231,14 @@ public class InstallLocations
             "SENZING_DATA_DIR");
         string? resourcePath = Environment.GetEnvironmentVariable(
             "SENZING_RESOURCE_DIR");
+
+        Console.Error.WriteLine();
+        Console.Error.WriteLine("---------------------------------");
+        Console.Error.WriteLine("EXPLICIT SUPPORT PATH: " + supportPath);
+        Console.Error.WriteLine("DEFAULT SUPPORT PATH: " + defaultSupportPath);
+        Console.Error.WriteLine("HOME SUPPORT PATH: " + homeSupport.FullName);
+        Console.Error.WriteLine("---------------------------------");
+        Console.Error.WriteLine();
 
         // normalize empty strings as null
         if (installPath != null && installPath.Trim().Length == 0)
