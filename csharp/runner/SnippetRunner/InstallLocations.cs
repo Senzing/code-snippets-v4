@@ -232,14 +232,6 @@ public class InstallLocations
         string? resourcePath = Environment.GetEnvironmentVariable(
             "SENZING_RESOURCE_DIR");
 
-        Console.Error.WriteLine();
-        Console.Error.WriteLine("---------------------------------");
-        Console.Error.WriteLine("EXPLICIT SUPPORT PATH: " + supportPath);
-        Console.Error.WriteLine("DEFAULT SUPPORT PATH: " + defaultSupportPath);
-        Console.Error.WriteLine("HOME SUPPORT PATH: " + homeSupport.FullName);
-        Console.Error.WriteLine("---------------------------------");
-        Console.Error.WriteLine();
-
         // normalize empty strings as null
         if (installPath != null && installPath.Trim().Length == 0)
         {
