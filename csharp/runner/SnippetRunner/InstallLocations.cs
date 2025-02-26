@@ -199,31 +199,31 @@ public class InstallLocations
         string? defaultConfigPath = null;
         string defaultSupportPath;
 
-        switch (Environment.OSVersion.Platform)
+        if (OperatingSystem.IsWindows())
         {
-            case PlatformID.Win32NT:
-                defaultInstallPath = homeInstall.FullName;
-                defaultSupportPath = homeSupport.FullName;
-                break;
-            case PlatformID.MacOSX:
-                defaultInstallPath = homeInstall.FullName;
-                defaultSupportPath = homeSupport.FullName;
-                break;
-            case PlatformID.Unix:
-                defaultInstallPath = "/opt/senzing/er";
-                defaultConfigPath = "/etc/opt/senzing";
-                defaultSupportPath = "/opt/senzing/data";
-                break;
-            default:
-                throw new NotSupportedException(
-                    "Unsupported Operating System: "
-                    + Environment.OSVersion.Platform);
+            defaultInstallPath = homeInstall.FullName;
+            defaultSupportPath = homeSupport.FullName;
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            defaultInstallPath = homeInstall.FullName;
+            defaultSupportPath = homeSupport.FullName;
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            defaultInstallPath = "/opt/senzing/er";
+            defaultConfigPath = "/etc/opt/senzing";
+            defaultSupportPath = "/opt/senzing/data";
+        }
+        else
+        {
+            throw new NotSupportedException(
+                "Unsupported Operating System: "
+                + Environment.OSVersion.Platform);
         }
 
         Console.Error.WriteLine();
         Console.Error.WriteLine("---------------------------------");
-        Console.Error.WriteLine("IS MACOS: " + OperatingSystem.IsMacOS());
-        Console.Error.WriteLine("PLATFORM ID: " + Environment.OSVersion.Platform);
         Console.Error.WriteLine("DEFAULT SUPPORT PATH: " + defaultSupportPath);
         Console.Error.WriteLine("HOME SUPPORT PATH: " + homeSupport.FullName);
         Console.Error.WriteLine("---------------------------------");
