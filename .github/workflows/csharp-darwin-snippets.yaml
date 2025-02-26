@@ -29,9 +29,17 @@ jobs:
         with:
           senzingsdk-repository-path: ${{ secrets.SENZING_OSX_BETA_REPOSITORY }}
 
+      - name: configure environment
+        run: |
+          SENZING_DIR="${HOME}/senzing/er"
+          {
+            echo "SENZING_DIR=${SENZING_DIR}"
+            echo "DYLD_LIBRARY_PATH=${SENZING_DIR}/lib"
+            echo "SENZING_DATA_DIR=${SENZING_DIR}/data" 
+          } >> "$GITHUB_ENV"
+
       - name: configure local nuget repo
         run: |
-          find "${HOME}"/senzing/er/sdk/dotnet/ -name "Senzing.Sdk*" | xargs -0 -L 1 basename
           sdk_package=$(find "${HOME}"/senzing/er/sdk/dotnet/ -name "Senzing.Sdk*" | xargs -0 -L 1 basename)
           mkdir -p ~/dev/nuget/packages
           dotnet nuget add source ~/dev/nuget/packages -n dev
@@ -39,10 +47,6 @@ jobs:
 
       - name: run csharp snippets
         run: |
-          # shellcheck disable=SC2034
-          export SENZING_DIR="${HOME}/senzing/er"
-          # shellcheck disable=SC2034
-          export DYLD_LIBRARY_PATH="${SENZING_DIR}/lib"
           cd "${GITHUB_WORKSPACE}"/csharp/runner
           dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
           dotnet run --project SnippetRunner all
