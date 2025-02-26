@@ -35,7 +35,6 @@ jobs:
           {
             echo "SENZING_DIR=${SENZING_DIR}"
             echo "DYLD_LIBRARY_PATH=${SENZING_DIR}/lib"
-            echo "SENZING_DATA_DIR=${SENZING_DIR}/data" 
           } >> "$GITHUB_ENV"
 
       - name: configure local nuget repo
