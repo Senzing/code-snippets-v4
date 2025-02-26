@@ -180,6 +180,15 @@ public class InstallLocations
     /// </summary>
     public static InstallLocations? FindLocations()
     {
+        DirectoryInfo homeDir = new DirectoryInfo(Environment.GetFolderPath(
+            Environment.SpecialFolder.UserProfile));
+        DirectoryInfo homeSenzing = new DirectoryInfo(
+            Path.Combine(homeDir.FullName, "senzing"));
+        DirectoryInfo homeInstall = new DirectoryInfo(
+            Path.Combine(homeSenzing.FullName, "er"));
+        DirectoryInfo homeSupport = new DirectoryInfo(
+            Path.Combine(homeInstall.FullName, "data"));
+
         DirectoryInfo? installDir = null;
         DirectoryInfo? configDir = null;
         DirectoryInfo? resourceDir = null;
@@ -193,12 +202,12 @@ public class InstallLocations
         switch (Environment.OSVersion.Platform)
         {
             case PlatformID.Win32NT:
-                defaultInstallPath = "C:\\Program Files\\Senzing\\er";
-                defaultSupportPath = "C:\\Program Files\\Senzing\\er\\data";
+                defaultInstallPath = homeInstall.FullName;
+                defaultSupportPath = homeSupport.FullName;
                 break;
             case PlatformID.MacOSX:
-                defaultInstallPath = "/opt/senzing/er";
-                defaultSupportPath = "/opt/senzing/er/data";
+                defaultInstallPath = homeInstall.FullName;
+                defaultSupportPath = homeSupport.FullName;
                 break;
             case PlatformID.Unix:
                 defaultInstallPath = "/opt/senzing/er";

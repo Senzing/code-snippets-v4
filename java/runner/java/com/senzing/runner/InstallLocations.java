@@ -133,8 +133,8 @@ public class InstallLocations {
      * Finds the install directories and returns the {@link InstallLocations}
      * instance describing those locations.
      *
-     * @param senzingDir The optional Senzing installation directory if one has
-     *                   been provided, <code>null</code> otherwise.
+     * @param senzingDir The optional Senzing installation directory if one has been
+     *                   provided, <code>null</code> otherwise.
      * 
      * @return The {@link InstallLocations} instance describing the install
      *         locations.
@@ -148,12 +148,14 @@ public class InstallLocations {
         String lowerOSName = osName.toLowerCase().trim();
         if (lowerOSName.startsWith("windows")) {
             windows = true;
-        } else if (lowerOSName.startsWith("mac")
-                   || lowerOSName.indexOf("darwin") >= 0)
-        {
+        } else if (lowerOSName.startsWith("mac") || lowerOSName.indexOf("darwin") >= 0) {
             macOS = true;
         }
 
+        File homeDir = new File(System.getProperty("user.home"));
+        File homeSenzing = new File(homeDir, "senzing");
+        File homeInstall = new File(homeSenzing, "er");
+        File homeSupport = new File(homeInstall, "data");
         File installDir = null;
         File configDir = null;
         File resourceDir = null;
@@ -165,14 +167,14 @@ public class InstallLocations {
             String defaultSupportPath = null;
 
             if (windows) {
-                defaultInstallPath = "C:\\Program Files\\Senzing\\er";
-                defaultSupportPath = "C:\\Program Files\\Senzing\\er\\data";
+                defaultInstallPath = homeInstall.getCanonicalPath();
+                defaultSupportPath = homeSupport.getCanonicalPath();
             } else if (macOS) {
-                defaultInstallPath = "/opt/senzing/er";
-                defaultSupportPath = "/opt/senzing/er/data";
+                defaultInstallPath = homeInstall.getCanonicalPath();
+                defaultSupportPath = homeSupport.getCanonicalPath();
             } else {
                 defaultInstallPath = "/opt/senzing/er";
-                defaultConfigPath  = "/etc/opt/senzing";
+                defaultConfigPath = "/etc/opt/senzing";
                 defaultSupportPath = "/opt/senzing/data";
             }
 
@@ -214,12 +216,10 @@ public class InstallLocations {
                 System.err.println("     " + installDir);
                 System.err.println();
                 if (installPath != null) {
-                    System.err.println(
-                        "Check the -Dsenzing.install.dir=[path] command line option.");
+                    System.err.println("Check the -Dsenzing.install.dir=[path] command line option.");
                 } else {
-                    System.err.println(
-                        "Use the -Dsenzing.install.dir=[path] command line option to "
-                        + "specify a path");
+                    System.err
+                            .println("Use the -Dsenzing.install.dir=[path] command line option to " + "specify a path");
                 }
 
                 return null;
@@ -227,9 +227,7 @@ public class InstallLocations {
 
             // normalize the senzing directory
             String dirName = installDir.getName();
-            if (installDir.isDirectory() && !dirName.equalsIgnoreCase("er")
-                && dirName.equalsIgnoreCase("senzing"))
-            {
+            if (installDir.isDirectory() && !dirName.equalsIgnoreCase("er") && dirName.equalsIgnoreCase("senzing")) {
                 // for windows or linux allow the "Senzing" dir as well
                 installDir = new File(installDir, "er");
             }
@@ -239,12 +237,10 @@ public class InstallLocations {
                 System.err.println("     " + installDir);
                 System.err.println();
                 if (installPath != null) {
-                    System.err.println(
-                        "Check the -Dsenzing.install.dir=[path] command line option.");
+                    System.err.println("Check the -Dsenzing.install.dir=[path] command line option.");
                 } else {
-                    System.err.println(
-                        "Use the -Dsenzing.install.dir=[path] command line option to "
-                        + "specify a path");
+                    System.err
+                            .println("Use the -Dsenzing.install.dir=[path] command line option to " + "specify a path");
                 }
 
                 return null;
@@ -260,7 +256,7 @@ public class InstallLocations {
                     supportDir = new File(installDir, "data");
                 } else {
                     // no explicit path, try the default support path
-                     supportDir = new File(defaultSupportPath);
+                    supportDir = new File(defaultSupportPath);
                 }
 
             } else {
@@ -274,8 +270,8 @@ public class InstallLocations {
                 if (supportPath != null) {
                     System.err.println("Check the -Dsenzing.support.dir=[path] command line option.");
                 } else {
-                    System.err.println("Use the -Dsenzing.support.dir=[path] command line option to "
-                        + "specify a path");
+                    System.err
+                            .println("Use the -Dsenzing.support.dir=[path] command line option to " + "specify a path");
                 }
 
                 throw new IllegalStateException("The support directory does not exist: " + supportDir);
@@ -287,8 +283,8 @@ public class InstallLocations {
                 if (supportPath != null) {
                     System.err.println("Check the -Dsenzing.support.dir=[path] command line option.");
                 } else {
-                    System.err.println("Use the -Dsenzing.support.dir=[path] command line option to "
-                        + "specify a path");
+                    System.err
+                            .println("Use the -Dsenzing.support.dir=[path] command line option to " + "specify a path");
                 }
                 throw new IllegalStateException("The support directory is invalid: " + supportDir);
 
@@ -317,24 +313,21 @@ public class InstallLocations {
                 configDir = new File(installDir, "etc");
                 if (!configDir.exists()) {
                     configDir = null;
-                }                
+                }
             }
 
             if (configPath != null && !configDir.exists()) {
-                System.err.println(
-                    "The -Dsenzing.config.dir=[path] option specifies a path that does not exist:");
+                System.err.println("The -Dsenzing.config.dir=[path] option specifies a path that does not exist:");
                 System.err.println("         " + configPath);
 
                 throw new IllegalStateException("Explicit config path does not exist: " + configPath);
             }
             if (configDir != null && configDir.exists()) {
                 if (!configDir.isDirectory()) {
-                    System.err.println(
-                        "The -Dsenzing.config.dir=[path] option specifies a file, not a directory:");
+                    System.err.println("The -Dsenzing.config.dir=[path] option specifies a file, not a directory:");
                     System.err.println("         " + configPath);
 
-                    throw new IllegalStateException(
-                        "Explicit config path is not directory: " + configPath);
+                    throw new IllegalStateException("Explicit config path is not directory: " + configPath);
                 }
 
                 String[] requiredFiles = { "cfgVariant.json" };
@@ -348,13 +341,11 @@ public class InstallLocations {
                     }
                 }
                 if (missingFiles.size() > 0 && configPath != null) {
-                    System.err.println(
-                        "The -Dsenzing.config.dir=[path] option specifies an invalid config directory:");
+                    System.err.println("The -Dsenzing.config.dir=[path] option specifies an invalid config directory:");
                     for (String missing : missingFiles) {
                         System.err.println("         " + missing + " was not found");
                     }
-                    throw new IllegalStateException(
-                            "Explicit config path missing required files: " + missingFiles);
+                    throw new IllegalStateException("Explicit config path missing required files: " + missingFiles);
                 }
             }
 
@@ -372,22 +363,19 @@ public class InstallLocations {
 
             if (resourcePath != null) {
                 if (!resourceDir.exists()) {
-                    System.err.println(
-                        "The -Dsenzing.resource.dir=[path] option specifies a path that does not exist:");
+                    System.err
+                            .println("The -Dsenzing.resource.dir=[path] option specifies a path that does not exist:");
                     System.err.println("         " + resourcePath);
 
-                    throw new IllegalStateException(
-                        "Explicit resource path does not exist: " + resourcePath);
+                    throw new IllegalStateException("Explicit resource path does not exist: " + resourcePath);
                 }
 
                 if (!resourceDir.isDirectory() || !templatesDir.exists() || !templatesDir.isDirectory()) {
                     System.err.println(
-                            "The -Dsenzing.resource.dir=[path] option specifies an invalid "
-                            + "resource directory:");
+                            "The -Dsenzing.resource.dir=[path] option specifies an invalid " + "resource directory:");
                     System.err.println("         " + resourcePath);
 
-                    throw new IllegalStateException(
-                        "Explicit resource path is not valid: " + resourcePath);
+                    throw new IllegalStateException("Explicit resource path is not valid: " + resourcePath);
                 }
 
             } else if (!resourceDir.exists() || !resourceDir.isDirectory() || !templatesDir.exists()
