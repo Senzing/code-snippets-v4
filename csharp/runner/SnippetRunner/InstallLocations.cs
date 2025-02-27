@@ -180,6 +180,15 @@ public class InstallLocations
     /// </summary>
     public static InstallLocations? FindLocations()
     {
+        DirectoryInfo homeDir = new DirectoryInfo(Environment.GetFolderPath(
+            Environment.SpecialFolder.UserProfile));
+        DirectoryInfo homeSenzing = new DirectoryInfo(
+            Path.Combine(homeDir.FullName, "senzing"));
+        DirectoryInfo homeInstall = new DirectoryInfo(
+            Path.Combine(homeSenzing.FullName, "er"));
+        DirectoryInfo homeSupport = new DirectoryInfo(
+            Path.Combine(homeInstall.FullName, "data"));
+
         DirectoryInfo? installDir = null;
         DirectoryInfo? configDir = null;
         DirectoryInfo? resourceDir = null;
@@ -190,25 +199,27 @@ public class InstallLocations
         string? defaultConfigPath = null;
         string defaultSupportPath;
 
-        switch (Environment.OSVersion.Platform)
+        if (OperatingSystem.IsWindows())
         {
-            case PlatformID.Win32NT:
-                defaultInstallPath = "C:\\Program Files\\Senzing\\er";
-                defaultSupportPath = "C:\\Program Files\\Senzing\\er\\data";
-                break;
-            case PlatformID.MacOSX:
-                defaultInstallPath = "/opt/senzing/er";
-                defaultSupportPath = "/opt/senzing/er/data";
-                break;
-            case PlatformID.Unix:
-                defaultInstallPath = "/opt/senzing/er";
-                defaultConfigPath = "/etc/opt/senzing";
-                defaultSupportPath = "/opt/senzing/data";
-                break;
-            default:
-                throw new NotSupportedException(
-                    "Unsupported Operating System: "
-                    + Environment.OSVersion.Platform);
+            defaultInstallPath = homeInstall.FullName;
+            defaultSupportPath = homeSupport.FullName;
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            defaultInstallPath = homeInstall.FullName;
+            defaultSupportPath = homeSupport.FullName;
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            defaultInstallPath = "/opt/senzing/er";
+            defaultConfigPath = "/etc/opt/senzing";
+            defaultSupportPath = "/opt/senzing/data";
+        }
+        else
+        {
+            throw new NotSupportedException(
+                "Unsupported Operating System: "
+                + Environment.OSVersion.Platform);
         }
 
         // check for senzing system properties
@@ -302,22 +313,6 @@ public class InstallLocations
             }
             else
             {
-                switch (Environment.OSVersion.Platform)
-                {
-                    case PlatformID.Win32NT:
-                        defaultSupportPath = Path.Combine(installDir.FullName, "data");
-                        break;
-                    case PlatformID.MacOSX:
-                        defaultSupportPath = Path.Combine(installDir.FullName, "data");
-                        break;
-                    case PlatformID.Unix:
-                        break;
-                    default:
-                        throw new NotSupportedException(
-                             "Unsupported Operating System: "
-                             + Environment.OSVersion.Platform);
-                }
-
                 // no explicit path, try the default support path
                 supportDir = new DirectoryInfo(defaultSupportPath);
             }
