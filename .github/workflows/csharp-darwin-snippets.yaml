@@ -31,10 +31,9 @@ jobs:
 
       - name: configure environment
         run: |
-          SENZING_DIR="${HOME}/senzing/er"
+          SENZING_PATH="${HOME}/senzing"
           {
-            echo "SENZING_DIR=${SENZING_DIR}"
-            echo "DYLD_LIBRARY_PATH=${SENZING_DIR}/lib"
+            echo "DYLD_LIBRARY_PATH=${SENZING_PATH}/er/lib"
           } >> "$GITHUB_ENV"
 
       - name: configure local nuget repo

@@ -33,15 +33,15 @@ jobs:
 
       - name: build with Maven
         run: |
-          $Env:SENZING_DIR = "$Env:USERPROFILE\Senzing\er"
+          $Env:SENZING_PATH = "$Env:USERPROFILE\senzing"
           cd "${Env:GITHUB_WORKSPACE}/java"
           mvn clean install
 
       - name: Add to "Path" environment variable
         run: |
-          Add-Content $env:GITHUB_PATH "$Env:USERPROFILE\Senzing\er\lib"
+          Add-Content $env:GITHUB_PATH "$Env:USERPROFILE\senzing\er\lib"
 
       - name: run java snippets
         run: |
           cd "${Env:GITHUB_WORKSPACE}/java"
-          java "-Dsenzing.install.dir=$Env:USERPROFILE\Senzing\er" -jar target/sz-sdk-snippets.jar all
+          java -jar target/sz-sdk-snippets.jar all

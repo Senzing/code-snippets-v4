@@ -2,29 +2,40 @@
 
 The Java snippets are contained in the `snippets` directory under various Java package directories.
 
+## Prerequisites
+
+FurYou will need to set environment variables so the Senzing installation can be located for building and for running the snippets:
+
+- Linux:
+
+    ```console
+    export SENZING_PATH=/opt/senzing/
+    export LD_LIBRARY_PATH=$SENZING_PATH/er/lib:$LD_LIBRARY_PATH
+    ```
+
+- macOS:
+
+    ```console
+    export SENZING_PATH=$HOME/senzing
+    export DYLD_LIBRARY_PATH=$SENZING_PATH/er/lib:$SENZING_PATH/er/lib/macos:$DYLD_LIBRARY_PATH
+    ```
+
+- Windows:
+
+    ```console
+    set SENZING_PATH=%USERPROFILE%\senzing
+    set Path=%SENZING_PATH%\er\lib;%Path%
+    ```
+
 ## Building
 
 The Java snippets can built using the `pom.xml` in this directory using `mvn package`.  The result will be the `sz-sdk-snippets.jar` file in the `target` directory.
 
-1. First, set the `SENZING_DIR` environment variable so the `pom.xml` can locate
-the `sz-sdk.jar`.
-    - Linux/macOS:
+Run the maven build via the following:
 
-        ```console
-        export SENZING_DIR=/opt/senzing/er
-        ```
-
-    - Windows:
-
-        ```console
-        set SENZING_DIR=C:\Program Files\Senzing\er
-        ```
-
-1. Run the maven build:
-
-    ```console
-    mvn package
-    ```
+```console
+mvn package
+```
 
 ## Running
 
@@ -50,6 +61,8 @@ You may run any individual Snippet class directly providing you have a Senzing r
 
 The `com.senzing.runner.SnippetRunner` class will run one or more snippets for you and create a temporary Senzing repository to run
 then against.  This is the `Main-Class` of the `sz-sdk-snippets.jar` file so it can be executed using `java -jar target/sz-sdk-snippets.jar`.
+
+The runner will need to know the path to the Senzing installation.  This is accomplished by setting the `SENZING_PATH` environment variable as documented above.
 
 **NOTE:** When code snippets are run this way you cannot specify command-line arguments for individual snippets, nor can you respond to command-line input requests (they will be automatically be responded by the runner -- including forced termination of a snippet that is intended to run indefinitely).
 
