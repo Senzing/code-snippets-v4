@@ -33,8 +33,9 @@ jobs:
 
       - name: configure environment
         run: |
-          SENZING_PATH="${HOME}/senzing"
+          SENZING_PATH="${HOME}/senzing/er"
           {
+            echo "SENZING_PATH=${SENZING_PATH}"
             echo "DYLD_LIBRARY_PATH=${SENZING_PATH}/er/lib:${SENZING_PATH}/er/lib/macos"
           } >> "$GITHUB_ENV"
 
