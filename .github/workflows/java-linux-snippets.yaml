@@ -31,7 +31,7 @@ jobs:
           distribution: ${{ matrix.java-distribution }}
 
       - name: install Senzing runtime
-        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        uses: senzing-factory/github-action-install-senzing-sdk@v3
         with:
           packages-to-install: "senzingsdk-runtime senzingsdk-setup"
           senzingsdk-repository-package: ${{ secrets.SENZING_APT_BETA_STAGING_REPOSITORY_PACKAGE }}
@@ -39,7 +39,7 @@ jobs:
 
       - name: build with Maven
         env:
-          SENZING_DIR: "/opt/senzing/er"
+          SENZING_PATH: "/opt/senzing"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           mvn clean install -Pcheckstyle,spotbugs -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn

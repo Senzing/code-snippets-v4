@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
+### Changed in 0.0.5
+
+- Modified configuration examples for new szconfig and szconfigmanager pattern
+
 ### Added to 0.0.4
 
 - C# examples

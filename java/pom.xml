@@ -20,7 +20,7 @@
         <artifactId>sz-sdk</artifactId>
         <version>4.0.0-beta.2.0</version>
         <scope>system</scope>
-        <systemPath>${SENZING_DIR}/sdk/java/sz-sdk.jar</systemPath>
+        <systemPath>${SENZING_PATH}/er/sdk/java/sz-sdk.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.glassfish</groupId>
@@ -39,6 +39,7 @@
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.includeEncoding>UTF-8</project.build.includeEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <senzing.path>${SENZING_PATH}</senzing.path>
   </properties>
   <build>
     <sourceDirectory>snippets</sourceDirectory>
@@ -88,7 +89,7 @@
         <configuration>
           <createDependencyReducedPom>false</createDependencyReducedPom>
           <extraJars>
-            <include>${SENZING_DIR}/sdk/java/sz-sdk.jar</include>
+            <include>${SENZING_PATH}/er/sdk/java/sz-sdk.jar</include>
           </extraJars>
           <filters>
             <filter>

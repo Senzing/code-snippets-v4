@@ -27,20 +27,19 @@ jobs:
           distribution: ${{ matrix.java-distribution }}
 
       - name: install Senzing SDK
-        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        uses: senzing-factory/github-action-install-senzing-sdk@v3
         with:
           senzingsdk-repository-path: ${{ secrets.SENZING_WIN_BETA_REPOSITORY }}
 
       - name: build with Maven
-        env:
-          SENZING_DIR: 'C:\Program Files\Senzing\er'
         run: |
+          $Env:SENZING_PATH = "$Env:USERPROFILE\senzing"
           cd "${Env:GITHUB_WORKSPACE}/java"
           mvn clean install -Pcheckstyle,spotbugs -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
       - name: Add to "Path" environment variable
         run: |
-          Add-Content $env:GITHUB_PATH "C:\Program Files\Senzing\er\lib"
+          Add-Content $env:GITHUB_PATH "$Env:USERPROFILE\senzing\er\lib"
 
       - name: run java snippets
         run: |

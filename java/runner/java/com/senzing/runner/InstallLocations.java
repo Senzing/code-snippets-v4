@@ -3,8 +3,10 @@ package com.senzing.runner;
 import java.io.File;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import static com.senzing.runner.OperatingSystemFamily.RUNTIME_OS_FAMILY;
 
 /**
  * Describes the directories on disk used to find the Senzing product
@@ -101,8 +103,8 @@ public class InstallLocations {
     /**
      * Checks if the installation is actually a development build.
      * 
-     * @return <code>true</code> if this installation represents a development
-     *         build, otherwise <code>false</code>.
+     * @return <code>true</code> if this installation represents a
+     *         development build, otherwise <code>false</code>.
      */
     public boolean isDevelopmentBuild() {
         return this.devBuild;
@@ -133,50 +135,60 @@ public class InstallLocations {
      * Finds the install directories and returns the {@link InstallLocations}
      * instance describing those locations.
      *
-     * @param senzingDir The optional Senzing installation directory if one has
-     *                   been provided, <code>null</code> otherwise.
-     * 
      * @return The {@link InstallLocations} instance describing the install
      *         locations.
      */
     public static InstallLocations findLocations() {
-        final String osName = System.getProperty("os.name");
-
-        boolean windows = false;
-        boolean macOS = false;
-
-        String lowerOSName = osName.toLowerCase().trim();
-        if (lowerOSName.startsWith("windows")) {
-            windows = true;
-        } else if (lowerOSName.startsWith("mac")
-                   || lowerOSName.indexOf("darwin") >= 0)
-        {
-            macOS = true;
-        }
-
-        File installDir = null;
-        File configDir = null;
-        File resourceDir = null;
-        File supportDir = null;
-        File templatesDir = null;
+        File homeDir        = new File(System.getProperty("user.home"));
+        File homeSenzing    = new File(homeDir, "senzing");
+        File homeInstall    = new File(homeSenzing, "er");
+        File homeSupport    = new File(homeSenzing, "data");
+        
+        File senzingDir     = null;
+        File installDir     = null;
+        File configDir      = null;
+        File resourceDir    = null;
+        File supportDir     = null;
+        File templatesDir   = null;
         try {
+            String defaultSenzingPath = null;
             String defaultInstallPath;
             String defaultConfigPath = null;
             String defaultSupportPath = null;
-
-            if (windows) {
-                defaultInstallPath = "C:\\Program Files\\Senzing\\er";
-                defaultSupportPath = "C:\\Program Files\\Senzing\\er\\data";
-            } else if (macOS) {
-                defaultInstallPath = "/opt/senzing/er";
-                defaultSupportPath = "/opt/senzing/er/data";
-            } else {
-                defaultInstallPath = "/opt/senzing/er";
-                defaultConfigPath  = "/etc/opt/senzing";
-                defaultSupportPath = "/opt/senzing/data";
+            
+            // get the senzing path
+            String senzingPath = System.getProperty("senzing.path");
+            if (senzingPath == null || senzingPath.trim().length() == 0) {
+                senzingPath = System.getenv("SENZING_PATH");
+            }
+            if (senzingPath != null && senzingPath.trim().length() == 0) {
+                senzingPath = null;
             }
 
-            // set the install path if one has been provided
+            // check if we are in the dev structure with no senzing path defined
+            switch (RUNTIME_OS_FAMILY) {
+                case WINDOWS:
+                    defaultSenzingPath = homeSenzing.getCanonicalPath();
+                    defaultInstallPath = homeInstall.getCanonicalPath();
+                    defaultSupportPath = homeSupport.getCanonicalPath();
+                    break;
+                case MAC_OS:
+                    defaultSenzingPath = homeSenzing.getCanonicalPath();
+                    defaultInstallPath = homeInstall.getCanonicalPath();
+                    defaultSupportPath = homeSupport.getCanonicalPath();
+                    break;
+                case UNIX:
+                    defaultSenzingPath  = "/opt/senzing";
+                    defaultInstallPath  = defaultSenzingPath + "/er";
+                    defaultSupportPath  = defaultSenzingPath + "/data";
+                    defaultConfigPath   = "/etc/opt/senzing";
+                    break;
+                default:
+                    throw new IllegalStateException(
+                            "Unrecognized Operating System: " + RUNTIME_OS_FAMILY);
+            }
+
+            // check for senzing system properties
             String installPath = System.getProperty("senzing.install.dir");
             String configPath = System.getProperty("senzing.config.dir");
             String supportPath = System.getProperty("senzing.support.dir");
@@ -187,10 +199,13 @@ public class InstallLocations {
                 installPath = System.getenv("SENZING_DIR");
             }
             if (configPath == null || configPath.trim().length() == 0) {
-                configPath = System.getenv("SENZING_ETC_DIR");
+                configPath = System.getenv("SENZING_CONFIG_DIR");
             }
             if (supportPath == null || supportPath.trim().length() == 0) {
-                supportPath = System.getenv("SENZING_DATA_DIR");
+                supportPath = System.getenv("SENZING_SUPPORT_DIR");
+            }
+            if (resourcePath == null || resourcePath.trim().length() == 0) {
+                resourcePath = System.getenv("SENZING_RESOURCE_DIR");
             }
 
             // normalize empty strings as null
@@ -207,104 +222,185 @@ public class InstallLocations {
                 resourcePath = null;
             }
 
-            // check the senzing directory
-            installDir = new File(installPath == null ? defaultInstallPath : installPath);
-            if (!installDir.exists()) {
-                System.err.println("Could not find Senzing installation directory:");
+            // check for the root senzing dir
+            senzingDir = new File((senzingPath == null) ? defaultSenzingPath : senzingPath);
+            
+            if (!senzingDir.exists()) {
+                senzingDir = null;
+            }
+
+            // check the senzing install directory
+            installDir = (installPath != null)
+                ? new File(installPath)
+                : ((senzingDir == null) 
+                    ? new File(defaultInstallPath) 
+                    : (senzingDir.getName().equalsIgnoreCase("dist")
+                        ? senzingDir : new File(senzingDir, "er")));
+
+            if ((!installDir.exists()) || (!installDir.isDirectory())) {
+                if (!installDir.exists()) {
+                    System.err.println("Could not find Senzing ER installation directory:");
+                } else {
+                    System.err.println("Senzing ER installation directory appears invalid:");
+                }
                 System.err.println("     " + installDir);
                 System.err.println();
                 if (installPath != null) {
                     System.err.println(
-                        "Check the -Dsenzing.install.dir=[path] command line option.");
+                            "Check the -Dsenzing.install.dir=[path] command line option "
+                            + "or SENZING_DIR environment variable.");
+                
+                } else if (senzingPath != null) {
+                    System.err.println(
+                            "Check the -Dsenzing.path=[path] command line option "
+                            + "or SENZING_PATH environment variable.");
+        
                 } else {
                     System.err.println(
-                        "Use the -Dsenzing.install.dir=[path] command line option to "
-                        + "specify a path");
+                            "Use the -Dsenzing.path=[path] command line option or SENZING_PATH "
+                            + "environment variable to specify a base Senzing path.");
+                    System.err.println();
+                    System.err.println(
+                            "Alternatively, use the -Dsenzing.install.dir=[path] command line option "
+                            + "or SENZING_DIR environment variable to specify a Senzing ER path");
                 }
 
                 return null;
             }
 
-            // normalize the senzing directory
-            String dirName = installDir.getName();
-            if (installDir.isDirectory() && !dirName.equalsIgnoreCase("er")
-                && dirName.equalsIgnoreCase("senzing"))
+
+            // check the senzing support path
+            supportDir = (supportPath != null) ? new File(supportPath) : null;
+
+            // check if support dir is not defined AND we have a local dev build
+            if (supportDir == null && installDir != null
+                && installDir.getName().equalsIgnoreCase("dist"))
             {
-                // for windows or linux allow the "Senzing" dir as well
-                installDir = new File(installDir, "er");
+                supportDir = new File(installDir, "data");
+                if (!supportDir.exists()) {
+                    supportDir = null;
+                }
             }
 
-            if (!installDir.isDirectory()) {
-                System.err.println("Senzing installation directory appears invalid:");
-                System.err.println("     " + installDir);
+            // check if support dir is not defined BUT senzing path is defined
+            if (supportDir == null && senzingPath != null && senzingDir != null) 
+            {
+                supportDir = new File(senzingDir, "data");
+                if (!supportDir.exists()) {
+                    supportDir = null;
+                }
+            }
+
+            // fall back to whatever the default support directory path is
+            if (supportDir == null) 
+            {
+                supportDir = new File(defaultSupportPath);
+            }
+
+            // verify the discovered support directory
+            if ((!supportDir.exists()) || (!supportDir.isDirectory())) {
+                if (!supportDir.exists()) {
+                    System.err.println("Could not find Senzing support directory:");
+                } else {
+                    System.err.println("Senzing support directory appears invalid:");
+                }
+                System.err.println("     " + supportDir);
                 System.err.println();
-                if (installPath != null) {
-                    System.err.println(
-                        "Check the -Dsenzing.install.dir=[path] command line option.");
-                } else {
-                    System.err.println(
-                        "Use the -Dsenzing.install.dir=[path] command line option to "
-                        + "specify a path");
-                }
-
-                return null;
-            }
-
-            // check if an explicit support path has been specified
-            if (supportPath == null || supportPath.trim().length() == 0) {
-                // check if using a dev build
-                if ("dist".equals(installDir.getName())) {
-                    // use the "data" sub-directory of the dev build
-                    supportDir = new File(installDir, "data");
-                } else if (windows || macOS) {
-                    supportDir = new File(installDir, "data");
-                } else {
-                    // no explicit path, try the default support path
-                     supportDir = new File(defaultSupportPath);
-                }
-
-            } else {
-                // use the specified explicit path
-                supportDir = new File(supportPath);
-            }
-
-            if (!supportDir.exists()) {
-                System.err.println("The support directory does not exist:");
-                System.err.println("         " + supportDir);
                 if (supportPath != null) {
-                    System.err.println("Check the -Dsenzing.support.dir=[path] command line option.");
+                    System.err.println(
+                            "Check the -Dsenzing.support.dir=[path] command line option "
+                            + "or SENZING_SUPPORT_DIR environment variable.");
+                
+                } else if (senzingPath != null) {
+                    System.err.println(
+                            "Check the -Dsenzing.path=[path] command line option "
+                            + "or SENZING_PATH environment variable.");
+        
                 } else {
-                    System.err.println("Use the -Dsenzing.support.dir=[path] command line option to "
-                        + "specify a path");
+                    System.err.println(
+                            "Use the -Dsenzing.path=[path] command line option or SENZING_PATH "
+                            + "environment variable to specify a base Senzing path.");
+                    System.err.println();
+                    System.err.println(
+                            "Alternatively, use the -Dsenzing.support.dir=[path] command line option or "
+                            + "SENZING_SUPPORT_DIR environment variable to specify a Senzing ER path.");
                 }
 
-                throw new IllegalStateException("The support directory does not exist: " + supportDir);
+                throw new IllegalStateException(
+                        "The support directory does not exist or is invalid: " + supportDir);
             }
 
-            if (!supportDir.isDirectory()) {
-                System.err.println("The support directory is invalid:");
-                System.err.println("         " + supportDir);
-                if (supportPath != null) {
-                    System.err.println("Check the -Dsenzing.support.dir=[path] command line option.");
-                } else {
-                    System.err.println("Use the -Dsenzing.support.dir=[path] command line option to "
-                        + "specify a path");
+            // now determine the resource path
+            resourceDir = (resourcePath != null) ? new File(resourcePath) : null;
+
+            // try the "resources" sub-directory of the installation
+            if (resourceDir == null && installDir != null) {
+                resourceDir = new File(installDir, "resources");
+                if (!resourceDir.exists()) {
+                    resourceDir = null;
                 }
-                throw new IllegalStateException("The support directory is invalid: " + supportDir);
-
             }
 
-            // check the config path
-            if (configPath != null) {
-                configDir = new File(configPath);
+            // set the templates directory if we have the resource directory
+            if (resourceDir != null && resourceDir.exists()
+                && resourceDir.isDirectory()) 
+            {
+                templatesDir = new File(resourceDir, "templates");
             }
 
-            // check for a dev build installation
-            if (configDir == null && installDir != null && "dist".equals(installDir.getName())) {
-                configDir = new File(installDir, "data");
+            // verify the discovered resource path
+            if ((resourceDir == null) || (!resourceDir.exists()) 
+                 || (!resourceDir.isDirectory())) 
+            {
+                if (resourceDir == null || !resourceDir.exists()) {
+                    System.err.println("Could not find Senzing resource directory:");
+                } else {
+                    System.err.println("Senzing resource directory appears invalid:");
+                }
+                if (resourceDir != null) System.err.println("         " + resourceDir);
+                
+                System.err.println();
+
+                if (resourcePath != null) {
+                    System.err.println(
+                            "Check the -Dsenzing.resource.dir=[path] command line option "
+                            + "or SENZING_RESOURCE_DIR environment variable.");
+                
+                } else if (senzingPath != null) {
+                    System.err.println(
+                            "Check the -Dsenzing.path=[path] command line option "
+                            + "or SENZING_PATH environment variable.");
+        
+                } else if (installPath != null) {
+                    System.err.println(
+                            "Check the -Dsenzing.install.dir=[path] command line option "
+                            + "or SENZING_DIR environment variable.");
+
+                } else {
+                    System.err.println(
+                            "Use the -Dsenzing.path=[path] command line option or SENZING_PATH "
+                            + "environment variable to specify a valid base Senzing path.");
+                    System.err.println();
+                    System.err.println(
+                            "Alternatively, use the -Dsenzing.resource.dir=[path] command line option or "
+                            + "SENZING_RESOURCE_DIR environment variable to specify a Senzing resource path.");
+                }
+
+                throw new IllegalStateException(
+                        "The resource directory does not exist or is invalid: " + resourceDir);
             }
 
-            // if still null and there is a default, then use it
+            // check the senzing config path
+            configDir = (configPath != null) ? new File(configPath) : null;
+
+            // check if config dir is not defined AND we have a local dev build
+            if (configDir == null && installDir != null && templatesDir != null
+                && installDir.getName().equalsIgnoreCase("dist"))
+            {
+                configDir = templatesDir;
+            }
+
+            // check if config dir is still not defined and fall back to default
             if (configDir == null && defaultConfigPath != null) {
                 configDir = new File(defaultConfigPath);
                 if (!configDir.exists()) {
@@ -320,25 +416,12 @@ public class InstallLocations {
                 }                
             }
 
-            if (configPath != null && !configDir.exists()) {
-                System.err.println(
-                    "The -Dsenzing.config.dir=[path] option specifies a path that does not exist:");
-                System.err.println("         " + configPath);
+            // validate the contents of the config directory
+            List<String> missingFiles = new LinkedList<>();
 
-                throw new IllegalStateException("Explicit config path does not exist: " + configPath);
-            }
+            // check if the config directory does not exist
             if (configDir != null && configDir.exists()) {
-                if (!configDir.isDirectory()) {
-                    System.err.println(
-                        "The -Dsenzing.config.dir=[path] option specifies a file, not a directory:");
-                    System.err.println("         " + configPath);
-
-                    throw new IllegalStateException(
-                        "Explicit config path is not directory: " + configPath);
-                }
-
                 String[] requiredFiles = { "cfgVariant.json" };
-                List<String> missingFiles = new ArrayList<>(requiredFiles.length);
 
                 for (String fileName : requiredFiles) {
                     File configFile = new File(configDir, fileName);
@@ -347,53 +430,55 @@ public class InstallLocations {
                         missingFiles.add(fileName);
                     }
                 }
-                if (missingFiles.size() > 0 && configPath != null) {
-                    System.err.println(
-                        "The -Dsenzing.config.dir=[path] option specifies an invalid config directory:");
+            }
+
+            // verify the discovered config directory
+            if ((configDir == null) || (!configDir.exists()) 
+                 || (!configDir.isDirectory()) || (missingFiles.size() > 0))
+            {
+                if (configDir == null || !configDir.exists()) {
+                    System.err.println("Could not find Senzing config directory:");
+                } else {
+                    System.err.println("Senzing config directory appears invalid:");
+                }
+                if (configDir != null) System.err.println("     " + configDir);
+
+                if (missingFiles.size() > 0) {
                     for (String missing : missingFiles) {
-                        System.err.println("         " + missing + " was not found");
+                        System.err.println(
+                                "         " + missing + " was not found in config directory");
                     }
-                    throw new IllegalStateException(
-                            "Explicit config path missing required files: " + missingFiles);
                 }
-            }
 
-            // now determine the resource path
-            resourceDir = (resourcePath == null) ? null : new File(resourcePath);
-            if (resourceDir == null) {
-                resourceDir = new File(installDir, "resources");
-                if (!resourceDir.exists())
-                    resourceDir = null;
-            }
-
-            if (resourceDir != null && resourceDir.exists() && resourceDir.isDirectory()) {
-                templatesDir = new File(resourceDir, "templates");
-            }
-
-            if (resourcePath != null) {
-                if (!resourceDir.exists()) {
+                System.err.println();
+                if (configPath != null) {
                     System.err.println(
-                        "The -Dsenzing.resource.dir=[path] option specifies a path that does not exist:");
-                    System.err.println("         " + resourcePath);
-
-                    throw new IllegalStateException(
-                        "Explicit resource path does not exist: " + resourcePath);
-                }
-
-                if (!resourceDir.isDirectory() || !templatesDir.exists() || !templatesDir.isDirectory()) {
+                            "Check the -Dsenzing.config.dir=[path] command line option "
+                            + "or SENZING_CONFIG_DIR environment variable.");
+                
+                } else if (senzingPath != null) {
                     System.err.println(
-                            "The -Dsenzing.resource.dir=[path] option specifies an invalid "
-                            + "resource directory:");
-                    System.err.println("         " + resourcePath);
+                            "Check the -Dsenzing.path=[path] command line option "
+                            + "or SENZING_PATH environment variable.");
+        
+                } else if (installPath != null) {
+                    System.err.println(
+                            "Check the -Dsenzing.install.dir=[path] command line option "
+                            + "or SENZING_DIR environment variable.");
 
-                    throw new IllegalStateException(
-                        "Explicit resource path is not valid: " + resourcePath);
+                } else {
+                    System.err.println(
+                            "Use the -Dsenzing.path=[path] command line option or SENZING_PATH "
+                            + "environment variable to specify a valid base Senzing path.");
+                    System.err.println();
+                    System.err.println(
+                            "Alternatively, use the -Dsenzing.config.dir=[path] command line option or "
+                            + "SENZING_CONFIG_DIR environment variable to specify a Senzing config path.");
                 }
 
-            } else if (!resourceDir.exists() || !resourceDir.isDirectory() || !templatesDir.exists()
-                    || !templatesDir.isDirectory()) {
-                resourceDir = null;
-                templatesDir = null;
+                throw new IllegalStateException(
+                        "The config directory does not exist or is invalid: " + configDir
+                        + (missingFiles.size() == 0 ? "" : ", missingFiles=[ " + missingFiles + " ]"));
             }
 
             // construct and initialize the result

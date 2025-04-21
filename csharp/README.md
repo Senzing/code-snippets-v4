@@ -9,6 +9,29 @@ Before attempting to build the snippets you will need to make the make the
 `Senzing.Sdk.[version].nupkg` file available to the `dotnet` executable so
 it can be used as a dependency.  This is done via these [instructions](https://github.com/senzing-garage/sz-sdk-csharp/blob/main/README.md#Usage).
 
+Further, you will need to set environment variables so the Senzing installation can be located:
+
+- Linux:
+
+    ```console
+    export SENZING_PATH=/opt/senzing/
+    export LD_LIBRARY_PATH=$SENZING_PATH/er/lib:$LD_LIBRARY_PATH
+    ```
+
+- macOS:
+
+    ```console
+    export SENZING_PATH=$HOME/senzing
+    export DYLD_LIBRARY_PATH=$SENZING_PATH/er/lib:$SENZING_PATH/er/lib/macos:$DYLD_LIBRARY_PATH
+    ```
+
+- Windows:
+
+    ```console
+    set SENZING_PATH=%USERPROFILE%\senzing
+    set Path=%SENZING_PATH%\er\lib;%Path%
+    ```
+
 ## Building
 
 The C# snippets can built using the `dotnet build [project-name]` command under each directory.  They can be run using `dotnet run --project [project-name]` command.  Attempting to run a snippet will also trigger building it.
@@ -23,22 +46,21 @@ You may run any individual Snippet class directly providing you have a Senzing r
 
 1. Run a snippet that takes no command-line arguments.
 
-    ```[shell]
+    ```console
     cd snippets
     dotnet run --project loading/LoadRecords
     ```
 
 2. Run a snippet and override the input file using command-line arguments
 
-    ```[shell]
+    ```console
     dotnet run --project loading/LoadRecordsViaLoop ../../resources/data/load-500-with-errors.jsonl
     ```
 
 ### Run via Runner
 
 The `SnippetRunner` project will run one or more snippets for you and create a temporary Senzing repository to run then against.  This can be executed using:
-
-    ```[shell]
+    ```console
     cd runner
     dotnet run --project SnippetRunner
     ```
@@ -47,42 +69,42 @@ The `SnippetRunner` project will run one or more snippets for you and create a t
 
 1. Execute all code snippets:
 
-    ```[shell]
+    ```console
     cd runner
     dotnet run --project SnippetRunner all
     ```
 
 2. Execute all code snippets in a group:
 
-    ```[shell]
+    ```console
     cd runner
     dotnet run --project SnippetRunner loading
     ```
 
 3. Execute all code snippets from multiple groups:
 
-    ```[shell]
+    ```console
     cd runner
     dotnet run --project SnippetRunner loading redo
     ```
 
 4. Execute specific code snippets:
 
-    ```[shell]
+    ```console
     cd runner
     dotnet run --project SnippetRunner loading.LoadViaLoop loading.LoadViaQueue
     ```
 
 5. Mix and match packages with individual snippets:
 
-    ```[shell]
+    ```console
     cd runner
     dotnet run --project SnippetRunner redo loading.LoadViaLoop
     ```
 
 6. Generate a help message by specifying no arguments:
 
-    ```[shell]
+    ```console
     cd runner
     dotnet run --project SnippetRunner
 

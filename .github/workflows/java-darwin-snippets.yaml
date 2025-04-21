@@ -27,20 +27,24 @@ jobs:
           java-version: ${{ matrix.java-version }}
 
       - name: install Senzing SDK
-        uses: senzing-factory/github-action-install-senzing-sdk@v2
+        uses: senzing-factory/github-action-install-senzing-sdk@v3
         with:
           senzingsdk-repository-path: ${{ secrets.SENZING_OSX_BETA_REPOSITORY }}
 
+      - name: configure environment
+        run: |
+          SENZING_PATH="${HOME}/senzing"
+          {
+            echo "SENZING_PATH=${SENZING_PATH}"
+            echo "DYLD_LIBRARY_PATH=${SENZING_PATH}/er/lib:${SENZING_PATH}/er/lib/macos"
+          } >> "$GITHUB_ENV"
+
       - name: build with Maven
-        env:
-          SENZING_DIR: "/opt/senzing/er"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           mvn clean install -Pcheckstyle,spotbugs -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
       - name: run java snippets
-        env:
-          DYLD_LIBRARY_PATH: "/opt/senzing/er/lib"
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all
