@@ -28,13 +28,11 @@ public class EnvironmentAndHubs {
         
         try {
             SzProduct       product     = env.getProduct();
-            SzConfig        config      = env.getConfig();
             SzConfigManager configMgr   = env.getConfigManager();
             SzDiagnostic    diagnostic  = env.getDiagnostic();
             SzEngine        engine      = env.getEngine();
             
             System.out.println(product);
-            System.out.println(config);
             System.out.println(configMgr);
             System.out.println(diagnostic);
             System.out.println(engine);

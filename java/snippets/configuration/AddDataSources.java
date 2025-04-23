@@ -26,40 +26,32 @@ public class AddDataSources {
             .build();
         
         try {
-            // get the config and config manager from the environment
-            SzConfig        config      = env.getConfig();
-            SzConfigManager configMgr   = env.getConfigManager();
+            // get the config manager from the environment
+            SzConfigManager configMgr = env.getConfigManager();
 
             // setup a loop to handle race-condition conflicts on 
             // replacing the default config ID
             boolean replacedConfig = false;
             while (!replacedConfig) {
-                // get the current default config ID and associated config JSON
-                long    configId = configMgr.getDefaultConfigId();
-                String  configDefinition = configMgr.getConfig(configId);
+                // get the current default config ID
+                long configId = configMgr.getDefaultConfigId();
 
-                // prepare an in-memory config to be modified and get the handle
-                long    configHandle = config.importConfig(configDefinition);
-                String  modifiedConfig = null;
-                try {
-                    // create an array of the data sources to add
-                    String[] dataSources = { "CUSTOMERS", "EMPLOYEES", "WATCHLIST" };
+                // get the SzConfig for the config ID
+                SzConfig config = configMgr.createConfig(configId);
 
-                    // loop through the array and add each data source
-                    for (String dataSource : dataSources) {
-                        config.addDataSource(configHandle, dataSource);
-                    }
+                // create an array of the data sources to add
+                String[] dataSources = { "CUSTOMERS", "EMPLOYEES", "WATCHLIST" };
 
-                    // export the modified config to JSON text
-                    modifiedConfig = config.exportConfig(configHandle);
-
-                } finally {
-                    config.closeConfig(configHandle);
+                // loop through the array and add each data source
+                for (String dataSource : dataSources) {
+                    config.addDataSource(dataSource);
                 }
 
-                // add the modified config to the repository with a comment
-                long newConfigId = configMgr.addConfig(
-                    modifiedConfig, "Added truth set data sources");
+                // export the modified config to JSON text
+                String modifiedConfig = config.export();
+
+                // register the modified config in the repository
+                long newConfigId = configMgr.registerConfig(modifiedConfig);
 
                 try {                    
                     // replace the default config

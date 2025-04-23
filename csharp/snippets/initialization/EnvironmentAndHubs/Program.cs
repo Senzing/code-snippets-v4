@@ -29,13 +29,11 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 try
 {
     SzProduct product = env.GetProduct();
-    SzConfig config = env.GetConfig();
     SzConfigManager configMgr = env.GetConfigManager();
     SzDiagnostic diagnostic = env.GetDiagnostic();
     SzEngine engine = env.GetEngine();
 
     Console.WriteLine(product);
-    Console.WriteLine(config);
     Console.WriteLine(configMgr);
     Console.WriteLine(diagnostic);
     Console.WriteLine(engine);
