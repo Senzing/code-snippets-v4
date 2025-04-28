@@ -28,30 +28,16 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 
 try
 {
-    // get the config and config manager from the environment
-    SzConfig config = env.GetConfig();
+    // get the config and config from the environment
     SzConfigManager configMgr = env.GetConfigManager();
 
-    // prepare an in-memory config to be modified and get the handle
-    IntPtr configHandle = config.CreateConfig();
-    string? configDefinition = null;
-
-    try
-    {
-        configDefinition = config.ExportConfig(configHandle);
-
-    }
-    finally
-    {
-        config.CloseConfig(configHandle);
-    }
+    // prepare a config to be modified
+    SzConfig config             = configMgr.CreateConfig();
+    string   configDefinition   = config.Export();
 
     // add the modified config to the repository with a comment
-    long configID = configMgr.AddConfig(
-        configDefinition, "Initial configuration");
-
-    // replace the default config
-    configMgr.SetDefaultConfigID(configID);
+    configMgr.SetDefaultConfig(configDefinition);
+    
 }
 catch (SzException e)
 {

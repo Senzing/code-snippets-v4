@@ -27,25 +27,14 @@ public class InitDefaultConfig {
         
         try {
             // get the config and config manager from the environment
-            SzConfig        config      = env.getConfig();
-            SzConfigManager configMgr   = env.getConfigManager();
+            SzConfigManager configMgr = env.getConfigManager();
 
-            // prepare an in-memory config to be modified and get the handle
-            long    configHandle        = config.createConfig();
-            String  configDefinition    = null;
-            try {
-                configDefinition = config.exportConfig(configHandle);
+            // prepare a config to be modified
+            SzConfig    config              = configMgr.createConfig();
+            String      configDefinition    = config.export();
 
-            } finally {
-                config.closeConfig(configHandle);
-            }
-
-            // add the modified config to the repository with a comment
-            long configId = configMgr.addConfig(
-                configDefinition, "Initial configuration");
-
-            // replace the default config
-            configMgr.setDefaultConfigId(configId);
+            // register the modified config in the repository as the default
+            configMgr.setDefaultConfig(configDefinition);
 
         } catch (SzException e) {
             // handle any exception that may have occurred

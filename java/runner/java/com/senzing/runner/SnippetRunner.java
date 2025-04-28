@@ -181,31 +181,21 @@ public class SnippetRunner {
                     SzConfigManager configMgr = env.getConfigManager();
                     // check if we need to configure sources
                     if (properties.containsKey(SOURCE_KEY_PREFIX + 0)) {
-                        SzConfig    config          = env.getConfig();
-                        long        handle          = config.createConfig();
-                        String      snippetConfig   = null;                        
-                        try {
-                            for (int index = 0; 
-                                 properties.containsKey(SOURCE_KEY_PREFIX + index);
-                                 index++) 
-                            {
-                                String sourceKey = SOURCE_KEY_PREFIX + index;
-                                String source = properties.getProperty(sourceKey);
-                                source = source.trim();
-                                System.out.println("Adding data source: " + source);
-                                config.addDataSource(handle, source);
-                            }
-                            snippetConfig = config.exportConfig(handle);
-
-                        } finally {
-                            config.closeConfig(handle);
+                        SzConfig config = configMgr.createConfig();
+                        for (int index = 0; 
+                             properties.containsKey(SOURCE_KEY_PREFIX + index);
+                             index++) 
+                        {
+                            String sourceKey = SOURCE_KEY_PREFIX + index;
+                            String source = properties.getProperty(sourceKey);
+                            source = source.trim();
+                            System.out.println("Adding data source: " + source);
+                            config.addDataSource(source);
                         }
+                        String snippetConfig = config.export();
 
                         // register the config
-                        long configId = configMgr.addConfig(snippetConfig, snippet);
-
-                        // set the default config to the snippet config
-                        configMgr.setDefaultConfigId(configId);
+                        configMgr.setDefaultConfig(snippetConfig, snippet);
 
                     } else {
                         // set the default config to the initial default
@@ -501,11 +491,8 @@ public class SnippetRunner {
 
         SzEnvironment env = SzCoreEnvironment.newBuilder().settings(settings).build();
         try {
-            SzConfigManager configMgr = env.getConfigManager();
-
-            long configId = configMgr.addConfig(baseConfig, "Default Config");
-            configMgr.setDefaultConfigId(configId);
-
+            env.getConfigManager().setDefaultConfig(baseConfig);
+            
         } catch (SzException e) {
             System.err.println(settings);
             throw e;

@@ -246,35 +246,21 @@ try
             // check if we need to configure sources
             if (properties.ContainsKey(SourceKeyPrefix + 0))
             {
-                SzConfig config = env.GetConfig();
-                IntPtr handle = config.CreateConfig();
-                string? snippetConfig = null;
-                try
+                SzConfig config = configMgr.CreateConfig();
+                for (int index = 0;
+                    properties.ContainsKey(SourceKeyPrefix + index);
+                    index++)
                 {
-                    for (int index = 0;
-                        properties.ContainsKey(SourceKeyPrefix + index);
-                        index++)
-                    {
-                        string sourceKey = SourceKeyPrefix + index;
-                        string source = properties[sourceKey];
-                        source = source.Trim();
-                        Console.WriteLine("Adding data source: " + source);
-                        config.AddDataSource(handle, source);
-                    }
-                    snippetConfig = config.ExportConfig(handle);
-
+                    string sourceKey = SourceKeyPrefix + index;
+                    string source = properties[sourceKey];
+                    source = source.Trim();
+                    Console.WriteLine("Adding data source: " + source);
+                    config.AddDataSource(source);
                 }
-                finally
-                {
-                    config.CloseConfig(handle);
-                }
+                string snippetConfig = config.Export();
 
                 // register the config
-                long configID = configMgr.AddConfig(snippetConfig, snippet);
-
-                // set the default config to the snippet config
-                configMgr.SetDefaultConfigID(configID);
-
+                configMgr.SetDefaultConfig(snippetConfig);
             }
             else
             {
@@ -657,10 +643,7 @@ static string SetupTempRepository(InstallLocations senzingInstall)
     SzEnvironment env = SzCoreEnvironment.NewBuilder().Settings(settings).Build();
     try
     {
-        SzConfigManager configMgr = env.GetConfigManager();
-
-        long configID = configMgr.AddConfig(baseConfig, "Default Config");
-        configMgr.SetDefaultConfigID(configID);
+        env.GetConfigManager().SetDefaultConfig(baseConfig);
 
     }
     catch (Exception)

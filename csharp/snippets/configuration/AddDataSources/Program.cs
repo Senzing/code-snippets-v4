@@ -28,8 +28,7 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 
 try
 {
-    // get the config and config manager from the environment
-    SzConfig config = env.GetConfig();
+    // get the config manager from the environment
     SzConfigManager configMgr = env.GetConfigManager();
 
     // setup a loop to handle race-condition conflicts on 
@@ -39,35 +38,25 @@ try
     {
         // get the current default config ID and associated config JSON
         long configID = configMgr.GetDefaultConfigID();
-        string configDefinition = configMgr.GetConfig(configID);
+
+        // get the SzConfig for the config ID
+        SzConfig config = configMgr.CreateConfig(configID);
+        
+        // create an array of the data sources to add
+        string[] dataSources = { "CUSTOMERS", "EMPLOYEES", "WATCHLIST" };
+
+        // loop through the array and add each data source
+        foreach (string dataSource in dataSources)
+        {
+            config.AddDataSource(dataSource);
+        }
 
         // prepare an in-memory config to be modified and get the handle
-        IntPtr configHandle = config.ImportConfig(configDefinition);
-        string? modifiedConfig = null;
-        try
-        {
-            // create an array of the data sources to add
-            string[] dataSources = { "CUSTOMERS", "EMPLOYEES", "WATCHLIST" };
-
-            // loop through the array and add each data source
-            foreach (string dataSource in dataSources)
-            {
-                config.AddDataSource(configHandle, dataSource);
-            }
-
-            // export the modified config to JSON text
-            modifiedConfig = config.ExportConfig(configHandle);
-
-        }
-        finally
-        {
-            config.CloseConfig(configHandle);
-        }
+        string modifiedConfig = config.Export();
 
         // add the modified config to the repository with a comment
-        long newConfigID = configMgr.AddConfig(
-            modifiedConfig, "Added truth set data sources");
-
+        long newConfigID = configMgr.RegisterConfig(modifiedConfig);
+        
         try
         {
             // replace the default config
