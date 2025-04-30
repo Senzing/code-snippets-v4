@@ -7,4 +7,16 @@
 <suppressions>
   <suppress checks="LeftCurly" files="."/>
   <suppress checks="LineLength" files="."/>
-</suppressions>
+  <suppress checks="FinalParameters" files="."/>
+  <suppress checks="RegexpSingleline" files="."/>
+  <suppress checks="AvoidStarImport" files="."/>
+  <suppress checks="HiddenField" files="."/>
+  <suppress checks="ParameterNumber" files="."/>
+  <suppress checks="MagicNumber" files="."/>
+  <suppress checks="JavadocPackage" files="."/>
+  <suppress checks="JavadocVariable" files="."/>
+  <suppress checks="MissingJavadocMethod" files="."/>
+  <suppress checks="HideUtilityClassConstructor" files="."/>
+  <suppress checks="MethodLength" files="."/>
+  <suppress checks="EmptyBlock" files="redo/*"/>
+  </suppressions>

@@ -32,10 +32,10 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 string filePath = (args.Length > 0) ? args[0] : DefaultFilePath;
 
 FileStream fs = new FileStream(filePath, FileMode.Open);
+// create a reader
+StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
 try
 {
-    // create a reader
-    StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
 
     // get the engine from the environment
     SzEngine engine = env.GetEngine();
@@ -55,7 +55,7 @@ try
         if (line.Length == 0) continue;
 
         // skip any commented lines
-        if (line.StartsWith("#")) continue;
+        if (line.StartsWith('#')) continue;
 
         try
         {
@@ -130,8 +130,9 @@ catch (Exception e)
 }
 finally
 {
+    rdr.Close();
     fs.Close();
-    
+
     // IMPORTANT: make sure to destroy the environment
     env.Destroy();
 
@@ -188,18 +189,16 @@ public partial class Program
 
     private const string RecordID = "RECORD_ID";
 
-    private const int PauseTimeout = 100;
-
     private const string Error = "ERROR";
 
     private const string Warning = "WARNING";
 
     private const string Critical = "CRITICAL";
 
-    private static int errorCount = 0;
-    private static int successCount = 0;
-    private static int retryCount = 0;
-    private static FileInfo? retryFile = null;
-    private static StreamWriter? retryWriter = null;
+    private static int errorCount;
+    private static int successCount;
+    private static int retryCount;
+    private static FileInfo? retryFile;
+    private static StreamWriter? retryWriter;
 
 }

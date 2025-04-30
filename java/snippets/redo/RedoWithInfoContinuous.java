@@ -134,8 +134,7 @@ public class RedoWithInfoContinuous {
      * 
      * @param errorType The error type description.
      * @param exception The exception itself.
-     * @param lineNumber The line number of the failed record in the JSON input file.
-     * @param recordJson The JSON text for the failed record.
+     * @param redoRecord The JSON text for the redo record.
      */
     private static void logFailedRedo(String      errorType,
                                       Exception   exception,  
@@ -172,15 +171,18 @@ public class RedoWithInfoContinuous {
     /**
      * Example method for parsing and handling the INFO message (formatted
      * as JSON).  This example implementation simply tracks all entity ID's
-     * that appear as <code>"AFFECTED_ENTITIES"<code> to count the number
+     * that appear as <code>"AFFECTED_ENTITIES"</code> to count the number
      * of entities created for the records -- essentially a contrived
      * data mart.
      * 
+     * @param engine The {@link SzEngine} to use.
      * @param info The info message.
      */
     private static void processInfo(SzEngine engine, String info) {
         JsonObject jsonObject = Json.createReader(new StringReader(info)).readObject();
-        if (!jsonObject.containsKey(AFFECTED_ENTITIES)) return;
+        if (!jsonObject.containsKey(AFFECTED_ENTITIES)) {
+            return;
+        }
         JsonArray affectedArr = jsonObject.getJsonArray(AFFECTED_ENTITIES);
         for (JsonObject affected : affectedArr.getValuesAs(JsonObject.class)) {
             JsonNumber number = affected.getJsonNumber(ENTITY_ID);
@@ -221,5 +223,5 @@ public class RedoWithInfoContinuous {
     private static int         retryCount      = 0;
     private static File        retryFile       = null;
     private static PrintWriter retryWriter     = null;
-    private static final Set<Long> entityIdSet = new HashSet<>();
+    private static Set<Long> entityIdSet = new HashSet<>();
 }

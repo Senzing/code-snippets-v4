@@ -67,10 +67,14 @@ public class DeleteWithInfoViaFutures {
                     line = line.trim();
                     
                     // skip any blank lines
-                    if (line.length() == 0) continue;
+                    if (line.length() == 0) {
+                        continue;
+                    }
 
                     // skip any commented lines
-                    if (line.startsWith("#")) continue;
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
 
                     // construct the Record instance
                     Record record = new Record(lineNumber, line);
@@ -166,18 +170,20 @@ public class DeleteWithInfoViaFutures {
         throws Exception
     {
         // check for completed futures
-        Iterator<Map.Entry<Future<String>,Record>> iter
+        Iterator<Map.Entry<Future<String>, Record>> iter
         = pendingFutures.entrySet().iterator();
         
         // loop through the pending futures
         while (iter.hasNext()) {
             // get the next pending future
-            Map.Entry<Future<String>,Record> entry = iter.next();
+            Map.Entry<Future<String>, Record> entry = iter.next();
             Future<String>  future  = entry.getKey();
             Record          record  = entry.getValue();
             
             // if not blocking and this one is not done then continue
-            if (!blocking && !future.isDone()) continue;
+            if (!blocking && !future.isDone()) {
+                continue;
+            }
 
             // remove the pending future from the map
             iter.remove();
@@ -213,7 +219,7 @@ public class DeleteWithInfoViaFutures {
                 logFailedRecord(ERROR, e, record.lineNumber, record.line);
                 errorCount++;   // increment the error count
 
-            } catch (SzRetryableException|InterruptedException|CancellationException e) {
+            } catch (SzRetryableException | InterruptedException | CancellationException e) {
                 // handle thread interruption and cancellation as retries
                 logFailedRecord(WARNING, e, record.lineNumber, record.line);
                 errorCount++;   // increment the error count
@@ -239,15 +245,18 @@ public class DeleteWithInfoViaFutures {
     /**
      * Example method for parsing and handling the INFO message (formatted
      * as JSON).  This example implementation simply tracks all entity ID's
-     * that appear as <code>"AFFECTED_ENTITIES"<code> to count the number
+     * that appear as <code>"AFFECTED_ENTITIES"</code> to count the number
      * of entities deleted for the records -- essentially a contrived
      * data mart.
      * 
+     * @param engine the {@link SzEngine} to use.
      * @param info The info message.
      */
     private static void processInfo(SzEngine engine, String info) {
         JsonObject jsonObject = Json.createReader(new StringReader(info)).readObject();
-        if (!jsonObject.containsKey(AFFECTED_ENTITIES)) return;
+        if (!jsonObject.containsKey(AFFECTED_ENTITIES)) {
+            return;
+        }
         JsonArray affectedArr = jsonObject.getJsonArray(AFFECTED_ENTITIES);
         for (JsonObject affected : affectedArr.getValuesAs(JsonObject.class)) {
             JsonNumber number = affected.getJsonNumber(ENTITY_ID);
@@ -320,5 +329,5 @@ public class DeleteWithInfoViaFutures {
     private static int         retryCount      = 0;
     private static File        retryFile       = null;
     private static PrintWriter retryWriter     = null;
-    private static final Set<Long> entityIdSet = new HashSet<>();
+    private static Set<Long> entityIdSet = new HashSet<>();
 }

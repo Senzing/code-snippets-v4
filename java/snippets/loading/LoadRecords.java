@@ -34,7 +34,7 @@ public class LoadRecords {
             SzEngine engine = env.getEngine();
 
             // loop through the example records and add them to the repository
-            for (Map.Entry<SzRecordKey,String> entry : getRecords().entrySet()) {
+            for (Map.Entry<SzRecordKey, String> entry : getRecords().entrySet()) {
                 SzRecordKey recordKey = entry.getKey();
                 String recordDefinition = entry.getValue();
  

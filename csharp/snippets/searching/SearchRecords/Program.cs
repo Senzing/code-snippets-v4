@@ -58,10 +58,10 @@ try
                 obj = obj?["RESOLVED_ENTITY"]?.AsObject();
                 if (obj == null)
                 {
-                    throw new Exception("Unexpected result format: " + result);
+                    throw new JsonException("Unexpected result format: " + result);
                 }
-                long? entityID = obj?["ENTITY_ID"]?.GetValue<long>();
-                string? name = obj?["ENTITY_NAME"]?.GetValue<string>();
+                long? entityID = obj["ENTITY_ID"]?.GetValue<long>();
+                string? name = obj["ENTITY_NAME"]?.GetValue<string>();
                 Console.WriteLine(entityID + ": " + name);
             }
         }

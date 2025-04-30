@@ -40,7 +40,7 @@ public class AddDataSources {
                 SzConfig config = configMgr.createConfig(configId);
 
                 // create an array of the data sources to add
-                String[] dataSources = { "CUSTOMERS", "EMPLOYEES", "WATCHLIST" };
+                String[] dataSources = {"CUSTOMERS", "EMPLOYEES", "WATCHLIST"};
 
                 // loop through the array and add each data source
                 for (String dataSource : dataSources) {

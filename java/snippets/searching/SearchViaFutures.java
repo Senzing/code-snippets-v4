@@ -68,10 +68,14 @@ public class SearchViaFutures {
                     line = line.trim();
                     
                     // skip any blank lines
-                    if (line.length() == 0) continue;
+                    if (line.length() == 0) {
+                        continue;
+                    }
 
                     // skip any commented lines
-                    if (line.startsWith("#")) continue;
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
 
                     // construct the Record instance
                     Criteria criteria = new Criteria(lineNumber, line);
@@ -161,18 +165,20 @@ public class SearchViaFutures {
         throws Exception
     {
         // check for completed futures
-        Iterator<Map.Entry<Future<String>,Criteria>> iter
+        Iterator<Map.Entry<Future<String>, Criteria>> iter
             = pendingFutures.entrySet().iterator();
         
         // loop through the pending futures
         while (iter.hasNext()) {
             // get the next pending future
-            Map.Entry<Future<String>,Criteria> entry = iter.next();
+            Map.Entry<Future<String>, Criteria> entry = iter.next();
             Future<String>  future      = entry.getKey();
             Criteria        criteria    = entry.getValue();
             
             // if not blocking and this one is not done then continue
-            if (!blocking && !future.isDone()) continue;
+            if (!blocking && !future.isDone()) {
+                continue;
+            }
 
             // remove the pending future from the map
             iter.remove();
@@ -218,7 +224,7 @@ public class SearchViaFutures {
                 logFailedSearch(ERROR, e, criteria.lineNumber, criteria.line);
                 errorCount++;   // increment the error count
 
-            } catch (SzRetryableException|InterruptedException|CancellationException e) {
+            } catch (SzRetryableException | InterruptedException | CancellationException e) {
                 // handle thread interruption and cancellation as retries
                 logFailedSearch(WARNING, e, criteria.lineNumber, criteria.line);
                 errorCount++;   // increment the error count

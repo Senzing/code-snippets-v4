@@ -51,10 +51,11 @@ IList<(Task<string>, Record)> pendingFutures
     = new List<(Task<string>, Record)>(MaximumBacklog);
 
 FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+// create a reader
+StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
 try
 {
-    // create a reader
-    StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
 
     // get the engine from the environment
     SzEngine engine = env.GetEngine();
@@ -86,7 +87,7 @@ try
             if (line.Length == 0) continue;
 
             // skip any commented lines
-            if (line.StartsWith("#")) continue;
+            if (line.StartsWith('#')) continue;
 
             // construct the Record instance
             Record record = new Record(lineNumber, line);
@@ -106,11 +107,14 @@ try
                 string? recordID = recordJson[RecordID]?.GetValue<string>();
 
                 Task<string> task = factory.StartNew(() =>
-                {
-                    // call the addRecord() function with info flags
-                    return engine.AddRecord(
-                        dataSourceCode, recordID, record.Line, SzWithInfo);
-                });
+                    {
+                        // call the addRecord() function with info flags
+                        return engine.AddRecord(
+                            dataSourceCode, recordID, record.Line, SzWithInfo);
+                    },
+                    CancellationToken.None,
+                    TaskCreationOptions.None,
+                    taskScheduler);
 
                 // add the future to the pending future list
                 pendingFutures.Add((task, record));
@@ -132,15 +136,7 @@ try
             // briefly before trying again
             if (pendingFutures.Count >= MaximumBacklog)
             {
-                try
-                {
-                    Thread.Sleep(PauseTimeout);
-
-                }
-                catch (Exception)
-                {
-                    // do nothing
-                }
+                Thread.Sleep(PauseTimeout);
             }
         } while (pendingFutures.Count >= MaximumBacklog);
     }
@@ -161,8 +157,9 @@ catch (Exception e)
 }
 finally
 {
+    rdr.Close();
     fs.Close();
-    
+
     // IMPORTANT: make sure to destroy the environment
     env.Destroy();
 
@@ -388,17 +385,18 @@ public partial class Program
 
     private const string Critical = "CRITICAL";
 
-    public record Record(int LineNumber, string Line) { }
+    private static int errorCount;
 
-    private static int errorCount = 0;
+    private static int successCount;
 
-    private static int successCount = 0;
+    private static int retryCount;
 
-    private static int retryCount = 0;
+    private static FileInfo? retryFile;
 
-    private static FileInfo? retryFile = null;
-
-    private static StreamWriter? retryWriter = null;
+    private static StreamWriter? retryWriter;
 
     private static readonly ISet<long> entityIDSet = new HashSet<long>();
 }
+
+internal sealed record Record(int LineNumber, string Line) { }
+

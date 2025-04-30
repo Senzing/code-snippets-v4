@@ -32,12 +32,12 @@ try
     SzConfigManager configMgr = env.GetConfigManager();
 
     // prepare a config to be modified
-    SzConfig config             = configMgr.CreateConfig();
-    string   configDefinition   = config.Export();
+    SzConfig config = configMgr.CreateConfig();
+    string configDefinition = config.Export();
 
     // add the modified config to the repository with a comment
     configMgr.SetDefaultConfig(configDefinition);
-    
+
 }
 catch (SzException e)
 {

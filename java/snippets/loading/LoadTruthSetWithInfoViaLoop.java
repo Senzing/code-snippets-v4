@@ -39,7 +39,7 @@ public class LoadTruthSetWithInfoViaLoop {
     private static int         retryCount      = 0;
     private static File        retryFile       = null;
     private static PrintWriter retryWriter     = null;
-    private static final Set<Long> entityIdSet = new HashSet<>();
+    private static Set<Long>   entityIdSet = new HashSet<>();
 
     public static void main(String[] args) {
         // get the senzing repository settings
@@ -79,10 +79,14 @@ public class LoadTruthSetWithInfoViaLoop {
                         line = line.trim();
                         
                         // skip any blank lines
-                        if (line.length() == 0) continue;
+                        if (line.length() == 0) {
+                            continue;
+                        }
 
                         // skip any commented lines
-                        if (line.startsWith("#")) continue;
+                        if (line.startsWith("#")) {
+                            continue;
+                        }
 
                         try {
                             // parse the line as a JSON object
@@ -102,7 +106,7 @@ public class LoadTruthSetWithInfoViaLoop {
                             // process the info
                             processInfo(engine, info);
                             
-                        } catch (JsonException|SzBadInputException e) {
+                        } catch (JsonException | SzBadInputException e) {
                             logFailedRecord(ERROR, e, filePath, lineNumber, line);
                             errorCount++;   // increment the error count
 
@@ -162,7 +166,7 @@ public class LoadTruthSetWithInfoViaLoop {
     /**
      * Example method for parsing and handling the INFO message (formatted
      * as JSON).  This example implementation simply tracks all entity ID's
-     * that appear as <code>"AFFECTED_ENTITIES"<code> to count the number
+     * that appear as <code>"AFFECTED_ENTITIES"</code> to count the number
      * of entities created for the records -- essentially a contrived
      * data mart.
      * 
@@ -171,7 +175,9 @@ public class LoadTruthSetWithInfoViaLoop {
      */
     private static void processInfo(SzEngine engine, String info) {
         JsonObject jsonObject = Json.createReader(new StringReader(info)).readObject();
-        if (!jsonObject.containsKey(AFFECTED_ENTITIES)) return;
+        if (!jsonObject.containsKey(AFFECTED_ENTITIES)) {
+            return;
+        }
         JsonArray affectedArr = jsonObject.getJsonArray(AFFECTED_ENTITIES);
         for (JsonObject affected : affectedArr.getValuesAs(JsonObject.class)) {
             JsonNumber number = affected.getJsonNumber(ENTITY_ID);
@@ -197,6 +203,7 @@ public class LoadTruthSetWithInfoViaLoop {
      * 
      * @param errorType The error type description.
      * @param exception The exception itself.
+     * @param filePath The path to the file that was the source of the failed record.
      * @param lineNumber The line number of the failed record in the JSON input file.
      * @param recordJson The JSON text for the failed record.
      */

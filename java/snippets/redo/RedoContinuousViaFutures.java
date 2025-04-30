@@ -42,7 +42,9 @@ public class RedoContinuousViaFutures {
         // make sure we cleanup if exiting by CTRL-C or due to an exception
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             // shutdown the executor service
-            if (!executor.isShutdown()) executor.shutdown();
+            if (!executor.isShutdown()) {
+                executor.shutdown();
+            }
 
             try {
                 handlePendingFutures(pendingFutures, true);
@@ -68,7 +70,9 @@ public class RedoContinuousViaFutures {
                     String redo = engine.getRedoRecord();
 
                     // check if no redo reords are available
-                    if (redo == null) break;
+                    if (redo == null) {
+                        break;
+                    }
 
                     Future<?> future = executor.submit(() -> {
                         // process the redo record
@@ -139,18 +143,20 @@ public class RedoContinuousViaFutures {
         throws Exception
     {
         // check for completed futures
-        Iterator<Map.Entry<Future<?>,String>> iter
+        Iterator<Map.Entry<Future<?>, String>> iter
             = pendingFutures.entrySet().iterator();
         
         // loop through the pending futures
         while (iter.hasNext()) {
             // get the next pending future
-            Map.Entry<Future<?>,String> entry = iter.next();
+            Map.Entry<Future<?>, String> entry = iter.next();
             Future<?>   future      = entry.getKey();
             String      redoRecord  = entry.getValue();
             
             // if not blocking and this one is not done then continue
-            if (!blocking && !future.isDone()) continue;
+            if (!blocking && !future.isDone()) {
+                continue;
+            }
 
             // remove the pending future from the map
             iter.remove();
@@ -179,7 +185,7 @@ public class RedoContinuousViaFutures {
                     throw ((Exception) cause);
                 }
 
-            } catch (SzRetryableException|InterruptedException|CancellationException e) {
+            } catch (SzRetryableException | InterruptedException | CancellationException e) {
                 // handle thread interruption and cancellation as retries
                 logFailedRedo(WARNING, e, redoRecord);
                 errorCount++;   // increment the error count
@@ -219,8 +225,7 @@ public class RedoContinuousViaFutures {
      * 
      * @param errorType The error type description.
      * @param exception The exception itself.
-     * @param lineNumber The line number of the failed record in the JSON input file.
-     * @param recordJson The JSON text for the failed record.
+     * @param redoRecord The JSON text for the redo record.
      */
     private static void logFailedRedo(String      errorType,
                                       Exception   exception,  

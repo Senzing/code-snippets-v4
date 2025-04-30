@@ -41,7 +41,7 @@ try
 
         // get the SzConfig for the config ID
         SzConfig config = configMgr.CreateConfig(configID);
-        
+
         // create an array of the data sources to add
         string[] dataSources = { "CUSTOMERS", "EMPLOYEES", "WATCHLIST" };
 
@@ -56,7 +56,7 @@ try
 
         // add the modified config to the repository with a comment
         long newConfigID = configMgr.RegisterConfig(modifiedConfig);
-        
+
         try
         {
             // replace the default config
