@@ -39,9 +39,10 @@ try
     {
         FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 
+        StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
+
         try
         {
-            StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
             int lineNumber = 0;
             // loop through the example records and add them to the repository
             for (string? line = rdr.ReadLine(); line != null; line = rdr.ReadLine())
@@ -56,7 +57,7 @@ try
                 if (line.Length == 0) continue;
 
                 // skip any commented lines
-                if (line.StartsWith("#")) continue;
+                if (line.StartsWith('#')) continue;
 
                 try
                 {
@@ -125,6 +126,7 @@ try
         }
         finally
         {
+            rdr.Close();
             fs.Close();
         }
     }
@@ -259,10 +261,10 @@ public partial class Program
     private const string Critical = "CRITICAL";
 
     // setup some class-wide variables
-    private static int errorCount = 0;
-    private static int successCount = 0;
-    private static int retryCount = 0;
-    private static FileInfo? retryFile = null;
-    private static StreamWriter? retryWriter = null;
+    private static int errorCount;
+    private static int successCount;
+    private static int retryCount;
+    private static FileInfo? retryFile;
+    private static StreamWriter? retryWriter;
     private static readonly ISet<long> entityIDSet = new HashSet<long>();
 }

@@ -15,13 +15,15 @@ public class LimitedConcurrencyLevelTaskScheduler : TaskScheduler
     private readonly int _maxDegreeOfParallelism;
 
     // Indicates whether the scheduler is currently processing work items.
-    private int _delegatesQueuedOrRunning = 0;
+    private int _delegatesQueuedOrRunning;
 
     // Creates a new instance with the specified degree of parallelism.
     public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
     {
-        if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException("maxDegreeOfParallelism");
-        _maxDegreeOfParallelism = maxDegreeOfParallelism;
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            maxDegreeOfParallelism, 1, nameof(maxDegreeOfParallelism));
+
+        this._maxDegreeOfParallelism = maxDegreeOfParallelism;
     }
 
     // Queues a task to the scheduler.

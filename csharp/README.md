@@ -32,6 +32,12 @@ Further, you will need to set environment variables so the Senzing installation 
     set Path=%SENZING_PATH%\er\lib;%Path%
     ```
 
+## Using Example Code
+
+Senzing encourages and allows you to freely copy the provided example code and modify it to your own needs as you
+see fit.  However, please refer to the [Global Suppression Notes] to understand how to best adapt the example code
+to your own coding project.
+
 ## Building
 
 The C# snippets can built using the `dotnet build [project-name]` command under each directory.  They can be run using `dotnet run --project [project-name]` command.  Attempting to run a snippet will also trigger building it.
@@ -162,3 +168,5 @@ The `SnippetRunner` project will run one or more snippets for you and create a t
         - stewardship.ForceResolve
         - stewardship.ForceUnresolve
     ```
+
+[Global Suppression Notes]: GlobalSuppressions.md

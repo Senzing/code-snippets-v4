@@ -35,6 +35,7 @@ string filePath = (args.Length > 0) ? args[0] : DefaultFilePath;
 Thread producer = new Thread(() =>
 {
     FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+#pragma warning disable CA1031  // Catch *all* exceptions so we can record it for the thread
     try
     {
         StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
@@ -57,7 +58,7 @@ Thread producer = new Thread(() =>
             if (line.Length == 0) continue;
 
             // skip any commented lines
-            if (line.StartsWith("#")) continue;
+            if (line.StartsWith('#')) continue;
 
             // add the record to the queue
             recordQueue.Add(new Record(lineNumber, line));
@@ -73,6 +74,7 @@ Thread producer = new Thread(() =>
         fs.Close();
         recordQueue.CompleteAdding();
     }
+#pragma warning restore CA1031  // Catch *all* exceptions so we can record it for the thread
 });
 
 // start the producer
@@ -80,6 +82,7 @@ producer.Start();
 
 Thread consumer = new Thread(() =>
 {
+#pragma warning disable CA1031  // Catch *all* exceptions so we can record it for the thread
     try
     {
         // get the engine from the environment
@@ -180,6 +183,7 @@ Thread consumer = new Thread(() =>
     {
         consumerFailure = e;
     }
+#pragma warning restore CA1031 // Catch *all* exceptions so we can record it for the thread
 });
 
 // start the consumer
@@ -259,7 +263,7 @@ finally
 
 static bool IsStopped(Thread thread)
 {
-    lock (thread)
+    lock (Monitor)
     {
         return (thread.ThreadState == ThreadState.Stopped);
     }
@@ -301,21 +305,17 @@ public partial class Program
 
     private const string RecordID = "RECORD_ID";
 
-    private const int PauseTimeout = 100;
-
     private const string Error = "ERROR";
 
     private const string Warning = "WARNING";
 
     private const string Critical = "CRITICAL";
 
-    public record Record(int LineNumber, String Line) { }
-
-    private static int errorCount = 0;
-    private static int successCount = 0;
-    private static int retryCount = 0;
-    private static FileInfo? retryFile = null;
-    private static StreamWriter? retryWriter = null;
+    private static int errorCount;
+    private static int successCount;
+    private static int retryCount;
+    private static FileInfo? retryFile;
+    private static StreamWriter? retryWriter;
 
     private const int MaximumBacklog = 100;
 
@@ -326,7 +326,9 @@ public partial class Program
     private static readonly BlockingCollection<Record> recordQueue
         = new BlockingCollection<Record>(MaximumBacklog);
 
-    private static volatile Exception? producerFailure = null;
-    private static volatile Exception? consumerFailure = null;
+    private static volatile Exception? producerFailure;
+    private static volatile Exception? consumerFailure;
 }
+
+internal sealed record Record(int LineNumber, String Line) { }
 

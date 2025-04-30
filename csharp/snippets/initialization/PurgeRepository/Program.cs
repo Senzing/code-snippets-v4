@@ -9,6 +9,8 @@ using System.Text.Json.Nodes;
 using Senzing.Sdk;
 using Senzing.Sdk.Core;
 
+#pragma warning disable CA1303 // Do not pass literals as localized parameters (example messages)
+
 // confirm purge
 Console.WriteLine(PurgeMessage);
 string? response = Console.ReadLine();
@@ -78,6 +80,7 @@ finally
 public partial class Program
 {
     private const string PurgeMessage = """
+
             **************************************** WARNING ****************************************
 
             This example will purge all currently loaded data from the Senzing datastore!
@@ -91,3 +94,5 @@ public partial class Program
     private static readonly ReadOnlyCollection<string> YesAnswers
         = new ReadOnlyCollection<string>(["y", "Y", "Yes", "yes", "YES"]);
 }
+
+#pragma warning restore CA1303 // Do not pass literals as localized parameters (example messages)

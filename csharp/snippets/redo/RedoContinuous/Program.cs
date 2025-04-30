@@ -9,6 +9,8 @@ using Senzing.Sdk.Core;
 
 using static Senzing.Sdk.SzFlags;
 
+#pragma warning disable CA1303 // Do not pass literals as localized parameters (example messages)
+
 // get the senzing repository settings
 string? settings = Environment.GetEnvironmentVariable("SENZING_ENGINE_CONFIGURATION_JSON");
 if (settings == null)
@@ -187,9 +189,11 @@ public partial class Program
     private const string Critical = "CRITICAL";
 
     // setup some class-wide variables
-    private static int errorCount = 0;
-    private static int redoneCount = 0;
-    private static int retryCount = 0;
-    private static FileInfo? retryFile = null;
-    private static StreamWriter? retryWriter = null;
+    private static int errorCount;
+    private static int redoneCount;
+    private static int retryCount;
+    private static FileInfo? retryFile;
+    private static StreamWriter? retryWriter;
 }
+
+#pragma warning restore CA1303 // Do not pass literals as localized parameters (example messages)

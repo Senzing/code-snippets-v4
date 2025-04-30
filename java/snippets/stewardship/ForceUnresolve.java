@@ -38,7 +38,7 @@ public class ForceUnresolve {
 
             Map<SzRecordKey, String> recordMap = getRecords();
             // loop through the example records and add them to the repository
-            for (Map.Entry<SzRecordKey,String> entry : recordMap.entrySet()) {
+            for (Map.Entry<SzRecordKey, String> entry : recordMap.entrySet()) {
                 SzRecordKey recordKey = entry.getKey();
                 String recordDefinition = entry.getValue();
  

@@ -1,12 +1,18 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+
 using Microsoft.Data.Sqlite;
+
 using Senzing.Sdk;
 using Senzing.Sdk.Core;
+using Senzing.Snippets.Runner;
+
+using static System.StringComparison;
 using static Senzing.Sdk.SzFlags;
 
 Assembly assembly = Assembly.GetExecutingAssembly();
@@ -52,7 +58,7 @@ switch (dir.Name)
 if (snippetDir == null && runnerDir != null)
 {
     csharpDir = Directory.GetParent(runnerDir.FullName);
-    if (!"csharp".Equals(csharpDir?.Name))
+    if (!"csharp".Equals(csharpDir?.Name, Ordinal))
     {
         HandleWrongDirectory();
     }
@@ -86,7 +92,7 @@ try
     {
         string group = entry.Key;
         IDictionary<string, string> snippetMap = entry.Value;
-        IList<(string, string, string)> tuples
+        List<(string, string, string)> tuples
             = new List<(string, string, string)>(snippetMap.Count);
 
         foreach (KeyValuePair<string, string> subEntry in snippetMap)
@@ -106,7 +112,7 @@ try
         {
             string snippet = subEntry.Key;
             string snippetPath = subEntry.Value;
-            IList<(string, string, string)> tuples = new List<(string, string, string)>(1);
+            List<(string, string, string)> tuples = new List<(string, string, string)>(1);
             tuples.Add((group, snippet, snippetPath));
             snippetOptions.Add(snippet, tuples.AsReadOnly());
         }
@@ -132,7 +138,7 @@ try
             settingsJson = JsonNode.Parse(settings)?.AsObject();
             if (settingsJson == null)
             {
-                throw new Exception("Setting must be a JSON object: " + settings);
+                throw new ArgumentNullException("Setting must be a JSON object: " + settings);
             }
         }
         catch (Exception e)
@@ -141,6 +147,7 @@ try
             Console.Error.WriteLine("The provided Senzing settings were not valid JSON:");
             Console.Error.WriteLine();
             Environment.Exit(1);
+            throw;
         }
     }
 
@@ -155,6 +162,7 @@ try
     {
         Console.Error.WriteLine(e);
         Environment.Exit(1);
+        throw;
     }
     if (installLocations == null)
     {
@@ -164,11 +172,11 @@ try
         return;
     }
 
-    IList<(string, string)> snippets = new List<(string, string)>(100);
+    List<(string, string)> snippets = new List<(string, string)>(100);
     for (int index = 0; index < args.Length; index++)
     {
         string arg = args[index];
-        if (arg.Equals("all"))
+        if (arg.Equals("all", Ordinal))
         {
             foreach (IDictionary<string, string> snippetMap in snippetsMap.Values)
             {
@@ -230,7 +238,7 @@ try
     {
         Console.WriteLine();
         Stopwatch stopwatch = Stopwatch.StartNew();
-        IDictionary<string, string> properties = new Dictionary<string, string>();
+        Dictionary<string, string> properties = new Dictionary<string, string>();
         string resourceName = $"""{assemblyName}.Resources.{snippet}.properties""";
         LoadProperties(properties, resourceName);
         Console.WriteLine("Preparing repository for " + snippet + "...");
@@ -285,14 +293,14 @@ try
                             "Missing resource (" + fileName + ") for load file ("
                             + loadKey + ") for snippet (" + snippet + ")");
                     }
+                    StreamReader rdr = new StreamReader(stream, Encoding.UTF8);
                     try
                     {
-                        StreamReader rdr = new StreamReader(stream, Encoding.UTF8);
                         for (string? line = rdr.ReadLine(); line != null; line = rdr.ReadLine())
                         {
                             line = line.Trim();
                             if (line.Length == 0) continue;
-                            if (line.StartsWith("#")) continue;
+                            if (line.StartsWith('#')) continue;
                             JsonObject? record = JsonNode.Parse(line)?.AsObject();
                             if (record == null)
                             {
@@ -307,6 +315,7 @@ try
                     }
                     finally
                     {
+                        rdr.Close();
                         stream.Close();
                     }
 
@@ -337,7 +346,7 @@ catch (Exception e)
 {
     Console.Error.WriteLine(e);
     Environment.Exit(1);
-    return;
+    throw;
 }
 
 static void LoadProperties(IDictionary<string, string> properties, String resourceName)
@@ -352,9 +361,9 @@ static void LoadProperties(IDictionary<string, string> properties, String resour
             for (string? line = rdr.ReadLine(); line != null; line = rdr.ReadLine())
             {
                 if (line.Trim().Length == 0) continue;
-                if (line.StartsWith("#")) continue;
-                if (line.StartsWith("!")) continue;
-                int index = line.IndexOf('=');
+                if (line.StartsWith('#')) continue;
+                if (line.StartsWith('!')) continue;
+                int index = line.IndexOf('=', Ordinal);
                 if (index < 1) continue;
                 string key = line.Substring(0, index).Trim();
                 string value = "";
@@ -363,18 +372,19 @@ static void LoadProperties(IDictionary<string, string> properties, String resour
                     value = line.Substring(index + 1);
                 }
                 value = value.Trim();
-                while (value.EndsWith("\\"))
+                while (value.EndsWith('\\'))
                 {
                     line = rdr.ReadLine();
                     if (line == null) break;
                     line = line.Trim();
-                    value = value.Substring(0, value.Length - 1) + line;
+                    value = string.Concat(value.AsSpan(0, value.Length - 1), line);
                 }
                 properties[key] = value;
             }
         }
         finally
         {
+            rdr.Close();
             stream.Close();
         }
     }
@@ -393,11 +403,12 @@ static SortedDictionary<string, SortedDictionary<string, string>>
         {
             continue;
         }
-        if (!snippetsMap.ContainsKey(group))
+        snippetsMap.TryGetValue(group, out SortedDictionary<string, string>? snippetMap);
+        if (snippetMap == null)
         {
-            snippetsMap.Add(group, new SortedDictionary<string, string>());
+            snippetMap = new SortedDictionary<string, string>();
+            snippetsMap.Add(group, snippetMap);
         }
-        SortedDictionary<string, string> snippetMap = snippetsMap[group];
 
         foreach (string subdir in Directory.GetDirectories(dir))
         {
@@ -495,7 +506,7 @@ static void ExecuteSnippet(string snippet,
     Process? process = Process.Start(startInfo);
     if (process == null)
     {
-        throw new Exception("Failed to execute snippet; " + snippet);
+        throw new ArgumentNullException("Failed to execute snippet; " + snippet);
     }
 
     if (properties != null && properties.ContainsKey(InputKeyPrefix + 0))
@@ -520,7 +531,7 @@ static void ExecuteSnippet(string snippet,
     if (properties != null && properties.ContainsKey(DestroyAfterKey))
     {
         string propValue = properties[DestroyAfterKey];
-        int delay = Int32.Parse(propValue);
+        int delay = Int32.Parse(propValue, CultureInfo.InvariantCulture);
         bool exited = process.WaitForExit(delay);
         if (!exited && !process.HasExited)
         {
@@ -622,11 +633,11 @@ static string SetupTempRepository(InstallLocations senzingInstall)
         }
     }
 
-    string supportPath = supportDir.FullName.Replace("\\", "\\\\");
-    string configPath = configDir.FullName.Replace("\\", "\\\\"); ;
-    string resourcePath = resourcesDir.FullName.Replace("\\", "\\\\"); ;
-    string baseConfig = File.ReadAllText(configFile).Replace("\\", "\\\\");
-    string databasePath = databaseFile.Replace("\\", "\\\\");
+    string supportPath = supportDir.FullName.Replace("\\", "\\\\", Ordinal);
+    string configPath = configDir.FullName.Replace("\\", "\\\\", Ordinal);
+    string resourcePath = resourcesDir.FullName.Replace("\\", "\\\\", Ordinal);
+    string baseConfig = File.ReadAllText(configFile).Replace("\\", "\\\\", Ordinal);
+    string databasePath = databaseFile.Replace("\\", "\\\\", Ordinal);
     string settings = $$"""
             {
                 "PIPELINE": {

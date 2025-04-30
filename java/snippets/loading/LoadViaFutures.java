@@ -67,10 +67,14 @@ public class LoadViaFutures {
                     line = line.trim();
                     
                     // skip any blank lines
-                    if (line.length() == 0) continue;
+                    if (line.length() == 0) {
+                        continue;
+                    }
 
                     // skip any commented lines
-                    if (line.startsWith("#")) continue;
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
 
                     // construct the Record instance
                     Record record = new Record(lineNumber, line);
@@ -166,18 +170,20 @@ public class LoadViaFutures {
         throws Exception
     {
         // check for completed futures
-        Iterator<Map.Entry<Future<?>,Record>> iter
+        Iterator<Map.Entry<Future<?>, Record>> iter
         = pendingFutures.entrySet().iterator();
         
         // loop through the pending futures
         while (iter.hasNext()) {
             // get the next pending future
-            Map.Entry<Future<?>,Record> entry = iter.next();
+            Map.Entry<Future<?>, Record> entry = iter.next();
             Future<?> future  = entry.getKey();
             Record              record  = entry.getValue();
             
             // if not blocking and this one is not done then continue
-            if (!blocking && !future.isDone()) continue;
+            if (!blocking && !future.isDone()) {
+                continue;
+            }
 
             // remove the pending future from the map
             iter.remove();
@@ -210,7 +216,7 @@ public class LoadViaFutures {
                 logFailedRecord(ERROR, e, record.lineNumber, record.line);
                 errorCount++;   // increment the error count
 
-            } catch (SzRetryableException|InterruptedException|CancellationException e) {
+            } catch (SzRetryableException | InterruptedException | CancellationException e) {
                 // handle thread interruption and cancellation as retries
                 logFailedRecord(WARNING, e, record.lineNumber, record.line);
                 errorCount++;   // increment the error count
@@ -283,5 +289,4 @@ public class LoadViaFutures {
     private static int         retryCount      = 0;
     private static File        retryFile       = null;
     private static PrintWriter retryWriter     = null;
-
 }

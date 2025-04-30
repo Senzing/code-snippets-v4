@@ -9,6 +9,8 @@ using Senzing.Sdk.Core;
 
 using static Senzing.Sdk.SzFlags;
 
+#pragma warning disable CA1303 // Do not pass literals as localized parameters (example messages)
+
 // get the senzing repository settings
 string? settings = Environment.GetEnvironmentVariable("SENZING_ENGINE_CONFIGURATION_JSON");
 if (settings == null)
@@ -65,8 +67,8 @@ try
     Console.WriteLine();
     Console.WriteLine("Updating records with TRUSTED_ID to force resolve...");
 
-    string record1 = engine.GetRecord(TEST, "1", SzRecordDefaultFlags);
-    string record3 = engine.GetRecord(TEST, "3", SzRecordDefaultFlags);
+    string record1 = engine.GetRecord(TestDataSource, "1", SzRecordDefaultFlags);
+    string record3 = engine.GetRecord(TestDataSource, "3", SzRecordDefaultFlags);
 
     JsonObject?[] jsonObjects = {
         JsonNode.Parse(record1)?.AsObject()?["JSON_DATA"]?.AsObject(),
@@ -76,14 +78,14 @@ try
     {
         if (obj == null)
         {
-            throw new Exception("Parsed record is unexpectedly null: "
+            throw new JsonException("Parsed record is unexpectedly null: "
                 + record1 + " / " + record3);
         }
         obj["TRUSTED_ID_NUMBER"] = JsonNode.Parse("\"TEST_R1-TEST_R3\"");
         obj["TRUSTED_ID_TYPE"] = JsonNode.Parse("\"FORCE_RESOLVE\"");
     }
-    engine.AddRecord(TEST, "1", jsonObjects[0]?.ToJsonString());
-    engine.AddRecord(TEST, "3", jsonObjects[1]?.ToJsonString());
+    engine.AddRecord(TestDataSource, "1", jsonObjects[0]?.ToJsonString());
+    engine.AddRecord(TestDataSource, "3", jsonObjects[1]?.ToJsonString());
 
     Console.WriteLine();
 
@@ -135,7 +137,7 @@ finally
 /// </returns>
 static IDictionary<(string, string), string> GetRecords()
 {
-    IDictionary<(string, string), string> records
+    SortedDictionary<(string, string), string> records
         = new SortedDictionary<(string, string), string>();
 
     records.Add(
@@ -182,5 +184,7 @@ static IDictionary<(string, string), string> GetRecords()
 
 public partial class Program
 {
-    public const string TEST = "Test";
+    private const string TestDataSource = "Test";
 }
+
+#pragma warning restore CA1303 // Do not pass literals as localized parameters (example messages)

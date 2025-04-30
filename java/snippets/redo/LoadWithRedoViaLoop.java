@@ -52,10 +52,14 @@ public class LoadWithRedoViaLoop {
                         line = line.trim();
                         
                         // skip any blank lines
-                        if (line.length() == 0) continue;
+                        if (line.length() == 0) {
+                            continue;
+                        }
 
                         // skip any commented lines
-                        if (line.startsWith("#")) continue;
+                        if (line.startsWith("#")) {
+                            continue;
+                        }
 
                         try {
                             // parse the line as a JSON object
@@ -72,7 +76,7 @@ public class LoadWithRedoViaLoop {
 
                             successCount++;
 
-                        } catch (JsonException|SzBadInputException e) {
+                        } catch (JsonException | SzBadInputException e) {
                             logFailedRecord(ERROR, e, filePath, lineNumber, line);
                             errorCount++;   // increment the error count
 
@@ -156,6 +160,7 @@ public class LoadWithRedoViaLoop {
      * 
      * @param errorType The error type description.
      * @param exception The exception itself.
+     * @param filePath The path to the file that was the source of the failed record.
      * @param lineNumber The line number of the failed record in the JSON input file.
      * @param recordJson The JSON text for the failed record.
      */

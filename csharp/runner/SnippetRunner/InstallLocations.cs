@@ -1,3 +1,5 @@
+namespace Senzing.Snippets.Runner;
+
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -315,8 +317,7 @@ public class InstallLocations
         supportDir = (supportPath != null) ? new DirectoryInfo(supportPath) : null;
 
         // check if support dir is not defined AND we have a local dev build
-        if (supportDir == null && installDir != null
-            && "dist".Equals(installDir.Name, OrdinalIgnoreCase))
+        if (supportDir == null && "dist".Equals(installDir.Name, OrdinalIgnoreCase))
         {
             supportDir = new DirectoryInfo(Path.Combine(installDir.FullName, "data"));
             if (!supportDir.Exists)
@@ -386,7 +387,7 @@ public class InstallLocations
         resourceDir = (resourcePath != null) ? new DirectoryInfo(resourcePath) : null;
 
         // try the "resources" sub-directory of the installation
-        if (resourceDir == null && installDir != null)
+        if (resourceDir == null)
         {
             resourceDir = new DirectoryInfo(Path.Combine(installDir.FullName, "resources"));
             if (!resourceDir.Exists)
@@ -456,7 +457,7 @@ public class InstallLocations
         configDir = (configPath != null) ? new DirectoryInfo(configPath) : null;
 
         // check if config dir is not defined AND we have a local dev build
-        if (configDir == null && installDir != null && templatesDir != null
+        if (configDir == null && templatesDir != null
             && "dist".Equals(installDir.Name, OrdinalIgnoreCase))
         {
             configDir = templatesDir;
@@ -473,7 +474,7 @@ public class InstallLocations
         }
 
         // if still null, try to use the install's etc directory
-        if (configDir == null && installDir != null)
+        if (configDir == null)
         {
             configDir = new DirectoryInfo(
                 Path.Combine(installDir.FullName, "etc"));
@@ -572,7 +573,7 @@ public class InstallLocations
         result.supportDir = supportDir;
         result.resourceDir = resourceDir;
         result.templatesDir = templatesDir;
-        result.devBuild = (installDir != null) && ("dist".Equals(installDir.Name, OrdinalIgnoreCase));
+        result.devBuild = ("dist".Equals(installDir.Name, OrdinalIgnoreCase));
 
         // return the result
         return result;

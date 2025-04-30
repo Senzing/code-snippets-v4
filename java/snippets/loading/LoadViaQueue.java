@@ -53,10 +53,14 @@ public class LoadViaQueue {
                     line = line.trim();
                     
                     // skip any blank lines
-                    if (line.length() == 0) continue;
+                    if (line.length() == 0) {
+                        continue;
+                    }
 
                     // skip any commented lines
-                    if (line.startsWith("#")) continue;
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
 
                     // add the record to the queue
                     recordQueue.put(new Record(lineNumber, line));
@@ -109,7 +113,7 @@ public class LoadViaQueue {
                             successCount++;
                         }
     
-                    } catch (JsonException|SzBadInputException e) {
+                    } catch (JsonException | SzBadInputException e) {
                         logFailedRecord(ERROR, e, lineNumber, line);
                         synchronized (MONITOR) {
                             errorCount++;   // increment the error count
@@ -262,7 +266,7 @@ public class LoadViaQueue {
 
     public record Record(int lineNumber, String line) { }
 
-    private static final BlockingQueue<Record> recordQueue
+    private static BlockingQueue<Record> recordQueue
         = new LinkedBlockingQueue<>(MAXIMUM_BACKLOG);
 
     private static volatile Exception producerFailure = null;

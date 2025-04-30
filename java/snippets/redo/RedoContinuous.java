@@ -122,8 +122,7 @@ public class RedoContinuous {
      * 
      * @param errorType The error type description.
      * @param exception The exception itself.
-     * @param lineNumber The line number of the failed record in the JSON input file.
-     * @param recordJson The JSON text for the failed record.
+     * @param redoRecord The JSON text for the redo record.
      */
     private static void logFailedRedo(String      errorType,
                                       Exception   exception,  

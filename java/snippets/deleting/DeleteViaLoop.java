@@ -48,10 +48,14 @@ public class DeleteViaLoop {
                 line = line.trim();
                 
                 // skip any blank lines
-                if (line.length() == 0) continue;
+                if (line.length() == 0) {
+                    continue;
+                }
 
                 // skip any commented lines
-                if (line.startsWith("#")) continue;
+                if (line.startsWith("#")) {
+                    continue;
+                }
 
                 try {
                     // parse the line as a JSON object
@@ -68,7 +72,7 @@ public class DeleteViaLoop {
 
                     successCount++;
 
-                } catch (JsonException|SzBadInputException e) {
+                } catch (JsonException | SzBadInputException e) {
                     logFailedRecord(ERROR, e, lineNumber, line);
                     errorCount++;   // increment the error count
 
