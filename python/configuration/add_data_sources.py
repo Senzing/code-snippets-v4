@@ -22,8 +22,7 @@ try:
         _ = sz_config.add_data_source(data_source)
 
     new_config = sz_config.export()
-    new_config_id = sz_configmanager.register_config(new_config, INSTANCE_NAME)
-    sz_configmanager.set_default_config_id(config_id)
+    new_config_id = sz_configmanager.set_default_config(new_config, "Add data source CUSTOMERS")
 
     sz_config = sz_configmanager.create_config_from_config_id(new_config_id)
     response = sz_config.get_data_sources()
