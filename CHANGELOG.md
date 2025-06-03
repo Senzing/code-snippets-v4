@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
+### Changed in 0.0.7
+
+- Small improvements to Python snippets 
+
 ### Changed in 0.0.6
 
 - Improved Python add_data_sources.py

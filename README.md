@@ -67,24 +67,24 @@ You may already have installed the Senzing and created a Senzing project by foll
 
 ### Configuration
 
-When using a bare metal install, the initialization parameters used by the Senzing Python utilities are maintained within `<project_path>/etc/G2Module.ini`.
+When using a bare metal install, the initialization parameters used by the Senzing Python utilities are maintained within `<project_path>/etc/sz_engine_config.ini`.
 
-🤔To convert an existing Senzing project G2Module.ini file to a JSON string use one of the following methods:
+🤔To convert an existing Senzing project sz_engine_config.ini file to a JSON string use one of the following methods:
 
-- [g2_module_ini_to_json.py]
+- [sz_engine_config_ini_to_json.py]
 
-  - Modify the path to your projects G2Module.ini file.
+  - Modify the path to your projects sz_engine_config.ini file.
 
 - [jc]
 
   - ```console
-    cat <project_path>/etc/G2Module.ini | jc --ini
+    cat <project_path>/etc/sz_engine_config.ini.ini | jc --ini
     ```
 
 - Python one liner
 
   - ```python
-    python3 -c $'import configparser; ini_file_name = "<project_path>/etc/G2Module.ini";settings = {};cfgp = configparser.ConfigParser();cfgp.optionxform = str;cfgp.read(ini_file_name)\nfor section in cfgp.sections(): settings[section] = dict(cfgp.items(section))\nprint(settings)'
+    python3 -c $'import configparser; ini_file_name = "<project_path>/etc/sz_engine_config.ini";settings = {};cfgp = configparser.ConfigParser();cfgp.optionxform = str;cfgp.read(ini_file_name)\nfor section in cfgp.sections(): settings[section] = dict(cfgp.items(section))\nprint(settings)'
     ```
 
 :pencil2: `<project_path>` in the above example should point to your project.
@@ -172,7 +172,7 @@ There are different sized load files within the [data] path that can be used to 
 [Configuration]: #configuration
 [data]: resources/data/
 [Docker Usage]: #docker-usage
-[g2_module_ini_to_json.py]: python/initialization/g2_module_ini_to_json.py
+[sz_engine_config_ini_to_json.py]: python/initialization/sz_engine_config_ini_to_json.py
 [Input Load File Sizes]: #input-load-file-sizes
 [Items of Note]: #items-of-note
 [jc]: https://github.com/kellyjonbrazil/jc

@@ -72,10 +72,6 @@ def futures_add(engine, input_file, output_file):
                             mock_logger("CRITICAL", err, futures[f])
                             raise err
                         else:
-                            record = in_file.readline()
-                            if record:
-                                futures[executor.submit(add_record, engine, record)] = record
-
                             out_file.write(f"{result}\n")
 
                             success_recs += 1
@@ -85,6 +81,9 @@ def futures_add(engine, input_file, output_file):
                             if success_recs % 200 == 0:
                                 engine_stats(engine)
                         finally:
+                            if record := in_file.readline():
+                                futures[executor.submit(add_record, engine, record)] = record
+
                             del futures[f]
 
                 print(f"\nSuccessfully loaded {success_recs:,} records, with" f" {error_recs:,} errors")

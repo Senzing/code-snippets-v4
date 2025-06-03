@@ -43,7 +43,7 @@ def del_records_from_file(engine, input_file):
                 success_recs += 1
 
             if success_recs % 100 == 0:
-                print(f"Processed {success_recs:,} adds, with {error_recs:,} errors", flush=True)
+                print(f"Processed {success_recs:,} deletes, with {error_recs:,} errors", flush=True)
 
     print(f"\nSuccessfully deleted {success_recs:,} records, with {error_recs:,} errors")
 

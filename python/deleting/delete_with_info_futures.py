@@ -62,16 +62,15 @@ def futures_del(engine, input_file, output_file):
                             mock_logger("CRITICAL", err, futures[f])
                             raise err
                         else:
-                            record = in_file.readline()
-                            if record:
-                                futures[executor.submit(delete_record, engine, record)] = record
-
                             out_file.write(f"{result}\n")
 
                             success_recs += 1
                             if success_recs % 100 == 0:
-                                print(f"Processed {success_recs:,} adds, with {error_recs:,} errors", flush=True)
+                                print(f"Processed {success_recs:,} deletes, with {error_recs:,} errors", flush=True)
                         finally:
+                            if record := in_file.readline():
+                                futures[executor.submit(delete_record, engine, record)] = record
+
                             del futures[f]
 
                 print(f"\nSuccessfully deleted {success_recs:,} records, with" f" {error_recs:,} errors")

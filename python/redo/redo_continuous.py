@@ -22,11 +22,9 @@ def process_redo(engine):
     success_recs = 0
     error_recs = 0
 
-    while 1:
+    while True:
         try:
-            response = engine.get_redo_record()
-
-            if not response:
+            if not (response := engine.get_redo_record()):
                 print(
                     "No redo records to process, pausing for 30 seconds. Total"
                     f" processed {success_recs:,} . (CTRL-C to exit)..."

@@ -3,7 +3,7 @@
 import configparser
 from pathlib import Path
 
-INI_FILE = Path("../../resources/g2module/G2Module.ini").resolve()
+INI_FILE = Path("../../resources/engine_config/sz_engine_config.ini").resolve()
 settings = {}
 
 cfgp = configparser.ConfigParser()
