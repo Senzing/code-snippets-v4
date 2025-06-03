@@ -30,8 +30,7 @@ def get_redo_record(engine):
 def prime_redo_records(engine, quantity):
     redo_records = []
     for _ in range(quantity):
-        redo_record = get_redo_record(engine)
-        if redo_record:
+        if redo_record := get_redo_record(engine):
             redo_records.append(redo_record)
     return redo_records
 
@@ -61,7 +60,7 @@ def futures_redo(engine):
     redo_paused = False
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        while 1:
+        while True:
             futures = {
                 executor.submit(process_redo_record, engine, record): record
                 for record in prime_redo_records(engine, executor._max_workers)
@@ -71,7 +70,7 @@ def futures_redo(engine):
             else:
                 break
 
-        while 1:
+        while True:
             done, _ = concurrent.futures.wait(futures, return_when=concurrent.futures.FIRST_COMPLETED)
             for f in done:
                 try:
@@ -86,16 +85,15 @@ def futures_redo(engine):
                     mock_logger("CRITICAL", err, futures[f])
                     raise err
                 else:
-                    record = get_redo_record(engine)
-                    if record:
-                        futures[executor.submit(process_redo_record, engine, record)] = record
-                    else:
-                        redo_paused = True
-
                     success_recs += 1
                     if success_recs % 100 == 0:
                         print(f"Processed {success_recs:,} redo records, with" f" {error_recs:,} errors")
                 finally:
+                    if record := get_redo_record(engine):
+                        futures[executor.submit(process_redo_record, engine, record)] = record
+                    else:
+                        redo_paused = True
+
                     del futures[f]
 
             if redo_paused:
@@ -103,8 +101,7 @@ def futures_redo(engine):
                     redo_pause(success_recs)
                 redo_paused = False
                 while len(futures) < executor._max_workers:
-                    record = get_redo_record(engine)
-                    if record:
+                    if record := get_redo_record(engine):
                         futures[executor.submit(process_redo_record, engine, record)] = record
 
 

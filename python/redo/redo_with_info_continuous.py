@@ -42,10 +42,8 @@ def process_redo(engine, output_file):
 
     with open(output_file, "w", encoding="utf-8") as out_file:
         try:
-            while 1:
-                redo_record = engine.get_redo_record()
-
-                if not redo_record:
+            while True:
+                if not (redo_record := engine.get_redo_record()):
                     redo_pause(success_recs)
                     continue
 

@@ -59,10 +59,9 @@ def process_redo(engine):
 
     print("\nStarting to process redo records...")
 
-    while 1:
+    while True:
         try:
-            response = engine.get_redo_record()
-            if not response:
+            if not (response := engine.get_redo_record()):
                 break
             engine.process_redo_record(response)
 
@@ -87,9 +86,8 @@ try:
     sz_engine = sz_factory.create_engine()
     for load_file in INPUT_FILES:
         add_records_from_file(sz_engine, load_file)
-    redo_count = sz_engine.count_redo_records()
 
-    if redo_count:
+    if sz_engine.count_redo_records():
         process_redo(sz_engine)
     else:
         print("\nNo redo records to process")

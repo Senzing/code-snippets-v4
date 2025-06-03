@@ -56,14 +56,14 @@ def consumer(engine, queue):
                     mock_logger("CRITICAL", err, futures[f])
                     raise err
                 else:
-                    if not queue.empty():
-                        record = queue.get()
-                        futures[executor.submit(add_record, engine, record)] = record
-
                     success_recs += 1
                     if success_recs % 100 == 0:
                         print(f"Processed {success_recs:,} adds, with {error_recs:,} errors", flush=True)
                 finally:
+                    if not queue.empty():
+                        record = queue.get()
+                        futures[executor.submit(add_record, engine, record)] = record
+
                     del futures[f]
 
         print(f"\nSuccessfully loaded {success_recs:,} records, with {error_recs:,} errors")
@@ -80,6 +80,5 @@ try:
     consumer_proc.start()
     producer_proc.join()
     consumer_proc.join()
-
 except SzError as err:
     mock_logger("CRITICAL", err)
