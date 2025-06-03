@@ -5,34 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
+## [0.0.7] - 2025-06-03
+
 ### Changed in 0.0.7
 
 - Small improvements to Python snippets 
+
+## [0.0.6]
 
 ### Changed in 0.0.6
 
 - Improved Python add_data_sources.py
 
+## [0.0.5]
+
 ### Changed in 0.0.5
 
 - Modified configuration examples for new szconfig and szconfigmanager pattern
+
+## [0.0.4]
 
 ### Added to 0.0.4
 
 - C# examples
 - Updated Java examples to move declarations to the bottom
 
+## [0.0.3]
+
 ### Added to 0.0.3
 
 - Java examples
+
+## [0.0.2]
 
 ### Changed in 0.0.2
 
 - Modify Python imports to use senzing and senzing_core
 
-### Added to 0.0.1
+
+### Added to 0.0.2
 
 - Couple of new examples
+
+## [0.0.1]
 
 ### Added to 0.0.1
 
