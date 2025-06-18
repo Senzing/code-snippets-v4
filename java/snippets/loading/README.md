@@ -7,9 +7,9 @@ The loading snippets outline adding new source records. Adding source records in
 - **LoadRecords.java**
   - Basic iteration over a few records, adding each one
 - **LoadTruthSetWithInfoViaLoop.java**
-  - Read and load from multiple source files, adding a sample truth 
+  - Read and load from multiple source files, adding a sample truth
   - Collect the response using the [SZ_WITH_INFO flag](../../../README.md#with-info) on the `addRecord()` method and track the entity ID's for the records.
-- **LoaeViaFutures.java**
+- **LoadViaFutures.java**
   - Read and load source records from a file using multiple threads
 - **LoadViaLoop.java**
   - Basic read and add source records from a file

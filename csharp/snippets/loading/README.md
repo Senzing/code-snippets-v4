@@ -7,9 +7,9 @@ The loading snippets outline adding new source records. Adding source records in
 - **LoadRecords**
   - Basic iteration over a few records, adding each one
 - **LoadTruthSetWithInfoViaLoop**
-  - Read and load from multiple source files, adding a sample truth 
+  - Read and load from multiple source files, adding a sample truth
   - Collect the response using the [SzWithInfo flag](../../../README.md#with-info) on the `AddRecord()` method and track the entity ID's for the records.
-- **LoaeViaFutures**
+- **LoadViaFutures**
   - Read and load source records from a file using multiple threads
 - **LoadViaLoop**
   - Basic read and add source records from a file

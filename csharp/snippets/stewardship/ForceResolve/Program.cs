@@ -15,8 +15,8 @@ using static Senzing.Sdk.SzFlags;
 string? settings = Environment.GetEnvironmentVariable("SENZING_ENGINE_CONFIGURATION_JSON");
 if (settings == null)
 {
-    Console.Error.WriteLine("Unable to get settings.");
-    throw new ArgumentException("Unable to get settings");
+  Console.Error.WriteLine("Unable to get settings.");
+  throw new ArgumentException("Unable to get settings");
 }
 
 // create a descriptive instance name (can be anything)
@@ -32,99 +32,99 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 
 try
 {
-    // get the engine from the environment
-    SzEngine engine = env.GetEngine();
+  // get the engine from the environment
+  SzEngine engine = env.GetEngine();
 
-    IDictionary<(string, string), string> records = GetRecords();
+  IDictionary<(string, string), string> records = GetRecords();
 
-    // loop through the example records and add them to the repository
-    foreach (KeyValuePair<(string, string), string> pair in records)
-    {
-        (string dataSourceCode, string recordID) = pair.Key;
-        string recordDefinition = pair.Value;
+  // loop through the example records and add them to the repository
+  foreach (KeyValuePair<(string, string), string> pair in records)
+  {
+    (string dataSourceCode, string recordID) = pair.Key;
+    string recordDefinition = pair.Value;
 
-        // call the addRecord() function with no flags
-        engine.AddRecord(dataSourceCode, recordID, recordDefinition, SzNoFlags);
+    // call the addRecord() function with no flags
+    engine.AddRecord(dataSourceCode, recordID, recordDefinition, SzNoFlags);
 
-        Console.WriteLine("Record " + recordID + " added");
-        Console.Out.Flush();
-    }
+    Console.WriteLine("Record " + recordID + " added");
+    Console.Out.Flush();
+  }
 
-    Console.WriteLine();
-    foreach ((string dataSourceCode, string recordID) in records.Keys)
-    {
-        string result = engine.GetEntity(
-            dataSourceCode, recordID, SzEntityBriefDefaultFlags);
+  Console.WriteLine();
+  foreach ((string dataSourceCode, string recordID) in records.Keys)
+  {
+    string result = engine.GetEntity(
+        dataSourceCode, recordID, SzEntityBriefDefaultFlags);
 
-        JsonObject? jsonObj = JsonNode.Parse(result)?.AsObject();
-        jsonObj = jsonObj?["RESOLVED_ENTITY"]?.AsObject();
-        long? entityID = jsonObj?["ENTITY_ID"]?.GetValue<long>();
+    JsonObject? jsonObj = JsonNode.Parse(result)?.AsObject();
+    jsonObj = jsonObj?["RESOLVED_ENTITY"]?.AsObject();
+    long? entityID = jsonObj?["ENTITY_ID"]?.GetValue<long>();
 
-        Console.WriteLine(
-            "Record " + dataSourceCode + ":" + recordID
-            + " originally resolves to entity " + entityID);
-    }
-    Console.WriteLine();
-    Console.WriteLine("Updating records with TRUSTED_ID to force resolve...");
+    Console.WriteLine(
+        "Record " + dataSourceCode + ":" + recordID
+        + " originally resolves to entity " + entityID);
+  }
+  Console.WriteLine();
+  Console.WriteLine("Updating records with TRUSTED_ID to force resolve...");
 
-    string record1 = engine.GetRecord(TestDataSource, "1", SzRecordDefaultFlags);
-    string record3 = engine.GetRecord(TestDataSource, "3", SzRecordDefaultFlags);
+  string record1 = engine.GetRecord(TestDataSource, "1", SzRecordDefaultFlags);
+  string record3 = engine.GetRecord(TestDataSource, "3", SzRecordDefaultFlags);
 
-    JsonObject?[] jsonObjects = {
+  JsonObject?[] jsonObjects = {
         JsonNode.Parse(record1)?.AsObject()?["JSON_DATA"]?.AsObject(),
         JsonNode.Parse(record3)?.AsObject()?["JSON_DATA"]?.AsObject()
     };
-    foreach (JsonObject? obj in jsonObjects)
+  foreach (JsonObject? obj in jsonObjects)
+  {
+    if (obj == null)
     {
-        if (obj == null)
-        {
-            throw new JsonException("Parsed record is unexpectedly null: "
-                + record1 + " / " + record3);
-        }
-        obj["TRUSTED_ID_NUMBER"] = JsonNode.Parse("\"TEST_R1-TEST_R3\"");
-        obj["TRUSTED_ID_TYPE"] = JsonNode.Parse("\"FORCE_RESOLVE\"");
+      throw new JsonException("Parsed record is unexpectedly null: "
+          + record1 + " / " + record3);
     }
-    engine.AddRecord(TestDataSource, "1", jsonObjects[0]?.ToJsonString());
-    engine.AddRecord(TestDataSource, "3", jsonObjects[1]?.ToJsonString());
+    obj["TRUSTED_ID_NUMBER"] = JsonNode.Parse("\"TEST_R1-TEST_R3\"");
+    obj["TRUSTED_ID_TYPE"] = JsonNode.Parse("\"FORCE_RESOLVE\"");
+  }
+  engine.AddRecord(TestDataSource, "1", jsonObjects[0]?.ToJsonString());
+  engine.AddRecord(TestDataSource, "3", jsonObjects[1]?.ToJsonString());
 
-    Console.WriteLine();
+  Console.WriteLine();
 
-    foreach ((string dataSourceCode, string recordID) in records.Keys)
-    {
-        string result = engine.GetEntity(
-            dataSourceCode, recordID, SzEntityBriefDefaultFlags);
+  foreach ((string dataSourceCode, string recordID) in records.Keys)
+  {
+    string result = engine.GetEntity(
+        dataSourceCode, recordID, SzEntityBriefDefaultFlags);
 
-        JsonObject? jsonObj = JsonNode.Parse(result)?.AsObject();
-        jsonObj = jsonObj?["RESOLVED_ENTITY"]?.AsObject();
-        long? entityID = jsonObj?["ENTITY_ID"]?.GetValue<long>();
+    JsonObject? jsonObj = JsonNode.Parse(result)?.AsObject();
+    jsonObj = jsonObj?["RESOLVED_ENTITY"]?.AsObject();
+    long? entityID = jsonObj?["ENTITY_ID"]?.GetValue<long>();
 
-        Console.WriteLine(
-            "Record " + dataSourceCode + ":" + recordID
-            + " now resolves to entity " + entityID);
-    }
-    Console.WriteLine();
+    Console.WriteLine(
+        "Record " + dataSourceCode + ":" + recordID
+        + " now resolves to entity " + entityID);
+  }
+  Console.WriteLine();
 }
 catch (SzException e)
 {
-    // handle any exception that may have occurred
-    Console.Error.WriteLine("Senzing Error Message : " + e.Message);
-    Console.Error.WriteLine("Senzing Error Code    : " + e.ErrorCode);
-    Console.Error.WriteLine(e);
-    throw;
+  // handle any exception that may have occurred
+  Console.Error.WriteLine("Senzing Error Message : " + e.Message);
+  Console.Error.WriteLine("Senzing Error Code    : " + e.ErrorCode);
+  Console.Error.WriteLine(e);
+  throw;
 
 }
 catch (Exception e)
 {
-    Console.Error.WriteLine();
-    Console.Error.WriteLine("*** Terminated due to critical error ***");
-    Console.Error.WriteLine(e);
-    Console.Error.Flush();
-    throw;
+  Console.Error.WriteLine();
+  Console.Error.WriteLine("*** Terminated due to critical error ***");
+  Console.Error.WriteLine(e);
+  Console.Error.Flush();
+  throw;
 }
 finally
 {
-    // IMPORTANT: make sure to destroy the environment
-    env.Destroy();
+  // IMPORTANT: make sure to destroy the environment
+  env.Destroy();
 }
 
 /// <summary>
@@ -133,16 +133,16 @@ finally
 /// 
 /// <returns>
 /// A <see cref="IDictionary{(string,string),string}"/> of record key tuple keys
-/// to <c>string</c> JSON text values desribing the records to be added.
+/// to <c>string</c> JSON text values describing the records to be added.
 /// </returns>
 static IDictionary<(string, string), string> GetRecords()
 {
-    SortedDictionary<(string, string), string> records
-        = new SortedDictionary<(string, string), string>();
+  SortedDictionary<(string, string), string> records
+      = new SortedDictionary<(string, string), string>();
 
-    records.Add(
-        ("TEST", "1"),
-        """
+  records.Add(
+      ("TEST", "1"),
+      """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "1",
@@ -154,9 +154,9 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-    records.Add(
-        ("TEST", "2"),
-        """
+  records.Add(
+      ("TEST", "2"),
+      """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "2",
@@ -167,9 +167,9 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-    records.Add(
-        ("TEST", "3"),
-        """
+  records.Add(
+      ("TEST", "3"),
+      """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "3",
@@ -179,12 +179,12 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-    return records;
+  return records;
 }
 
 public partial class Program
 {
-    private const string TestDataSource = "Test";
+  private const string TestDataSource = "Test";
 }
 
 #pragma warning restore CA1303 // Do not pass literals as localized parameters (example messages)

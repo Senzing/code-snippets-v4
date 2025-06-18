@@ -18,8 +18,8 @@ using static Senzing.Sdk.SzFlags;
 string? settings = Environment.GetEnvironmentVariable("SENZING_ENGINE_CONFIGURATION_JSON");
 if (settings == null)
 {
-    Console.Error.WriteLine("Unable to get settings.");
-    throw new ArgumentException("Unable to get settings");
+  Console.Error.WriteLine("Unable to get settings.");
+  throw new ArgumentException("Unable to get settings");
 }
 
 // create a descriptive instance name (can be anything)
@@ -39,7 +39,7 @@ string filePath = (args.Length > 0) ? args[0] : DefaultFilePath;
 // execution to a specific limited pool of threads.  In order to
 // improve performance and conserve memory we want to use the same
 // threads for Senzing work.  The TaskScheduler implementation used
-// here is directly pulled from Mirosoft's TaskScheduler documentation
+// here is directly pulled from Microsoft's TaskScheduler documentation
 TaskScheduler taskScheduler
     = new LimitedConcurrencyLevelTaskScheduler(ThreadCount);
 
@@ -56,228 +56,228 @@ FileStream fs = new FileStream(filePath, FileMode.Open);
 StreamReader rdr = new StreamReader(fs, Encoding.UTF8);
 try
 {
-    // get the engine from the environment
-    SzEngine engine = env.GetEngine();
+  // get the engine from the environment
+  SzEngine engine = env.GetEngine();
 
-    int lineNumber = 0;
-    bool eof = false;
+  int lineNumber = 0;
+  bool eof = false;
 
-    while (!eof)
+  while (!eof)
+  {
+    // loop through the example records and queue them up so long
+    // as we have more records and backlog is not too large
+    while (pendingFutures.Count < MaximumBacklog)
     {
-        // loop through the example records and queue them up so long
-        // as we have more records and backlog is not too large
-        while (pendingFutures.Count < MaximumBacklog)
-        {
-            // read the next line
-            string? line = rdr.ReadLine();
-            lineNumber++;
+      // read the next line
+      string? line = rdr.ReadLine();
+      lineNumber++;
 
-            // check for EOF
-            if (line == null)
+      // check for EOF
+      if (line == null)
+      {
+        eof = true;
+        break;
+      }
+
+      // trim the line
+      line = line.Trim();
+
+      // skip any blank lines
+      if (line.Length == 0) continue;
+
+      // skip any commented lines
+      if (line.StartsWith('#')) continue;
+
+      // construct the Record instance
+      Criteria criteria = new Criteria(lineNumber, line);
+
+      try
+      {
+        Task<string> task = factory.StartNew(() =>
             {
-                eof = true;
-                break;
-            }
+              // call the addRecord() function with no flags
+              return engine.SearchByAttributes(
+                          criteria.Line, SzSearchByAttributesDefaultFlags);
+            },
+            CancellationToken.None,
+            TaskCreationOptions.None,
+            taskScheduler);
 
-            // trim the line
-            line = line.Trim();
+        // add the future to the pending future list
+        pendingFutures.Add((task, criteria));
 
-            // skip any blank lines
-            if (line.Length == 0) continue;
-
-            // skip any commented lines
-            if (line.StartsWith('#')) continue;
-
-            // construct the Record instance
-            Criteria criteria = new Criteria(lineNumber, line);
-
-            try
-            {
-                Task<string> task = factory.StartNew(() =>
-                    {
-                        // call the addRecord() function with no flags
-                        return engine.SearchByAttributes(
-                            criteria.Line, SzSearchByAttributesDefaultFlags);
-                    },
-                    CancellationToken.None,
-                    TaskCreationOptions.None,
-                    taskScheduler);
-
-                // add the future to the pending future list
-                pendingFutures.Add((task, criteria));
-
-            }
-            catch (SzBadInputException e)
-            {
-                LogFailedSearch(Error, e, lineNumber, line);
-                errorCount++;   // increment the error count          
-            }
-        }
-
-        do
-        {
-            // handle any pending futures WITHOUT blocking to reduce the backlog
-            HandlePendingFutures(pendingFutures, false);
-
-            // if we still have exceeded the backlog size then pause
-            // briefly before trying again
-            if (pendingFutures.Count >= MaximumBacklog)
-            {
-                Thread.Sleep(PauseTimeout);
-            }
-        } while (pendingFutures.Count >= MaximumBacklog);
+      }
+      catch (SzBadInputException e)
+      {
+        LogFailedSearch(Error, e, lineNumber, line);
+        errorCount++;   // increment the error count          
+      }
     }
 
-    // after we have submitted all records we need to handle the remaining
-    // pending futures so this time we block on each future
-    HandlePendingFutures(pendingFutures, true);
+    do
+    {
+      // handle any pending futures WITHOUT blocking to reduce the backlog
+      HandlePendingFutures(pendingFutures, false);
+
+      // if we still have exceeded the backlog size then pause
+      // briefly before trying again
+      if (pendingFutures.Count >= MaximumBacklog)
+      {
+        Thread.Sleep(PauseTimeout);
+      }
+    } while (pendingFutures.Count >= MaximumBacklog);
+  }
+
+  // after we have submitted all records we need to handle the remaining
+  // pending futures so this time we block on each future
+  HandlePendingFutures(pendingFutures, true);
 
 }
 catch (Exception e)
 {
-    Console.Error.WriteLine();
-    Console.Error.WriteLine("*** Terminated due to critical error ***");
-    Console.Error.WriteLine(e);
-    Console.Error.Flush();
-    throw;
+  Console.Error.WriteLine();
+  Console.Error.WriteLine("*** Terminated due to critical error ***");
+  Console.Error.WriteLine(e);
+  Console.Error.Flush();
+  throw;
 
 }
 finally
 {
-    rdr.Close();
-    fs.Close();
+  rdr.Close();
+  fs.Close();
 
-    // IMPORTANT: make sure to destroy the environment
-    env.Destroy();
+  // IMPORTANT: make sure to destroy the environment
+  env.Destroy();
 
-    Console.WriteLine();
-    Console.WriteLine("Searches successfully completed   : " + successCount);
-    Console.WriteLine("Total entities found via searches : " + foundEntities.Count);
-    Console.WriteLine("Searches failed with errors       : " + errorCount);
+  Console.WriteLine();
+  Console.WriteLine("Searches successfully completed   : " + successCount);
+  Console.WriteLine("Total entities found via searches : " + foundEntities.Count);
+  Console.WriteLine("Searches failed with errors       : " + errorCount);
 
-    // check on any retry records
-    if (retryWriter != null)
-    {
-        retryWriter.Flush();
-        retryWriter.Close();
-    }
-    if (retryCount > 0)
-    {
-        Console.WriteLine(retryCount + " searches to be retried in " + retryFile);
-    }
-    Console.Out.Flush();
+  // check on any retry records
+  if (retryWriter != null)
+  {
+    retryWriter.Flush();
+    retryWriter.Close();
+  }
+  if (retryCount > 0)
+  {
+    Console.WriteLine(retryCount + " searches to be retried in " + retryFile);
+  }
+  Console.Out.Flush();
 }
 
 static void HandlePendingFutures(IList<(Task<string>, Criteria)> pendingFutures, bool blocking)
 {
-    // loop through the pending futures
-    for (int index = 0; index < pendingFutures.Count; index++)
+  // loop through the pending futures
+  for (int index = 0; index < pendingFutures.Count; index++)
+  {
+    // get the next pending future
+    (Task<string> task, Criteria criteria) = pendingFutures[index];
+
+    // if not blocking and this one is not done then continue
+    if (!blocking && !task.IsCompleted) continue;
+
+    // remove the pending future from the list
+    pendingFutures.RemoveAt(index--);
+
+    try
     {
-        // get the next pending future
-        (Task<string> task, Criteria criteria) = pendingFutures[index];
+      try
+      {
+        // this will block if the task is not yet completed,
+        // however we only get here with a pending task if
+        // the blocking parameter is true
+        string results = task.Result;
 
-        // if not blocking and this one is not done then continue
-        if (!blocking && !task.IsCompleted) continue;
+        // if we get here then increment the success count
+        successCount++;
 
-        // remove the pending future from the list
-        pendingFutures.RemoveAt(index--);
-
-        try
+        // parse the search results
+        JsonObject? jsonObj = JsonNode.Parse(results)?.AsObject();
+        JsonArray? jsonArr = jsonObj?["RESOLVED_ENTITIES"]?.AsArray();
+        if (jsonArr != null)
         {
-            try
+          for (int index2 = 0; index2 < jsonArr.Count; index2++)
+          {
+            JsonObject? obj = jsonArr[index2]?.AsObject();
+            obj = obj?["ENTITY"]?.AsObject();
+            obj = obj?["RESOLVED_ENTITY"]?.AsObject();
+            long? entityID = obj?["ENTITY_ID"]?.GetValue<long>();
+            if (entityID != null)
             {
-                // this will block if the task is not yet completed,
-                // however we only get here with a pending task if
-                // the blocking parameter is true
-                string results = task.Result;
-
-                // if we get here then increment the success count
-                successCount++;
-
-                // parse the search results
-                JsonObject? jsonObj = JsonNode.Parse(results)?.AsObject();
-                JsonArray? jsonArr = jsonObj?["RESOLVED_ENTITIES"]?.AsArray();
-                if (jsonArr != null)
-                {
-                    for (int index2 = 0; index2 < jsonArr.Count; index2++)
-                    {
-                        JsonObject? obj = jsonArr[index2]?.AsObject();
-                        obj = obj?["ENTITY"]?.AsObject();
-                        obj = obj?["RESOLVED_ENTITY"]?.AsObject();
-                        long? entityID = obj?["ENTITY_ID"]?.GetValue<long>();
-                        if (entityID != null)
-                        {
-                            foundEntities.Add(entityID ?? 0L);
-                        }
-                    }
-                }
-
+              foundEntities.Add(entityID ?? 0L);
             }
-            catch (AggregateException e)
-                when (e.InnerException is TaskCanceledException
-                      || e.InnerException is ThreadInterruptedException)
-            {
-                throw new SzRetryableException(e.InnerException);
-            }
-            catch (ThreadInterruptedException e)
-            {
-                throw new SzRetryableException(e.InnerException);
-            }
-            catch (AggregateException e)
-            {
-                if (e.InnerException != null)
-                {
-                    // get the inner exception
-                    throw e.InnerException;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+          }
         }
-        catch (SzBadInputException e)
+
+      }
+      catch (AggregateException e)
+          when (e.InnerException is TaskCanceledException
+                || e.InnerException is ThreadInterruptedException)
+      {
+        throw new SzRetryableException(e.InnerException);
+      }
+      catch (ThreadInterruptedException e)
+      {
+        throw new SzRetryableException(e.InnerException);
+      }
+      catch (AggregateException e)
+      {
+        if (e.InnerException != null)
         {
-            LogFailedSearch(Error, e, criteria.LineNumber, criteria.Line);
-            errorCount++;   // increment the error count
-
+          // get the inner exception
+          throw e.InnerException;
         }
-        catch (SzRetryableException e)
+        else
         {
-            // handle thread interruption and cancellation as retries
-            LogFailedSearch(Warning, e, criteria.LineNumber, criteria.Line);
-            errorCount++;   // increment the error count
-            retryCount++;   // increment the retry count
-
-            // track the retry record so it can be retried later
-            if (retryFile == null)
-            {
-                retryFile = new FileInfo(
-                    Path.Combine(
-                        Path.GetTempPath(),
-                        RetryPrefix + Path.GetRandomFileName() + RetrySuffix));
-
-                retryWriter = new StreamWriter(
-                    new FileStream(retryFile.FullName,
-                                    FileMode.Open,
-                                    FileAccess.Write),
-                    Encoding.UTF8);
-            }
-            if (retryWriter != null)
-            {
-                retryWriter.WriteLine(criteria.Line);
-            }
-
+          throw;
         }
-        catch (Exception e)
-        {
-            // catch any other exception (incl. SzException) here
-            LogFailedSearch(Critical, e, criteria.LineNumber, criteria.Line);
-            errorCount++;
-            throw; // rethrow since exception is critical
-        }
+      }
+
     }
+    catch (SzBadInputException e)
+    {
+      LogFailedSearch(Error, e, criteria.LineNumber, criteria.Line);
+      errorCount++;   // increment the error count
+
+    }
+    catch (SzRetryableException e)
+    {
+      // handle thread interruption and cancellation as retries
+      LogFailedSearch(Warning, e, criteria.LineNumber, criteria.Line);
+      errorCount++;   // increment the error count
+      retryCount++;   // increment the retry count
+
+      // track the retry record so it can be retried later
+      if (retryFile == null)
+      {
+        retryFile = new FileInfo(
+            Path.Combine(
+                Path.GetTempPath(),
+                RetryPrefix + Path.GetRandomFileName() + RetrySuffix));
+
+        retryWriter = new StreamWriter(
+            new FileStream(retryFile.FullName,
+                            FileMode.Open,
+                            FileAccess.Write),
+            Encoding.UTF8);
+      }
+      if (retryWriter != null)
+      {
+        retryWriter.WriteLine(criteria.Line);
+      }
+
+    }
+    catch (Exception e)
+    {
+      // catch any other exception (incl. SzException) here
+      LogFailedSearch(Critical, e, criteria.LineNumber, criteria.Line);
+      errorCount++;
+      throw; // rethrow since exception is critical
+    }
+  }
 }
 
 /// <summary>
@@ -295,44 +295,44 @@ static void LogFailedSearch(string errorType,
                             int lineNumber,
                             string criteriaJson)
 {
-    Console.Error.WriteLine();
-    Console.Error.WriteLine(
-        "** " + errorType + " ** FAILED TO SEARCH CRITERIA AT LINE "
-        + lineNumber + ": ");
-    Console.Error.WriteLine(criteriaJson);
-    Console.Error.WriteLine(exception);
-    Console.Error.Flush();
+  Console.Error.WriteLine();
+  Console.Error.WriteLine(
+      "** " + errorType + " ** FAILED TO SEARCH CRITERIA AT LINE "
+      + lineNumber + ": ");
+  Console.Error.WriteLine(criteriaJson);
+  Console.Error.WriteLine(exception);
+  Console.Error.Flush();
 }
 
 public partial class Program
 {
-    private const string DefaultFilePath = "../../resources/data/search-5K.jsonl";
+  private const string DefaultFilePath = "../../resources/data/search-5K.jsonl";
 
-    private const string RetryPrefix = "retry-";
+  private const string RetryPrefix = "retry-";
 
-    private const string RetrySuffix = ".jsonl";
+  private const string RetrySuffix = ".jsonl";
 
-    private const int ThreadCount = 8;
+  private const int ThreadCount = 8;
 
-    private const int BacklogFactor = 10;
+  private const int BacklogFactor = 10;
 
-    private const int MaximumBacklog = ThreadCount * BacklogFactor;
+  private const int MaximumBacklog = ThreadCount * BacklogFactor;
 
-    private const int PauseTimeout = 100;
+  private const int PauseTimeout = 100;
 
-    private const string Error = "ERROR";
+  private const string Error = "ERROR";
 
-    private const string Warning = "WARNING";
+  private const string Warning = "WARNING";
 
-    private const string Critical = "CRITICAL";
+  private const string Critical = "CRITICAL";
 
-    private static int errorCount;
-    private static int successCount;
-    private static int retryCount;
-    private static FileInfo? retryFile;
-    private static StreamWriter? retryWriter;
+  private static int errorCount;
+  private static int successCount;
+  private static int retryCount;
+  private static FileInfo? retryFile;
+  private static StreamWriter? retryWriter;
 
-    private static readonly HashSet<long> foundEntities = new HashSet<long>();
+  private static readonly HashSet<long> foundEntities = new HashSet<long>();
 
 }
 internal sealed record Criteria(int LineNumber, string Line) { }

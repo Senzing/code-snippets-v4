@@ -11,72 +11,72 @@ import static com.senzing.sdk.SzFlag.*;
  * Provides a simple example of adding records to the Senzing repository.
  */
 public class LoadRecords {
-    public static void main(String[] args) {
-        // get the senzing repository settings
-        String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
-        if (settings == null) {
-            System.err.println("Unable to get settings.");
-            throw new IllegalArgumentException("Unable to get settings");
-        }
-
-        // create a descriptive instance name (can be anything)
-        String instanceName = LoadRecords.class.getSimpleName();
-
-        // initialize the Senzing environment
-        SzEnvironment env = SzCoreEnvironment.newBuilder()
-            .settings(settings)
-            .instanceName(instanceName)
-            .verboseLogging(false)
-            .build();
-        
-        try {
-            // get the engine from the environment
-            SzEngine engine = env.getEngine();
-
-            // loop through the example records and add them to the repository
-            for (Map.Entry<SzRecordKey, String> entry : getRecords().entrySet()) {
-                SzRecordKey recordKey = entry.getKey();
-                String recordDefinition = entry.getValue();
- 
-                // call the addRecord() function with no flags
-                engine.addRecord(recordKey, recordDefinition, SZ_NO_FLAGS);
-
-                System.out.println("Record " + recordKey.recordId() + " added");
-                System.out.flush();
-            }
-
-        } catch (SzException e) {
-            // handle any exception that may have occurred
-            System.err.println("Senzing Error Message : " + e.getMessage());
-            System.err.println("Senzing Error Code    : " + e.getErrorCode());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (e instanceof RuntimeException) {
-                throw ((RuntimeException) e);
-            }
-            throw new RuntimeException(e);
-
-        } finally {
-            // IMPORTANT: make sure to destroy the environment
-            env.destroy();
-        }
-
+  public static void main(String[] args) {
+    // get the senzing repository settings
+    String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
+    if (settings == null) {
+      System.err.println("Unable to get settings.");
+      throw new IllegalArgumentException("Unable to get settings");
     }
 
-    /**
-     * This is a support method for providing example records to add.
-     * 
-     * @return A {@link Map} of {@link SzRecordKey} keys to {@link String}
-     *         JSON text values desribing the records to be added.
-     */
-    public static Map<SzRecordKey, String> getRecords() {
-        Map<SzRecordKey, String> records = new LinkedHashMap<>();
-        records.put(
-            SzRecordKey.of("TEST", "1001"),
-            """
+    // create a descriptive instance name (can be anything)
+    String instanceName = LoadRecords.class.getSimpleName();
+
+    // initialize the Senzing environment
+    SzEnvironment env = SzCoreEnvironment.newBuilder()
+        .settings(settings)
+        .instanceName(instanceName)
+        .verboseLogging(false)
+        .build();
+
+    try {
+      // get the engine from the environment
+      SzEngine engine = env.getEngine();
+
+      // loop through the example records and add them to the repository
+      for (Map.Entry<SzRecordKey, String> entry : getRecords().entrySet()) {
+        SzRecordKey recordKey = entry.getKey();
+        String recordDefinition = entry.getValue();
+
+        // call the addRecord() function with no flags
+        engine.addRecord(recordKey, recordDefinition, SZ_NO_FLAGS);
+
+        System.out.println("Record " + recordKey.recordId() + " added");
+        System.out.flush();
+      }
+
+    } catch (SzException e) {
+      // handle any exception that may have occurred
+      System.err.println("Senzing Error Message : " + e.getMessage());
+      System.err.println("Senzing Error Code    : " + e.getErrorCode());
+      e.printStackTrace();
+      throw new RuntimeException(e);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      if (e instanceof RuntimeException) {
+        throw ((RuntimeException) e);
+      }
+      throw new RuntimeException(e);
+
+    } finally {
+      // IMPORTANT: make sure to destroy the environment
+      env.destroy();
+    }
+
+  }
+
+  /**
+   * This is a support method for providing example records to add.
+   * 
+   * @return A {@link Map} of {@link SzRecordKey} keys to {@link String}
+   *         JSON text values describing the records to be added.
+   */
+  public static Map<SzRecordKey, String> getRecords() {
+    Map<SzRecordKey, String> records = new LinkedHashMap<>();
+    records.put(
+        SzRecordKey.of("TEST", "1001"),
+        """
             {
                 "DATA_SOURCE": "TEST",
                 "RECORD_ID": "1001",
@@ -91,10 +91,10 @@ public class LoadRecords {
                 "EMAIL_ADDRESS": "bsmith@work.com"
             }
             """);
-        
-        records.put(
-            SzRecordKey.of("TEST", "1002"),
-            """
+
+    records.put(
+        SzRecordKey.of("TEST", "1002"),
+        """
             {
                 "DATA_SOURCE": "TEST",
                 "RECORD_ID": "1002",
@@ -112,10 +112,10 @@ public class LoadRecords {
                 "PHONE_NUMBER": "702-919-1300"
             }
             """);
-        
-        records.put(
-            SzRecordKey.of("TEST", "1003"),
-            """
+
+    records.put(
+        SzRecordKey.of("TEST", "1003"),
+        """
             {
                 "DATA_SOURCE": "TEST",
                 "RECORD_ID": "1003",
@@ -128,9 +128,9 @@ public class LoadRecords {
             }
             """);
 
-        records.put(
-            SzRecordKey.of("TEST", "1004"),
-            """
+    records.put(
+        SzRecordKey.of("TEST", "1004"),
+        """
             {
                 "DATA_SOURCE": "TEST",
                 "RECORD_ID": "1004",
@@ -146,9 +146,9 @@ public class LoadRecords {
             }
             """);
 
-        records.put(
-            SzRecordKey.of("TEST", "1005"),
-            """
+    records.put(
+        SzRecordKey.of("TEST", "1005"),
+        """
             {
                 "DATA_SOURCE": "TEST",
                 "RECORD_ID": "1005",
@@ -165,7 +165,7 @@ public class LoadRecords {
                 "ADDR_POSTAL_CODE": "89132"
             }
             """);
-        
-        return records;
-    }
+
+    return records;
+  }
 }
