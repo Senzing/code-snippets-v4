@@ -129,8 +129,10 @@ dmypy.json
 .pyre/
 .history
 
-# VSCode
-.vscode/
+# Visual Studio code
+.vscode/*
+!.vscode/cspell.json
+*.code-workspace
 .history
 
 # Output folder used by examples
