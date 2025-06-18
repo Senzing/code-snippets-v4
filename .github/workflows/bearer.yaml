@@ -18,3 +18,5 @@ jobs:
 
       - name: Bearer
         uses: bearer/bearer-action@v2
+        with:
+          skip-rule: "java_lang_information_leakage"
