@@ -10,9 +10,9 @@ from pathlib import Path
 from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableError
 from senzing_core import SzAbstractFactoryCore
 
-SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INPUT_FILE = Path("../../resources/data/load-500.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 def mock_logger(level, error, error_record=None):
@@ -40,13 +40,14 @@ def engine_stats(engine):
 
 def futures_add(engine, input_file):
     success_recs = 0
+    shutdown = False
     error_recs = 0
 
-    with open(input_file, "r", encoding="utf-8") as file:
+    with open(input_file, "r", encoding="utf-8") as in_file:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = {
                 executor.submit(add_record, engine, record): record
-                for record in itertools.islice(file, executor._max_workers)
+                for record in itertools.islice(in_file, executor._max_workers)
             }
 
             while futures:
@@ -61,7 +62,7 @@ def futures_add(engine, input_file):
                         mock_logger("WARN", err, futures[f])
                         error_recs += 1
                     except (SzUnrecoverableError, SzError) as err:
-                        mock_logger("CRITICAL", err, futures[f])
+                        shutdown = True
                         raise err
                     else:
                         success_recs += 1
@@ -71,7 +72,7 @@ def futures_add(engine, input_file):
                         if success_recs % 200 == 0:
                             engine_stats(engine)
                     finally:
-                        if record := file.readline():
+                        if not shutdown and (record := in_file.readline()):
                             futures[executor.submit(add_record, engine, record)] = record
 
                         del futures[f]

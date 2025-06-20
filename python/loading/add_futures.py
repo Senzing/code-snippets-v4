@@ -29,14 +29,15 @@ def add_record(engine, record_to_add):
 
 
 def futures_add(engine, input_file):
-    success_recs = 0
     error_recs = 0
+    shutdown = False
+    success_recs = 0
 
-    with open(input_file, "r", encoding="utf-8") as file:
+    with open(input_file, "r", encoding="utf-8") as in_file:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = {
                 executor.submit(add_record, engine, record): record
-                for record in itertools.islice(file, executor._max_workers)
+                for record in itertools.islice(in_file, executor._max_workers)
             }
 
             while futures:
@@ -51,14 +52,14 @@ def futures_add(engine, input_file):
                         mock_logger("WARN", err, futures[f])
                         error_recs += 1
                     except (SzUnrecoverableError, SzError) as err:
-                        mock_logger("CRITICAL", err, futures[f])
+                        shutdown = True
                         raise err
                     else:
                         success_recs += 1
                         if success_recs % 100 == 0:
                             print(f"Processed {success_recs:,} adds, with {error_recs:,} errors", flush=True)
                     finally:
-                        if record := file.readline():
+                        if not shutdown and (record := in_file.readline()):
                             futures[executor.submit(add_record, engine, record)] = record
 
                         del futures[f]

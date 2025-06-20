@@ -24,12 +24,12 @@ def mock_logger(level, error, error_record=None):
 
 
 def add_records_from_file(engine, input_file):
-    success_recs = 0
     error_recs = 0
+    success_recs = 0
 
-    with open(input_file, "r", encoding="utf-8") as file:
+    with open(input_file, "r", encoding="utf-8") as in_file:
 
-        for record_to_add in file:
+        for record_to_add in in_file:
             try:
                 record_dict = json.loads(record_to_add)
                 data_source = record_dict.get("DATA_SOURCE", None)
@@ -42,7 +42,6 @@ def add_records_from_file(engine, input_file):
                 mock_logger("WARN", err, record_to_add)
                 error_recs += 1
             except (SzUnrecoverableError, SzError) as err:
-                mock_logger("CRITICAL", err, record_to_add)
                 raise err
             else:
                 success_recs += 1
@@ -54,8 +53,8 @@ def add_records_from_file(engine, input_file):
 
 
 def process_redo(engine):
-    success_recs = 0
     error_recs = 0
+    success_recs = 0
 
     print("\nStarting to process redo records...")
 

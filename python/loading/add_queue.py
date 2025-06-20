@@ -29,14 +29,15 @@ def add_record(engine, record_to_add):
 
 
 def producer(input_file, queue):
-    with open(input_file, "r", encoding="utf-8") as file:
-        for record in file:
+    with open(input_file, "r", encoding="utf-8") as in_file:
+        for record in in_file:
             queue.put(record, block=True)
 
 
 def consumer(engine, queue):
-    success_recs = 0
     error_recs = 0
+    shutdown = False
+    success_recs = 0
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = {executor.submit(add_record, engine, queue.get()): _ for _ in range(executor._max_workers)}
@@ -53,14 +54,14 @@ def consumer(engine, queue):
                     mock_logger("WARN", err, futures[f])
                     error_recs += 1
                 except (SzUnrecoverableError, SzError) as err:
-                    mock_logger("CRITICAL", err, futures[f])
+                    shutdown = True
                     raise err
                 else:
                     success_recs += 1
                     if success_recs % 100 == 0:
                         print(f"Processed {success_recs:,} adds, with {error_recs:,} errors", flush=True)
                 finally:
-                    if not queue.empty():
+                    if not shutdown and not queue.empty():
                         record = queue.get()
                         futures[executor.submit(add_record, engine, record)] = record
 
@@ -73,7 +74,7 @@ try:
     sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
     sz_engine = sz_factory.create_engine()
 
-    input_queue = Queue(maxsize=200)  # type: ignore
+    input_queue = Queue(maxsize=200)
     producer_proc = Process(target=producer, args=(INPUT_FILE, input_queue))
     producer_proc.start()
     consumer_proc = Process(target=consumer, args=(sz_engine, input_queue))

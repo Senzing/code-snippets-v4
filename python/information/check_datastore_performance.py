@@ -6,9 +6,9 @@ from pathlib import Path
 from senzing import SzError
 from senzing_core import SzAbstractFactoryCore
 
-SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 INSTANCE_NAME = Path(__file__).stem
 SECONDS_TO_RUN = 3
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 try:
     sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)

@@ -20,7 +20,7 @@ OUTPUT_FILE = Path("../../resources/output/redo_with_info_continuous.jsonl").res
 SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
-def signal_handler(signum, frame):
+def responses_message(signum, frame):
     print(f"\nWith info responses written to {OUTPUT_FILE}")
     sys.exit()
 
@@ -37,12 +37,13 @@ def redo_pause(success):
 
 
 def process_redo(engine, output_file):
-    success_recs = 0
     error_recs = 0
+    shutdown = False
+    success_recs = 0
 
     with open(output_file, "w", encoding="utf-8") as out_file:
         try:
-            while True:
+            while not shutdown:
                 if not (redo_record := engine.get_redo_record()):
                     redo_pause(success_recs)
                     continue
@@ -60,11 +61,11 @@ def process_redo(engine, output_file):
             mock_logger("WARN", err, redo_record)
             error_recs += 1
         except (SzUnrecoverableError, SzError) as err:
-            mock_logger("CRITICAL", err, redo_record)
+            shutdown = True
             raise err
 
 
-signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGINT, responses_message)
 
 try:
     sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
@@ -72,3 +73,4 @@ try:
     process_redo(sz_engine, OUTPUT_FILE)
 except SzError as err:
     mock_logger("CRITICAL", err)
+    responses_message()

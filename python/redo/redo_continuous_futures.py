@@ -55,8 +55,9 @@ def redo_pause(success):
 
 
 def futures_redo(engine):
-    success_recs = 0
     error_recs = 0
+    shutdown = False
+    success_recs = 0
     redo_paused = False
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -82,14 +83,14 @@ def futures_redo(engine):
                     mock_logger("WARN", err, futures[f])
                     error_recs += 1
                 except (SzUnrecoverableError, SzError) as err:
-                    mock_logger("CRITICAL", err, futures[f])
+                    shutdown = True
                     raise err
                 else:
                     success_recs += 1
                     if success_recs % 100 == 0:
                         print(f"Processed {success_recs:,} redo records, with" f" {error_recs:,} errors")
                 finally:
-                    if record := get_redo_record(engine):
+                    if not shutdown and (record := get_redo_record(engine)):
                         futures[executor.submit(process_redo_record, engine, record)] = record
                     else:
                         redo_paused = True

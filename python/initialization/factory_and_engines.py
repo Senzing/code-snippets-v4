@@ -11,7 +11,6 @@ SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 try:
     sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)
-    sz_config = sz_factory.create_config()
     sz_configmgr = sz_factory.create_configmanager()
     sz_diagnostic = sz_factory.create_diagnostic()
     sz_engine = sz_factory.create_engine()
