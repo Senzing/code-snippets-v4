@@ -26,8 +26,9 @@ def search_record(engine, record_to_search):
 
 
 def futures_search(engine, input_file):
-    success_recs = 0
     error_recs = 0
+    shutdown = False
+    success_recs = 0
 
     with open(input_file, "r", encoding="utf-8") as in_file:
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -48,7 +49,7 @@ def futures_search(engine, input_file):
                         mock_logger("WARN", err, futures[f])
                         error_recs += 1
                     except (SzUnrecoverableError, SzError) as err:
-                        mock_logger("CRITICAL", err, futures[f])
+                        shutdown = True
                         raise err
                     else:
                         success_recs += 1
@@ -58,7 +59,7 @@ def futures_search(engine, input_file):
                         print(f"\n------ Searched: {futures[f]}", flush=True)
                         print(f"\n{result}", flush=True)
                     finally:
-                        if record := in_file.readline():
+                        if not shutdown and (record := in_file.readline()):
                             futures[executor.submit(search_record, engine, record)] = record
 
                         del futures[f]

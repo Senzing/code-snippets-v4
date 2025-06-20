@@ -9,9 +9,7 @@ from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableE
 from senzing_core import SzAbstractFactoryCore
 
 INSTANCE_NAME = Path(__file__).stem
-SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
-
-search_records = [
+SEARCH_RECORDS = [
     {
         "NAME_FULL": "Susan Moony",
         "DATE_OF_BIRTH": "15/6/1998",
@@ -28,6 +26,7 @@ search_records = [
         "ADDR_FULL": "787 Rotary Drive Rotorville FL 78720",
     },
 ]
+SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
 def mock_logger(level, error, error_record=None):
@@ -37,7 +36,7 @@ def mock_logger(level, error, error_record=None):
 
 
 def searcher(engine):
-    for search_record in search_records:
+    for search_record in SEARCH_RECORDS:
         try:
             record_str = json.dumps(search_record)
             response = engine.search_by_attributes(record_str)

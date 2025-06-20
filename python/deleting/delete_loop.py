@@ -20,11 +20,12 @@ def mock_logger(level, error, error_record=None):
 
 
 def del_records_from_file(engine, input_file):
-    success_recs = error_recs = 0
+    error_recs = 0
+    success_recs = 0
 
-    with open(input_file, "r", encoding="utf-8") as file:
+    with open(input_file, "r", encoding="utf-8") as in_file:
 
-        for record_to_delete in file:
+        for record_to_delete in in_file:
             try:
                 record_dict = json.loads(record_to_delete)
                 data_source = record_dict.get("DATA_SOURCE", "")
@@ -37,7 +38,6 @@ def del_records_from_file(engine, input_file):
                 mock_logger("WARN", err, record_to_delete)
                 error_recs += 1
             except (SzUnrecoverableError, SzError) as err:
-                mock_logger("CRITICAL", err, record_to_delete)
                 raise err
             else:
                 success_recs += 1

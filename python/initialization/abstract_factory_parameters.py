@@ -19,7 +19,6 @@ FACTORY_PARAMETERS: SzAbstractFactoryParametersCore = {
 
 try:
     sz_factory = SzAbstractFactoryCore(**FACTORY_PARAMETERS)
-    sz_config = sz_factory.create_config()
     sz_configmgr = sz_factory.create_configmanager()
     sz_diagnostic = sz_factory.create_diagnostic()
     sz_engine = sz_factory.create_engine()

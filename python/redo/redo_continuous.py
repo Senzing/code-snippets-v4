@@ -19,8 +19,8 @@ def mock_logger(level, error, error_record=None):
 
 
 def process_redo(engine):
-    success_recs = 0
     error_recs = 0
+    success_recs = 0
 
     while True:
         try:
@@ -44,7 +44,6 @@ def process_redo(engine):
             mock_logger("WARN", err)
             error_recs += 1
         except (SzUnrecoverableError, SzError) as err:
-            mock_logger("CRITICAL", err)
             raise err
 
 

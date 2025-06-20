@@ -36,8 +36,9 @@ def delete_record(engine, record_to_delete):
 
 
 def futures_del(engine, input_file, output_file):
-    success_recs = 0
     error_recs = 0
+    shutdown = False
+    success_recs = 0
 
     with open(output_file, "w", encoding="utf-8") as out_file:
         with open(input_file, "r", encoding="utf-8") as in_file:
@@ -59,7 +60,7 @@ def futures_del(engine, input_file, output_file):
                             mock_logger("WARN", err, futures[f])
                             error_recs += 1
                         except (SzUnrecoverableError, SzError) as err:
-                            mock_logger("CRITICAL", err, futures[f])
+                            shutdown = True
                             raise err
                         else:
                             out_file.write(f"{result}\n")
@@ -68,7 +69,7 @@ def futures_del(engine, input_file, output_file):
                             if success_recs % 100 == 0:
                                 print(f"Processed {success_recs:,} deletes, with {error_recs:,} errors", flush=True)
                         finally:
-                            if record := in_file.readline():
+                            if not shutdown and (record := in_file.readline()):
                                 futures[executor.submit(delete_record, engine, record)] = record
 
                             del futures[f]
