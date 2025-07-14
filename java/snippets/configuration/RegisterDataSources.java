@@ -6,7 +6,7 @@ import com.senzing.sdk.core.SzCoreEnvironment;
 /**
  * Provides a simple example of adding records to the Senzing repository.
  */
-public class AddDataSources {
+public class RegisterDataSources {
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -16,7 +16,7 @@ public class AddDataSources {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = AddDataSources.class.getSimpleName();
+        String instanceName = RegisterDataSources.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
@@ -44,7 +44,7 @@ public class AddDataSources {
 
                 // loop through the array and add each data source
                 for (String dataSource : dataSources) {
-                    config.addDataSource(dataSource);
+                    config.registerDataSource(dataSource);
                 }
 
                 // export the modified config to JSON text

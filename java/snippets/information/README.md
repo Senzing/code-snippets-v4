@@ -4,9 +4,9 @@ The information snippets outline the retrieval of different informational aspect
 
 ## Snippets
 
-- **CheckDatastorePerformance.java**
+- **CheckRepositoryPerformance.java**
   - Run an insert test against the Senzing repository to gauge performance
-- **GetDatastoreInfo.java**
+- **GetRepositoryInfo.java**
   - Return basic information about the Senzing repository(s)
 - **GetLicense.java**
   - Return the currently in use license details
