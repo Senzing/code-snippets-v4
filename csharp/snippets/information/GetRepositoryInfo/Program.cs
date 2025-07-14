@@ -30,7 +30,7 @@ try
 {
     SzDiagnostic diagnostic = env.GetDiagnostic();
 
-    string result = diagnostic.CheckDatastorePerformance(SecondsToRun);
+    string result = diagnostic.GetRepositoryInfo();
 
     Console.WriteLine(result);
 
@@ -57,9 +57,4 @@ finally
 {
     // IMPORTANT: make sure to destroy the environment
     env.Destroy();
-}
-
-public partial class Program
-{
-    private const int SecondsToRun = 3;
 }

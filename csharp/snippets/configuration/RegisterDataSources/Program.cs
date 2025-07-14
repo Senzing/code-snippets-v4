@@ -48,7 +48,7 @@ try
         // loop through the array and add each data source
         foreach (string dataSource in dataSources)
         {
-            config.AddDataSource(dataSource);
+            config.RegisterDataSource(dataSource);
         }
 
         // prepare an in-memory config to be modified and get the handle

@@ -187,7 +187,7 @@ public class SnippetRunner {
               String source = properties.getProperty(sourceKey);
               source = source.trim();
               System.out.println("Adding data source: " + source);
-              config.addDataSource(source);
+              config.registerDataSource(source);
             }
             String snippetConfig = config.export();
 

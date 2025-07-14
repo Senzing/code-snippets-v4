@@ -4,9 +4,9 @@ The information snippets outline the retrieval of different informational aspect
 
 ## Snippets
 
-- **CheckDatastorePerformance**
+- **CheckRepositoryPerformance**
   - Run an insert test against the Senzing repository to gauge performance
-- **GetDatastoreInfo**
+- **GetRepositoryInfo**
   - Return basic information about the Senzing repository(s)
 - **GetLicense**
   - Return the currently in use license details

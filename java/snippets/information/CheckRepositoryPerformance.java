@@ -7,7 +7,7 @@ import com.senzing.sdk.core.SzCoreEnvironment;
  * Provides an example of checking database performance via the 
  * diagnostic hub.
  */
-public class CheckDatastorePerformance {
+public class CheckRepositoryPerformance {
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -17,7 +17,7 @@ public class CheckDatastorePerformance {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = CheckDatastorePerformance.class.getSimpleName();
+        String instanceName = CheckRepositoryPerformance.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
@@ -29,7 +29,7 @@ public class CheckDatastorePerformance {
         try {
             SzDiagnostic diagnostic = env.getDiagnostic();
             
-            String result = diagnostic.checkDatastorePerformance(SECONDS_TO_RUN);
+            String result = diagnostic.checkRepositoryPerformance(SECONDS_TO_RUN);
 
             System.out.println(result);
             
