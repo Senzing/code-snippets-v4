@@ -263,7 +263,7 @@ try
           string source = properties[sourceKey];
           source = source.Trim();
           Console.WriteLine("Adding data source: " + source);
-          config.AddDataSource(source);
+          config.RegisterDataSource(source);
         }
         string snippetConfig = config.Export();
 

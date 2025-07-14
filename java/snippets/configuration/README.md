@@ -6,7 +6,7 @@ You may either `setDefaultConfigId()` or `replaceDefaultConfigId()`.  Initially,
 
 ## Snippets
 
-* **AddDataSources.java**
+* **RegisterDataSources.java**
   * Gets the current default config, creates a modified config with additional data sources, registers that modified config and then replaces the default config ID.
 * **InitDefaultConfig.java**
   * Initializes the repository with a default config ID using the template configuration provided by Senzing.

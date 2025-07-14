@@ -7,7 +7,7 @@ import com.senzing.sdk.core.SzCoreEnvironment;
  * Provides an example of obtaining the datastore information
  * from the diagnostic hub.
  */
-public class GetDatastoreInfo {
+public class GetRepositoryInfo {
     public static void main(String[] args) {
         // get the senzing repository settings
         String settings = System.getenv("SENZING_ENGINE_CONFIGURATION_JSON");
@@ -17,7 +17,7 @@ public class GetDatastoreInfo {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = GetDatastoreInfo.class.getSimpleName();
+        String instanceName = GetRepositoryInfo.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
@@ -29,7 +29,7 @@ public class GetDatastoreInfo {
         try {
             SzDiagnostic diagnostic = env.getDiagnostic();
             
-            String result = diagnostic.getDatastoreInfo();
+            String result = diagnostic.getRepositoryInfo();
 
             System.out.println(result);
             
