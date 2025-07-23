@@ -10,9 +10,9 @@ In these examples, the current JSON data for a record is first retrieved and add
 ## Snippets
 
 - **force_resolve.py**
-  - Force resolve records together to a single entity
+  - Force resolve records together to a single entity.
 - **force_unresolve.py**
-  - Force un-resolve a record from an entity into a new entity
+  - Force un-resolve a record from an entity into a new entity.
 
 ## Example Usage
 

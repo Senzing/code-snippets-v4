@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog], [markdownlint],
 and this project adheres to [Semantic Versioning].
 
+## [0.0.9] - 2025-07-23
+
+### Changed in 0.0.9
+
+- Modify method names changed in SDK
+- Additional snippets
+
 ## [0.0.8] - 2025-06-20
 
 ### Changed in 0.0.8
