@@ -11,11 +11,11 @@ When an entity requires additional work a record is automatically created in the
 ## Snippets
 
 - **add_with_redo.py**
-  - Read and load source records from a file and then process any redo records
+  - Read and load source records from a file and then process any redo records.
 - **redo_continuous_futures.py**
-  - Continuously monitor for redo records to process using multiple threads
+  - Continuously monitor for redo records to process using multiple threads.
 - **redo_continuous.py**
-  - Basic example of continuously monitoring for redo records to process
+  - Basic example of continuously monitoring for redo records to process.
 - **redo_with_info_continuous.py**
-  - Continuously monitor for redo records to process
-  - Collect the response using the [SZ_WITH_INFO flag](../../README.md#with-info) on the `process_redo_record()` method and write it to a file
+  - Continuously monitor for redo records to process.
+  - Collect the response using the [SZ_WITH_INFO flag](../../README.md#with-info) on the `process_redo_record()` method and write it to a file.

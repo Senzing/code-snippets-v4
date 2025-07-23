@@ -7,8 +7,8 @@ There are [considerations](https://senzing.zendesk.com/hc/en-us/articles/3600078
 ## Snippets
 
 - **search_futures.py**
-  - Read and search for records from a file using multiple threads
-  - To see results first load records with [add_futures.py](../loading/add_futures.py)
+  - Read and search for records from a file using multiple threads.
+  - To see results first load records with [add_futures.py](../loading/add_futures.py).
 - **search_records.py**
-  - Basic iteration over a few records, searching for each one
-  - To see results first load records with [add_truthset_loop.py](../loading/add_truthset_loop.py)
+  - Basic iteration over a few records, searching for each one.
+  - To see results first load records with [add_truthset_loop.py](../loading/add_truthset_loop.py).

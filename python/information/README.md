@@ -4,13 +4,13 @@ The information snippets outline the retrieval of different informational aspect
 
 ## Snippets
 
-- **check_datastore_performance.py**
-  - Run an insert test against the Senzing repository to gauge performance
-- **get_datastore_info.py**
-  - Return basic information about the Senzing repository(s)
+- **check_repository_performance.py**
+  - Run an insert test against the Senzing repository to gauge performance.
 - **get_license.py**
-  - Return the currently in use license details
+  - Return the currently in use license details.
+- **get_repository_info.py**
+  - Return basic information about the Senzing repository(s).
 - **get_stats.py**
-  - Return statistical information from the Senzing engine during entity resolution processing
+  - Return statistical information from the Senzing engine during entity resolution processing.
 - **get_version.py**
-  - Return the current Senzing product version details
+  - Return the current Senzing product version details.
