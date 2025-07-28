@@ -1,13 +1,21 @@
 name: java darwin snippets
 
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   java-darwin-snippets:
+    outputs:
+      status: ${{ job.status }}
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -48,3 +56,12 @@ jobs:
         run: |
           cd "${GITHUB_WORKSPACE}"/java
           java -jar target/sz-sdk-snippets.jar all
+
+  slack-notification:
+    needs: [java-darwin-snippets]
+    if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.java-darwin-snippets.outputs.status ) && github.event_name == 'schedule' }}
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v2
+    with:
+      job-status: ${{ needs.java-darwin-snippets.outputs.status }}

@@ -1,13 +1,21 @@
 name: csharp darwin snippets
 
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   csharp-darwin-snippets:
+    outputs:
+      status: ${{ job.status }}
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: macos-latest
     strategy:
       matrix:
@@ -48,3 +56,12 @@ jobs:
           cd "${GITHUB_WORKSPACE}"/csharp/runner
           dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
           dotnet run --project SnippetRunner all
+
+  slack-notification:
+    needs: [csharp-darwin-snippets]
+    if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.csharp-darwin-snippets.outputs.status ) && github.event_name == 'schedule' }}
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v2
+    with:
+      job-status: ${{ needs.csharp-darwin-snippets.outputs.status }}
