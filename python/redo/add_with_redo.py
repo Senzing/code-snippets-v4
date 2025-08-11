@@ -66,7 +66,7 @@ def process_redo(engine):
 
             success_recs += 1
             if success_recs % 1 == 0:
-                print(f"Processed {success_recs:,} redo records, with" f" {error_recs:,} errors")
+                print(f"Processed {success_recs:,} redo records, with {error_recs:,} errors")
         except SzBadInputError as err:
             mock_logger("ERROR", err)
             error_recs += 1
@@ -77,7 +77,7 @@ def process_redo(engine):
             mock_logger("CRITICAL", err)
             raise err
 
-    print(f"\nSuccessfully processed {success_recs:,} redo records, with" f" {error_recs:,} errors")
+    print(f"\nSuccessfully processed {success_recs:,} redo records, with {error_recs:,} errors")
 
 
 try:

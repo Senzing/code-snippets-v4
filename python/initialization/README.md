@@ -18,12 +18,17 @@
   - Priming the Senzing engine before use loads resource intensive assets upfront. 
   - Without priming the first SDK call to the engine will appear slower than usual as it causes these assets to be loaded.
 - **factory_destroy.py**
-  - Calls `destroy` on the abstract factory destroying the abstract factory and any Senzing objects it has created.
+  - Calls `destroy()` on the abstract factory destroying the abstract factory and any Senzing objects it has created.
   - The abstract factory must exist for the life of Senzing objects it has created.
-  - If the abstract factory goes out of scope `destroy` is automatically called
+  - If the abstract factory goes out of scope `destroy()` is automatically called
 - **purge_repository.py**
   - **WARNING** This script will remove all data from a Senzing repository, use with caution! **WARNING**.
   - It will prompt first, still use with caution!.
+  **signal_handler.py**
+  - Catches signal.SIGINT (ctrl + c) and exits cleanly
+  - Exiting cleanly on a signal ensures resource cleanup for the abstract factory is automatically called
+  - If sz_abstract_factory goes out of scope 'destroy()` is automatically called, if signals are not caught and handled automatic resource cleanup does not happen
+  - `destroy()` could also be called directly on the abstract factory by the signal handler
 - **sz_engine_config_ini_to_json.py**
   - The snippets herein utilize the `SENZING_ENGINE_CONFIGURATION_JSON` environment variable for Senzing abstract factory creation.
   - If you are familiar with working with a Senzing project you may be aware the same configuration data is held in the sz_engine_config.ini file.
