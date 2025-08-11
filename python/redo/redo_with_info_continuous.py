@@ -20,8 +20,13 @@ OUTPUT_FILE = Path("../../resources/output/redo_with_info_continuous.jsonl").res
 SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
-def responses_message(signum, frame):
+def handler(signum, frame):
+    print("\nCaught ctrl-c, exiting")
     print(f"\nWith info responses written to {OUTPUT_FILE}")
+    sys.exit(0)
+
+
+def responses_message(signum, frame):
     sys.exit()
 
 
@@ -32,7 +37,7 @@ def mock_logger(level, error, error_record=None):
 
 
 def redo_pause(success):
-    print("No redo records to process, pausing for 30 seconds. Total processed:" f" {success:,} (CTRL-C to exit)...")
+    print(f"No redo records to process, pausing for 30 seconds. Total processed: {success:,} (ctrl-c to exit)...")
     time.sleep(30)
 
 
@@ -53,7 +58,7 @@ def process_redo(engine, output_file):
                 out_file.write(f"{response}\n")
 
                 if success_recs % 100 == 0:
-                    print(f"Processed {success_recs:,} redo records, with" f" {error_recs:,} errors")
+                    print(f"Processed {success_recs:,} redo records, with {error_recs:,} errors")
         except SzBadInputError as err:
             mock_logger("ERROR", err, redo_record)
             error_recs += 1
@@ -65,7 +70,7 @@ def process_redo(engine, output_file):
             raise err
 
 
-signal.signal(signal.SIGINT, responses_message)
+signal.signal(signal.SIGINT, handler)
 
 try:
     sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)

@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import os
+import signal
 import sys
 import time
 from pathlib import Path
@@ -10,6 +11,11 @@ from senzing_core import SzAbstractFactoryCore
 
 INSTANCE_NAME = Path(__file__).stem
 SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
+
+
+def handler(signum, frame):
+    print("\nCaught ctrl-c, exiting")
+    sys.exit(0)
 
 
 def mock_logger(level, error, error_record=None):
@@ -27,7 +33,7 @@ def process_redo(engine):
             if not (response := engine.get_redo_record()):
                 print(
                     "No redo records to process, pausing for 30 seconds. Total"
-                    f" processed {success_recs:,} . (CTRL-C to exit)..."
+                    f" processed: {success_recs:,} (ctrl-c to exit)..."
                 )
                 time.sleep(30)
                 continue
@@ -36,7 +42,7 @@ def process_redo(engine):
 
             success_recs += 1
             if success_recs % 100 == 0:
-                print(f"Processed {success_recs:,} redo records, with" f" {error_recs:,} errors")
+                print(f"Processed {success_recs:,} redo records, with {error_recs:,} errors")
         except SzBadInputError as err:
             mock_logger("ERROR", err)
             error_recs += 1
@@ -46,6 +52,8 @@ def process_redo(engine):
         except (SzUnrecoverableError, SzError) as err:
             raise err
 
+
+signal.signal(signal.SIGINT, handler)
 
 try:
     sz_factory = SzAbstractFactoryCore(INSTANCE_NAME, SETTINGS, verbose_logging=False)

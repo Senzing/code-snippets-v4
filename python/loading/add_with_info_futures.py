@@ -87,7 +87,7 @@ def futures_add(engine, input_file, output_file):
 
                             del futures[f]
 
-                print(f"\nSuccessfully loaded {success_recs:,} records, with" f" {error_recs:,} errors")
+                print(f"\nSuccessfully loaded {success_recs:,} records, with {error_recs:,} errors")
                 print(f"\nWith info responses written to {output_file}")
 
 

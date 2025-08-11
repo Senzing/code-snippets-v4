@@ -64,7 +64,7 @@ def futures_search(engine, input_file):
 
                         del futures[f]
 
-            print(f"\nSuccessfully searched {success_recs:,} records, with" f" {error_recs:,} errors")
+            print(f"\nSuccessfully searched {success_recs:,} records, with {error_recs:,} errors")
 
 
 try:
