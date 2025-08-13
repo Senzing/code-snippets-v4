@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Senzing.Sdk" Version="4.0.0-beta*" />
+    <PackageReference Include="Senzing.Sdk" Version="4.*" />
   </ItemGroup>
 
 </Project>
