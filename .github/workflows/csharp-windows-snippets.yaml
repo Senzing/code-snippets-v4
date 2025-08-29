@@ -18,7 +18,9 @@ jobs:
       pull-requests: write
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
+        senzingsdk-version: [production-v4, staging-v4]
         include:
           - dotnet-version: "8"
 
@@ -35,7 +37,7 @@ jobs:
       - name: install Senzing SDK
         uses: senzing-factory/github-action-install-senzing-sdk@v3
         with:
-          senzingsdk-repository-path: ${{ secrets.SENZING_WIN_BETA_REPOSITORY }}
+          senzingsdk-version: ${{ matrix.senzingsdk-version }}
 
       - name: configure local nuget repo
         run: |
