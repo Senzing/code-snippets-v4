@@ -4,7 +4,7 @@ The Java snippets are contained in the `snippets` directory under various Java p
 
 ## Prerequisites
 
-FurYou will need to set environment variables so the Senzing installation can be located for building and for running the snippets:
+You will need to set environment variables so the Senzing installation can be located for building and for running the snippets:
 
 - Linux:
 
