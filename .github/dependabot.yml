@@ -23,4 +23,4 @@ updates:
     directories:
       - "/csharp/*"
     schedule:
-      interval: “daily"
+      interval: "daily"
