@@ -19,9 +19,9 @@ updates:
     directory: "/java/"
     schedule:
       interval: "daily"
-  - package-ecosystem: “nuget”
+  - package-ecosystem: "nuget"
     directories:
-      - “/csharp/*”
+      - /csharp/*
       - /csharp/snippets/configuration/InitDefaultConfig/
       - /csharp/snippets/configuration/RegisterDataSources/
       - /csharp/snippets/information/GetVersion/
