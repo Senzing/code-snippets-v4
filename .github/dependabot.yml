@@ -21,7 +21,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "nuget"
     directories:
-      - /csharp/*
       - /csharp/snippets/configuration/InitDefaultConfig/
       - /csharp/snippets/configuration/RegisterDataSources/
       - /csharp/snippets/information/GetVersion/
