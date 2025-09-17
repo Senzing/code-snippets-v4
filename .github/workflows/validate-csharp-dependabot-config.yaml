@@ -1,0 +1,29 @@
+name: validate csharp dependabot config
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-csharp-dependabot-config:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: |
+          cs_projects=$(find . -name "*.csproj" | cut -c 2-)
+          exit_code=0
+          for project in $cs_projects; do
+            project_directory=${project%/*}
+            echo "[INFO] project directory is: $project_directory"
+            if ! grep -qE "\- $project_directory/" .github/dependabot.yml; then
+              echo "[ERROR] $project_directory missing from .github/dependabot.yml configuration"
+              exit_code=1
+            fi
+          done
+
+          exit $exit_code
