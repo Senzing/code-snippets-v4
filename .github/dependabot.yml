@@ -19,36 +19,8 @@ updates:
     directory: "/java/"
     schedule:
       interval: "daily"
-  - package-ecosystem: “nuget”
+  - package-ecosystem: "nuget"
     directories:
-      - “/csharp/*”
-      - /csharp/snippets/configuration/InitDefaultConfig/
-      - /csharp/snippets/configuration/RegisterDataSources/
-      - /csharp/snippets/information/GetVersion/
-      - /csharp/snippets/information/CheckRepositoryPerformance/
-      - /csharp/snippets/information/GetRepositoryInfo/
-      - /csharp/snippets/information/GetLicense/
-      - /csharp/snippets/loading/LoadWithStatsViaLoop/
-      - /csharp/snippets/loading/LoadViaLoop/
-      - /csharp/snippets/loading/LoadWithInfoViaFutures/
-      - /csharp/snippets/loading/LoadViaFutures/
-      - /csharp/snippets/loading/LoadRecords/
-      - /csharp/snippets/loading/LoadViaQueue/
-      - /csharp/snippets/loading/LoadTruthSetWithInfoViaLoop/
-      - /csharp/snippets/redo/LoadWithRedoViaLoop/
-      - /csharp/snippets/redo/RedoContinuousViaFutures/
-      - /csharp/snippets/redo/RedoWithInfoContinuous/
-      - /csharp/snippets/redo/RedoContinuous/
-      - /csharp/snippets/searching/SearchViaFutures/
-      - /csharp/snippets/searching/SearchRecords/
-      - /csharp/snippets/initialization/EnginePriming/
-      - /csharp/snippets/initialization/PurgeRepository/
-      - /csharp/snippets/initialization/EnvironmentAndHubs/
-      - /csharp/snippets/stewardship/ForceUnresolve/
-      - /csharp/snippets/stewardship/ForceResolve/
-      - /csharp/snippets/deleting/DeleteViaLoop/
-      - /csharp/snippets/deleting/DeleteViaFutures/
-      - /csharp/snippets/deleting/DeleteWithInfoViaFutures/
-      - /csharp/runner/SnippetRunner/
+      - "/csharp/*"
     schedule:
-      interval: “daily"
+      interval: "daily"
