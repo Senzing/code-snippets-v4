@@ -60,7 +60,7 @@ updates:
       all:
         patterns: 
           - "*"
-        exclude-pattern: 
+        exclude-patterns: 
           - "Senzing.Sdk"
     schedule:
       interval: "daily"
