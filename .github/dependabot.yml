@@ -49,5 +49,7 @@ updates:
       - /csharp/snippets/deleting/DeleteViaFutures/
       - /csharp/snippets/deleting/DeleteWithInfoViaFutures/
       - /csharp/runner/SnippetRunner/
+    ignore:
+      - dependency-name: "Senzing.Sdk"
     schedule:
       interval: "daily"
