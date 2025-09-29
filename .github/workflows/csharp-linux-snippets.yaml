@@ -8,8 +8,7 @@ on:
   schedule:
     - cron: "15 7 * * *"
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   csharp-linux-snippets:
@@ -30,7 +29,7 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/setup-dotnet@v5
         with:
@@ -62,6 +61,6 @@ jobs:
     if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.csharp-linux-snippets.outputs.status ) && github.event_name == 'schedule' }}
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v2
+    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v3
     with:
       job-status: ${{ needs.csharp-linux-snippets.outputs.status }}

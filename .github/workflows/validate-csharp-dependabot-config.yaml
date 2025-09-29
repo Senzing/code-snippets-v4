@@ -4,15 +4,18 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   validate-csharp-dependabot-config:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - run: |
           cs_projects=$(find . -name "*.csproj" | cut -c 2-)
