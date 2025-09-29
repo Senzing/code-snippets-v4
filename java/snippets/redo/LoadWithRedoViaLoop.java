@@ -98,10 +98,10 @@ public class LoadWithRedoViaLoop {
             }
 
             // now that we have loaded the records, check for redos and handle them
-            while (engine.countRedoRecords() > 0) {
-                // get the next redo record
-                String redo = engine.getRedoRecord();
-
+            for (String redo = engine.getRedoRecord(); 
+                 redo != null; 
+                 redo = engine.getRedoRecord()) 
+            {
                 try {
                     // process the redo record
                     engine.processRedoRecord(redo, SZ_NO_FLAGS);
