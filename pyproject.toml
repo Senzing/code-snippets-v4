@@ -55,6 +55,9 @@ lint = [
 ]
 test = ["pytest==8.4.2", "coverage==7.10.7"]
 
+[tool.setuptools]
+package-dir = { "" = "python" }
+
 [tool.bandit]
 skips = ["B101"]
 
