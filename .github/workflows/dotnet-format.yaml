@@ -6,11 +6,12 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   dotnet-format:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -23,7 +24,7 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/setup-dotnet@v5
         with:

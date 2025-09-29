@@ -6,8 +6,7 @@ on:
     - cron: "15 7 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   csharp-darwin-snippets:
@@ -28,7 +27,7 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/setup-dotnet@v5
         with:
