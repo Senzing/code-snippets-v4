@@ -73,15 +73,10 @@ try
     {
         // loop through the example records and queue them up so long
         // as we have more records and backlog is not too large
-        while (pendingFutures.Count < MaximumBacklog)
+        for (string redo = engine.GetRedoRecord();
+             redo != null;
+             redo = engine.GetRedoRecord())
         {
-
-            // get the next redo record
-            string redo = engine.GetRedoRecord();
-
-            // check if no redo records are available
-            if (redo == null) break;
-
             Task task = factory.StartNew(() =>
                 {
                     engine.ProcessRedoRecord(redo, SzNoFlags);
@@ -92,28 +87,32 @@ try
 
             // add the future to the pending future list
             pendingFutures.Add((task, redo));
-        }
 
-        do
-        {
-            // handle any pending futures WITHOUT blocking to reduce the backlog
-            HandlePendingFutures(pendingFutures, false);
-
-            // if we still have exceeded the backlog size then pause
-            // briefly before trying again
-            if (pendingFutures.Count >= MaximumBacklog)
+            // handle the pending futures as log as maximum backlog exceeded
+            for (int loop = 0;
+                    pendingFutures.Count >= MaximumBacklog;
+                    loop++)
             {
-                try
+                // check if this is NOT our first iteration through the loop
+                if (loop > 0)
                 {
-                    Thread.Sleep(HandlePauseTimeout);
+                    // if we still have exceeded the backlog size after the first
+                    // loop iteration then pause briefly before trying again
+                    try
+                    {
+                        Thread.Sleep(HandlePauseTimeout);
 
+                    }
+                    catch (ThreadInterruptedException)
+                    {
+                        // do nothing
+                    }
                 }
-                catch (ThreadInterruptedException)
-                {
-                    // do nothing
-                }
+
+                // handle any pending futures WITHOUT blocking to reduce the backlog
+                HandlePendingFutures(pendingFutures, false);
             }
-        } while (pendingFutures.Count >= MaximumBacklog);
+        }
 
         // check if there are no redo records right now
         // NOTE: we do NOT want to call countRedoRecords() in a loop that
