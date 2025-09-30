@@ -4,11 +4,12 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   dependency-submission-maven:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,7 +21,7 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: "Dependency Review"
         uses: actions/dependency-review-action@v4
