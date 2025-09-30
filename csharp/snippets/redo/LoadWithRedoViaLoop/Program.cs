@@ -109,11 +109,10 @@ try
     }
 
     // now that we have loaded the records, check for redos and handle them
-    while (engine.CountRedoRecords() > 0)
+    for (string redo = engine.GetRedoRecord();
+         redo != null;
+         redo = engine.GetRedoRecord())
     {
-        // get the next redo record
-        string redo = engine.GetRedoRecord();
-
         try
         {
             // process the redo record

@@ -116,6 +116,9 @@ try
         } while (pendingFutures.Count >= MaximumBacklog);
 
         // check if there are no redo records right now
+        // NOTE: we do NOT want to call countRedoRecords() in a loop that
+        // is processing redo records, we call it here AFTER we believe
+        // have processed all pending redos to confirm still zero
         if (engine.CountRedoRecords() == 0)
         {
             OutputRedoStatistics();

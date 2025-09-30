@@ -103,6 +103,9 @@ public class RedoContinuousViaFutures {
         } while (pendingFutures.size() >= MAXIMUM_BACKLOG);
 
         // check if there are no redo records right now
+        // NOTE: we do NOT want to call countRedoRecords() in a loop that
+        // is processing redo records, we call it here AFTER we believe
+        // have processed all pending redos to confirm still zero
         if (engine.countRedoRecords() == 0) {
           outputRedoStatistics();
           System.out.println();
