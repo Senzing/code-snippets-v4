@@ -11,8 +11,8 @@ using static Senzing.Sdk.SzFlags;
 string? settings = Environment.GetEnvironmentVariable("SENZING_ENGINE_CONFIGURATION_JSON");
 if (settings == null)
 {
-  Console.Error.WriteLine("Unable to get settings.");
-  throw new ArgumentException("Unable to get settings");
+    Console.Error.WriteLine("Unable to get settings.");
+    throw new ArgumentException("Unable to get settings");
 }
 
 // create a descriptive instance name (can be anything)
@@ -28,44 +28,44 @@ SzEnvironment env = SzCoreEnvironment.NewBuilder()
 
 try
 {
-  // get the engine from the environment
-  SzEngine engine = env.GetEngine();
+    // get the engine from the environment
+    SzEngine engine = env.GetEngine();
 
-  // loop through the example records and add them to the repository
-  foreach (KeyValuePair<(string, string), string> pair in GetRecords())
-  {
-    (string dataSourceCode, string recordID) = pair.Key;
-    string recordDefinition = pair.Value;
+    // loop through the example records and add them to the repository
+    foreach (KeyValuePair<(string, string), string> pair in GetRecords())
+    {
+        (string dataSourceCode, string recordID) = pair.Key;
+        string recordDefinition = pair.Value;
 
-    // call the addRecord() function with no flags
-    engine.AddRecord(dataSourceCode, recordID, recordDefinition, SzNoFlags);
+        // call the addRecord() function with no flags
+        engine.AddRecord(dataSourceCode, recordID, recordDefinition, SzNoFlags);
 
-    Console.WriteLine("Record " + recordID + " added");
-    Console.Out.Flush();
-  }
+        Console.WriteLine("Record " + recordID + " added");
+        Console.Out.Flush();
+    }
 
 }
 catch (SzException e)
 {
-  // handle any exception that may have occurred
-  Console.Error.WriteLine("Senzing Error Message : " + e.Message);
-  Console.Error.WriteLine("Senzing Error Code    : " + e.ErrorCode);
-  Console.Error.WriteLine(e);
-  throw;
+    // handle any exception that may have occurred
+    Console.Error.WriteLine("Senzing Error Message : " + e.Message);
+    Console.Error.WriteLine("Senzing Error Code    : " + e.ErrorCode);
+    Console.Error.WriteLine(e);
+    throw;
 
 }
 catch (Exception e)
 {
-  Console.Error.WriteLine();
-  Console.Error.WriteLine("*** Terminated due to critical error ***");
-  Console.Error.WriteLine(e);
-  Console.Error.Flush();
-  throw;
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("*** Terminated due to critical error ***");
+    Console.Error.WriteLine(e);
+    Console.Error.Flush();
+    throw;
 }
 finally
 {
-  // IMPORTANT: make sure to destroy the environment
-  env.Destroy();
+    // IMPORTANT: make sure to destroy the environment
+    env.Destroy();
 }
 
 /// <summary>
@@ -78,12 +78,12 @@ finally
 /// </returns>
 static IDictionary<(string, string), string> GetRecords()
 {
-  IDictionary<(string, string), string> records
-      = new SortedDictionary<(string, string), string>();
+    IDictionary<(string, string), string> records
+        = new SortedDictionary<(string, string), string>();
 
-  records.Add(
-      ("TEST", "1001"),
-      """
+    records.Add(
+        ("TEST", "1001"),
+        """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "1001",
@@ -99,9 +99,9 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-  records.Add(
-      ("TEST", "1002"),
-      """
+    records.Add(
+        ("TEST", "1002"),
+        """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "1002",
@@ -120,9 +120,9 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-  records.Add(
-      ("TEST", "1003"),
-      """
+    records.Add(
+        ("TEST", "1003"),
+        """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "1003",
@@ -135,9 +135,9 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-  records.Add(
-      ("TEST", "1004"),
-      """
+    records.Add(
+        ("TEST", "1004"),
+        """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "1004",
@@ -153,9 +153,9 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-  records.Add(
-      ("TEST", "1005"),
-      """
+    records.Add(
+        ("TEST", "1005"),
+        """
         {
             "DATA_SOURCE": "TEST",
             "RECORD_ID": "1005",
@@ -173,5 +173,5 @@ static IDictionary<(string, string), string> GetRecords()
         }
         """);
 
-  return records;
+    return records;
 }

@@ -17,8 +17,8 @@ using static Senzing.Sdk.SzFlags;
 string? settings = Environment.GetEnvironmentVariable("SENZING_ENGINE_CONFIGURATION_JSON");
 if (settings == null)
 {
-  Console.Error.WriteLine("Unable to get settings.");
-  throw new ArgumentException("Unable to get settings");
+    Console.Error.WriteLine("Unable to get settings.");
+    throw new ArgumentException("Unable to get settings");
 }
 
 // create a descriptive instance name (can be anything)
@@ -49,186 +49,186 @@ IList<(Task, string)> pendingFutures = new List<(Task, string)>(MaximumBacklog);
 AppDomain.CurrentDomain.ProcessExit += (s, e) =>
 {
 #pragma warning disable CA1031 // Need to catch all exceptions here
-  try
-  {
-    HandlePendingFutures(pendingFutures, true);
-  }
-  catch (Exception exception)
-  {
-    Console.Error.WriteLine(exception);
-  }
+    try
+    {
+        HandlePendingFutures(pendingFutures, true);
+    }
+    catch (Exception exception)
+    {
+        Console.Error.WriteLine(exception);
+    }
 #pragma warning restore CA1031 // Need to catch all exceptions here
 
-  // IMPORTANT: make sure to destroy the environment
-  env.Destroy();
-  OutputRedoStatistics();
+    // IMPORTANT: make sure to destroy the environment
+    env.Destroy();
+    OutputRedoStatistics();
 };
 
 try
 {
-  // get the engine from the environment
-  SzEngine engine = env.GetEngine();
+    // get the engine from the environment
+    SzEngine engine = env.GetEngine();
 
-  while (true)
-  {
-    // loop through the example records and queue them up so long
-    // as we have more records and backlog is not too large
-    while (pendingFutures.Count < MaximumBacklog)
+    while (true)
     {
-
-      // get the next redo record
-      string redo = engine.GetRedoRecord();
-
-      // check if no redo records are available
-      if (redo == null) break;
-
-      Task task = factory.StartNew(() =>
-          {
-            engine.ProcessRedoRecord(redo, SzNoFlags);
-          },
-          CancellationToken.None,
-          TaskCreationOptions.None,
-          taskScheduler);
-
-      // add the future to the pending future list
-      pendingFutures.Add((task, redo));
-    }
-
-    do
-    {
-      // handle any pending futures WITHOUT blocking to reduce the backlog
-      HandlePendingFutures(pendingFutures, false);
-
-      // if we still have exceeded the backlog size then pause
-      // briefly before trying again
-      if (pendingFutures.Count >= MaximumBacklog)
-      {
-        try
+        // loop through the example records and queue them up so long
+        // as we have more records and backlog is not too large
+        while (pendingFutures.Count < MaximumBacklog)
         {
-          Thread.Sleep(HandlePauseTimeout);
 
+            // get the next redo record
+            string redo = engine.GetRedoRecord();
+
+            // check if no redo records are available
+            if (redo == null) break;
+
+            Task task = factory.StartNew(() =>
+                {
+                    engine.ProcessRedoRecord(redo, SzNoFlags);
+                },
+                CancellationToken.None,
+                TaskCreationOptions.None,
+                taskScheduler);
+
+            // add the future to the pending future list
+            pendingFutures.Add((task, redo));
         }
-        catch (ThreadInterruptedException)
+
+        do
         {
-          // do nothing
-        }
-      }
-    } while (pendingFutures.Count >= MaximumBacklog);
+            // handle any pending futures WITHOUT blocking to reduce the backlog
+            HandlePendingFutures(pendingFutures, false);
 
-    // check if there are no redo records right now
-    // NOTE: we do NOT want to call countRedoRecords() in a loop that
-    // is processing redo records, we call it here AFTER we believe
-    // have processed all pending redos to confirm still zero
-    if (engine.CountRedoRecords() == 0)
-    {
-      OutputRedoStatistics();
-      Console.WriteLine();
-      Console.WriteLine(
-          "No redo records to process.  Pausing for "
-          + RedoPauseDescription + "....");
-      Console.WriteLine("Press CTRL-C to exit.");
-      try
-      {
-        Thread.Sleep(RedoPauseTimeout);
-      }
-      catch (ThreadInterruptedException)
-      {
-        // ignore the exception
-      }
-      continue;
+            // if we still have exceeded the backlog size then pause
+            // briefly before trying again
+            if (pendingFutures.Count >= MaximumBacklog)
+            {
+                try
+                {
+                    Thread.Sleep(HandlePauseTimeout);
+
+                }
+                catch (ThreadInterruptedException)
+                {
+                    // do nothing
+                }
+            }
+        } while (pendingFutures.Count >= MaximumBacklog);
+
+        // check if there are no redo records right now
+        // NOTE: we do NOT want to call countRedoRecords() in a loop that
+        // is processing redo records, we call it here AFTER we believe
+        // have processed all pending redos to confirm still zero
+        if (engine.CountRedoRecords() == 0)
+        {
+            OutputRedoStatistics();
+            Console.WriteLine();
+            Console.WriteLine(
+                "No redo records to process.  Pausing for "
+                + RedoPauseDescription + "....");
+            Console.WriteLine("Press CTRL-C to exit.");
+            try
+            {
+                Thread.Sleep(RedoPauseTimeout);
+            }
+            catch (ThreadInterruptedException)
+            {
+                // ignore the exception
+            }
+            continue;
+        }
     }
-  }
 
 }
 catch (Exception e)
 {
-  Console.Error.WriteLine();
-  Console.Error.WriteLine("*** Terminated due to critical error ***");
-  Console.Error.WriteLine(e);
-  Console.Error.Flush();
-  throw;
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("*** Terminated due to critical error ***");
+    Console.Error.WriteLine(e);
+    Console.Error.Flush();
+    throw;
 
 }
 finally
 {
-  // normally we would call env.destroy() here, but we have registered
-  // a shutdown hook to do that since termination will typically occur
-  // via CTRL-C being pressed, and the shutdown hook will still run if
-  // we get an exception
+    // normally we would call env.destroy() here, but we have registered
+    // a shutdown hook to do that since termination will typically occur
+    // via CTRL-C being pressed, and the shutdown hook will still run if
+    // we get an exception
 }
 
 static void HandlePendingFutures(IList<(Task, string)> pendingFutures, bool blocking)
 {
-  // loop through the pending futures
-  for (int index = 0; index < pendingFutures.Count; index++)
-  {
-    // get the next pending future
-    (Task task, string redoRecord) = pendingFutures[index];
-
-    // if not blocking and this one is not done then continue
-    if (!blocking && !task.IsCompleted) continue;
-
-    // remove the pending future from the list
-    pendingFutures.RemoveAt(index--);
-
-    try
+    // loop through the pending futures
+    for (int index = 0; index < pendingFutures.Count; index++)
     {
-      try
-      {
-        // wait for completion -- if non-blocking then this
-        // task is already completed and this will just 
-        // throw any exception that might have occurred
-        if (blocking && !task.IsCompleted)
+        // get the next pending future
+        (Task task, string redoRecord) = pendingFutures[index];
+
+        // if not blocking and this one is not done then continue
+        if (!blocking && !task.IsCompleted) continue;
+
+        // remove the pending future from the list
+        pendingFutures.RemoveAt(index--);
+
+        try
         {
-          task.Wait();
+            try
+            {
+                // wait for completion -- if non-blocking then this
+                // task is already completed and this will just 
+                // throw any exception that might have occurred
+                if (blocking && !task.IsCompleted)
+                {
+                    task.Wait();
+                }
+
+                // if we get here then increment the success count
+                redoneCount++;
+
+            }
+            catch (AggregateException e)
+                when (e.InnerException is TaskCanceledException
+                      || e.InnerException is ThreadInterruptedException)
+            {
+                throw new SzRetryableException(e.InnerException);
+            }
+            catch (ThreadInterruptedException e)
+            {
+                throw new SzRetryableException(e.InnerException);
+            }
+            catch (AggregateException e)
+            {
+                if (e.InnerException != null)
+                {
+                    // get the inner exception
+                    throw e.InnerException;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
         }
-
-        // if we get here then increment the success count
-        redoneCount++;
-
-      }
-      catch (AggregateException e)
-          when (e.InnerException is TaskCanceledException
-                || e.InnerException is ThreadInterruptedException)
-      {
-        throw new SzRetryableException(e.InnerException);
-      }
-      catch (ThreadInterruptedException e)
-      {
-        throw new SzRetryableException(e.InnerException);
-      }
-      catch (AggregateException e)
-      {
-        if (e.InnerException != null)
+        catch (SzRetryableException e)
         {
-          // get the inner exception
-          throw e.InnerException;
+            // handle thread interruption and cancellation as retries
+            LogFailedRedo(Warning, e, redoRecord);
+            errorCount++;   // increment the error count
+            retryCount++;   // increment the retry count
+
+            // track the retry record so it can be retried later
+            TrackRetryRecord(redoRecord);
         }
-        else
+        catch (Exception e)
         {
-          throw;
+            // catch any other exception (incl. SzException) here
+            LogFailedRedo(Critical, e, redoRecord);
+            errorCount++;
+            throw; // rethrow since exception is critical
         }
-      }
-
     }
-    catch (SzRetryableException e)
-    {
-      // handle thread interruption and cancellation as retries
-      LogFailedRedo(Warning, e, redoRecord);
-      errorCount++;   // increment the error count
-      retryCount++;   // increment the retry count
-
-      // track the retry record so it can be retried later
-      TrackRetryRecord(redoRecord);
-    }
-    catch (Exception e)
-    {
-      // catch any other exception (incl. SzException) here
-      LogFailedRedo(Critical, e, redoRecord);
-      errorCount++;
-      throw; // rethrow since exception is critical
-    }
-  }
 }
 
 /// <summary>
@@ -240,24 +240,24 @@ static void HandlePendingFutures(IList<(Task, string)> pendingFutures, bool bloc
 /// </param>
 static void TrackRetryRecord(string recordJson)
 {
-  // track the retry record so it can be retried later
-  if (retryFile == null)
-  {
-    retryFile = new FileInfo(
-        Path.Combine(
-            Path.GetTempPath(),
-            RetryPrefix + Path.GetRandomFileName() + RetrySuffix));
+    // track the retry record so it can be retried later
+    if (retryFile == null)
+    {
+        retryFile = new FileInfo(
+            Path.Combine(
+                Path.GetTempPath(),
+                RetryPrefix + Path.GetRandomFileName() + RetrySuffix));
 
-    retryWriter = new StreamWriter(
-        new FileStream(retryFile.FullName,
-                        FileMode.Open,
-                        FileAccess.Write),
-        Encoding.UTF8);
-  }
-  if (retryWriter != null)
-  {
-    retryWriter.WriteLine(recordJson);
-  }
+        retryWriter = new StreamWriter(
+            new FileStream(retryFile.FullName,
+                            FileMode.Open,
+                            FileAccess.Write),
+            Encoding.UTF8);
+    }
+    if (retryWriter != null)
+    {
+        retryWriter.WriteLine(recordJson);
+    }
 }
 
 /// <summary>
@@ -271,58 +271,58 @@ static void LogFailedRedo(string errorType,
                           Exception exception,
                           string redoRecord)
 {
-  Console.Error.WriteLine();
-  Console.Error.WriteLine("** " + errorType + " ** FAILED TO PROCESS REDO: ");
-  Console.Error.WriteLine(redoRecord);
-  Console.Error.WriteLine(exception);
-  Console.Error.Flush();
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("** " + errorType + " ** FAILED TO PROCESS REDO: ");
+    Console.Error.WriteLine(redoRecord);
+    Console.Error.WriteLine(exception);
+    Console.Error.Flush();
 }
 
 static void OutputRedoStatistics()
 {
-  Console.WriteLine();
-  Console.WriteLine("Redos successfully processed : " + redoneCount);
-  Console.WriteLine("Total failed records/redos   : " + errorCount);
+    Console.WriteLine();
+    Console.WriteLine("Redos successfully processed : " + redoneCount);
+    Console.WriteLine("Total failed records/redos   : " + errorCount);
 
-  // check on any retry records
-  if (retryWriter != null)
-  {
-    retryWriter.Flush();
-    retryWriter.Close();
-  }
-  if (retryCount > 0)
-  {
-    Console.WriteLine(
-        retryCount + " records/redos to be retried in " + retryFile);
-  }
-  Console.Out.Flush();
+    // check on any retry records
+    if (retryWriter != null)
+    {
+        retryWriter.Flush();
+        retryWriter.Close();
+    }
+    if (retryCount > 0)
+    {
+        Console.WriteLine(
+            retryCount + " records/redos to be retried in " + retryFile);
+    }
+    Console.Out.Flush();
 }
 
 public partial class Program
 {
-  private const string RedoPauseDescription = "30 seconds";
+    private const string RedoPauseDescription = "30 seconds";
 
-  private const int RedoPauseTimeout = 30000;
+    private const int RedoPauseTimeout = 30000;
 
-  private const string RetryPrefix = "retry-";
-  private const string RetrySuffix = ".jsonl";
-  private const string Warning = "WARNING";
-  private const string Critical = "CRITICAL";
+    private const string RetryPrefix = "retry-";
+    private const string RetrySuffix = ".jsonl";
+    private const string Warning = "WARNING";
+    private const string Critical = "CRITICAL";
 
-  // setup some class-wide variables
-  private static int errorCount;
-  private static int redoneCount;
-  private static int retryCount;
-  private static FileInfo? retryFile;
-  private static StreamWriter? retryWriter;
+    // setup some class-wide variables
+    private static int errorCount;
+    private static int redoneCount;
+    private static int retryCount;
+    private static FileInfo? retryFile;
+    private static StreamWriter? retryWriter;
 
-  private const int ThreadCount = 8;
+    private const int ThreadCount = 8;
 
-  private const int BacklogFactor = 10;
+    private const int BacklogFactor = 10;
 
-  private const int MaximumBacklog = ThreadCount * BacklogFactor;
+    private const int MaximumBacklog = ThreadCount * BacklogFactor;
 
-  private const int HandlePauseTimeout = 100;
+    private const int HandlePauseTimeout = 100;
 }
 
 #pragma warning restore CA1303 // Do not pass literals as localized parameters (example messages)
