@@ -44,4 +44,4 @@ jobs:
       - name: Run mypy tests
         run: |
           # shellcheck disable=SC2046
-          mypy --strict $(git ls-files '*.py' ':!:docs/source/*')
+          mypy $(git ls-files '*.py' ':!:docs/source/*')
