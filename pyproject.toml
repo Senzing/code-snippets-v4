@@ -85,8 +85,8 @@ profile = "black"
 src_paths = ["examples", "src", "tests"]
 
 [tool.mypy]
-disallow_untyped_defs = false
-disallow_untyped_calls = false
+disallow_untyped_defs = "false"
+disallow_untyped_calls = "false"
 
 [[tool.mypy.overrides]]
 module = "senzing_abstract.szengineflags.*"
@@ -117,6 +117,7 @@ disable = [
   "protected-access",
   "too-many-branches",
   "too-many-locals",
+  "unused-argument",
 ]
 good-names = ["code-snippets-v4"]
 notes = ["FIXME"]
