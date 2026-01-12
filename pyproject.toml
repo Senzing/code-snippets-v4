@@ -84,6 +84,10 @@ max-line-length = 120
 profile = "black"
 src_paths = ["examples", "src", "tests"]
 
+[tool.mypy]
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+
 [[tool.mypy.overrides]]
 module = "senzing_abstract.szengineflags.*"
 ignore_missing_imports = true
@@ -96,14 +100,11 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "senzing_core.*"
 ignore_missing_imports = true
-disallow_untyped_defs = false
-disallow_untyped_calls = false
 
 [[tool.mypy.overrides]]
 module = "senzing.*"
 ignore_missing_imports = true
-disallow_untyped_defs = false
-disallow_untyped_calls = false
+
 
 [tool.pylint]
 ignored-argument-names = "args|kwargs"
