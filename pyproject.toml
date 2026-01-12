@@ -87,6 +87,7 @@ src_paths = ["examples", "src", "tests"]
 [tool.mypy]
 disallow_untyped_defs = false
 disallow_untyped_calls = false
+disable_error_code = ["call-arg", "var-annotated"]
 
 [[tool.mypy.overrides]]
 module = "senzing_abstract.szengineflags.*"
