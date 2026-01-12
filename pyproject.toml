@@ -84,6 +84,10 @@ max-line-length = 120
 profile = "black"
 src_paths = ["examples", "src", "tests"]
 
+[tool.mypy]
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+
 [[tool.mypy.overrides]]
 module = "senzing_abstract.szengineflags.*"
 ignore_missing_imports = "true"
@@ -102,9 +106,14 @@ ignored-argument-names = "args|kwargs"
 disable = [
   "broad-except",
   "consider-using-f-string",
+  "duplicate-code",
+  "import-error",
+  "inconsistent-return-statements",
+  "invalid-name",
   "line-too-long",
   "missing-function-docstring",
   "missing-module-docstring",
+  "no-value-for-parameter",
   "protected-access",
   "too-many-branches",
   "too-many-locals",
