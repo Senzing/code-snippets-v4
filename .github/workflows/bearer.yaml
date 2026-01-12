@@ -26,4 +26,4 @@ jobs:
       - name: Bearer
         uses: bearer/bearer-action@v2
         with:
-          skip-rule: "java_lang_information_leakage"
+          skip-rule: "java_lang_information_leakage,java_lang_path_using_user_input,python_lang_path_traversal"

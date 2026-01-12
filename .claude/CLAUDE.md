@@ -61,7 +61,7 @@ mvn -P checkstyle validate
 mvn -P spotbugs validate
 ```
 
-### C#
+### C-sharp
 
 Build and run from `csharp/snippets` directory:
 
