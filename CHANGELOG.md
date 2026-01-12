@@ -2,8 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog], [markdownlint],
-and this project adheres to [Semantic Versioning].
+The changelog format is based on [Keep a Changelog] and [CommonMark].
+This project adheres to [Semantic Versioning].
 
 ## [0.0.10] - 2025-08-11
 
@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning].
 
 ### Changed in 0.0.7
 
-- Small improvements to Python snippets 
+- Small improvements to Python snippets
 
 ## [0.0.6]
 
@@ -61,7 +61,6 @@ and this project adheres to [Semantic Versioning].
 
 - Modify Python imports to use senzing and senzing_core
 
-
 ### Added to 0.0.2
 
 - Couple of new examples
@@ -72,6 +71,6 @@ and this project adheres to [Semantic Versioning].
 
 - Initial for V4
 
-[Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
-[markdownlint]: https://dlaa.me/markdownlint/
-[Semantic Versioning]: https://semver.org/spec/v2.0.0.html
+[CommonMark]: https://commonmark.org/
+[Keep a Changelog]: https://keepachangelog.com/
+[Semantic Versioning]: https://semver.org/

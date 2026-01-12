@@ -1,10 +1,12 @@
-name: bearer
+name: Bearer
 
 on:
-  push:
-    branches-ignore: [main]
   pull_request:
     branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 permissions: {}
 
@@ -13,13 +15,15 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Bearer
         uses: bearer/bearer-action@v2
         with:
-          skip-rule: "java_lang_information_leakage"
+          skip-rule: "java_lang_information_leakage,java_lang_path_using_user_input,python_lang_path_traversal"

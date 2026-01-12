@@ -3,26 +3,34 @@
 
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    cooldown:
+      default-days: 21
+    directory: /
     schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "/"
+      interval: daily
+  - package-ecosystem: docker
+    cooldown:
+      default-days: 21
+    directory: /
     schedule:
-      interval: "daily"
-  - package-ecosystem: "pip"
-    directory: "/"
+      interval: daily
+  - package-ecosystem: pip
+    cooldown:
+      default-days: 21
+    directory: /
     schedule:
-      interval: "daily"
-  - package-ecosystem: "maven"
-    directory: "/java/"
+      interval: daily
+  - package-ecosystem: maven
+    cooldown:
+      default-days: 21
+    directory: /java/
     schedule:
-      interval: "daily"
-  - package-ecosystem: "nuget"
+      interval: daily
+  - package-ecosystem: nuget
     cooldown:
       default-days: 90
-      include: 
+      include:
         - "Senzing.Sdk"
     directories:
       - /csharp/snippets/configuration/InitDefaultConfig/
@@ -55,12 +63,17 @@ updates:
       - /csharp/runner/SnippetRunner/
     ignore:
       - dependency-name: "Senzing.Sdk"
-        update-types: ["version-update:semver-major","version-update:semver-minor","version-update:semver-patch"]
+        update-types:
+          [
+            "version-update:semver-major",
+            "version-update:semver-minor",
+            "version-update:semver-patch",
+          ]
     groups:
       all:
-        patterns: 
+        patterns:
           - "*"
-        exclude-patterns: 
+        exclude-patterns:
           - "Senzing.Sdk"
     schedule:
-      interval: "daily"
+      interval: daily
