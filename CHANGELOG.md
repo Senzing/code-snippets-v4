@@ -28,7 +28,7 @@ This project adheres to [Semantic Versioning].
 
 ### Changed in 0.0.7
 
-- Small improvements to Python snippets 
+- Small improvements to Python snippets
 
 ## [0.0.6]
 
@@ -60,7 +60,6 @@ This project adheres to [Semantic Versioning].
 ### Changed in 0.0.2
 
 - Modify Python imports to use senzing and senzing_core
-
 
 ### Added to 0.0.2
 

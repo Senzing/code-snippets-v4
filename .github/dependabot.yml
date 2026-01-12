@@ -30,7 +30,7 @@ updates:
   - package-ecosystem: nuget
     cooldown:
       default-days: 90
-      include: 
+      include:
         - "Senzing.Sdk"
     directories:
       - /csharp/snippets/configuration/InitDefaultConfig/
@@ -63,12 +63,17 @@ updates:
       - /csharp/runner/SnippetRunner/
     ignore:
       - dependency-name: "Senzing.Sdk"
-        update-types: ["version-update:semver-major","version-update:semver-minor","version-update:semver-patch"]
+        update-types:
+          [
+            "version-update:semver-major",
+            "version-update:semver-minor",
+            "version-update:semver-patch",
+          ]
     groups:
       all:
-        patterns: 
+        patterns:
           - "*"
-        exclude-patterns: 
+        exclude-patterns:
           - "Senzing.Sdk"
     schedule:
       interval: daily

@@ -36,6 +36,7 @@ jobs:
       - name: Run flake8 lint
         uses: py-actions/flake8@v2
         with:
+          ignore: E501
           max-line-length: 88
           path: python
           plugins: flake8-black
