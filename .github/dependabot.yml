@@ -3,23 +3,31 @@
 
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    cooldown:
+      default-days: 21
+    directory: /
     schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "/"
+      interval: daily
+  - package-ecosystem: docker
+    cooldown:
+      default-days: 21
+    directory: /
     schedule:
-      interval: "daily"
-  - package-ecosystem: "pip"
-    directory: "/"
+      interval: daily
+  - package-ecosystem: pip
+    cooldown:
+      default-days: 21
+    directory: /
     schedule:
-      interval: "daily"
-  - package-ecosystem: "maven"
-    directory: "/java/"
+      interval: daily
+  - package-ecosystem: maven
+    cooldown:
+      default-days: 21
+    directory: /java/
     schedule:
-      interval: "daily"
-  - package-ecosystem: "nuget"
+      interval: daily
+  - package-ecosystem: nuget
     cooldown:
       default-days: 90
       include: 
@@ -63,4 +71,4 @@ updates:
         exclude-patterns: 
           - "Senzing.Sdk"
     schedule:
-      interval: "daily"
+      interval: daily
