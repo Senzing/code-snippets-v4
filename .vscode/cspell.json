@@ -27,6 +27,7 @@
     "isort",
     "javax",
     "jdbc",
+    "kernelsam",
     "kwargs",
     "lukehinds",
     "Makio",

@@ -67,6 +67,7 @@ jobs:
     if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.csharp-darwin-snippets.outputs.status ) && github.event_name == 'schedule' }}
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v3
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v4
     with:
       job-status: ${{ needs.csharp-darwin-snippets.outputs.status }}
