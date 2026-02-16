@@ -1,37 +1,48 @@
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-
 version: 2
 updates:
-  - package-ecosystem: github-actions
+  - package-ecosystem: "github-actions"
+    assignees:
+      - "kernelsam"
     cooldown:
       default-days: 21
-    directory: /
+      exclude-patterns:
+        - "senzing-factory/*"
+    directory: "/"
+    groups:
+      senzing-factory:
+        patterns:
+          - "senzing-factory/*"
     schedule:
-      interval: daily
-  - package-ecosystem: docker
+      interval: "daily"
+  - package-ecosystem: "docker"
     cooldown:
       default-days: 21
-    directory: /
+      exclude-patterns:
+        - "senzing-factory/*"
+    directory: "/"
     schedule:
-      interval: daily
-  - package-ecosystem: pip
+      interval: "daily"
+  - package-ecosystem: "pip"
     cooldown:
       default-days: 21
-    directory: /
+      exclude-patterns:
+        - "senzing-factory/*"
+    directory: "/"
     schedule:
-      interval: daily
-  - package-ecosystem: maven
+      interval: "daily"
+  - package-ecosystem: "maven"
     cooldown:
       default-days: 21
-    directory: /java/
+      exclude-patterns:
+        - "senzing-factory/*"
+    directory: "/java/"
     schedule:
-      interval: daily
-  - package-ecosystem: nuget
+      interval: "daily"
+  - package-ecosystem: "nuget"
     cooldown:
-      default-days: 90
-      include:
-        - "Senzing.Sdk"
+      default-days: 21
+      exclude-patterns:
+        - "senzing-factory/*"
     directories:
       - /csharp/snippets/configuration/InitDefaultConfig/
       - /csharp/snippets/configuration/RegisterDataSources/
@@ -61,19 +72,19 @@ updates:
       - /csharp/snippets/deleting/DeleteViaFutures/
       - /csharp/snippets/deleting/DeleteWithInfoViaFutures/
       - /csharp/runner/SnippetRunner/
-    ignore:
-      - dependency-name: "Senzing.Sdk"
-        update-types:
-          [
-            "version-update:semver-major",
-            "version-update:semver-minor",
-            "version-update:semver-patch",
-          ]
     groups:
       all:
         patterns:
           - "*"
         exclude-patterns:
           - "Senzing.Sdk"
+    ignore:
+      - dependency-name: "Senzing.Sdk"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
+    include:
+      - "Senzing.Sdk"
     schedule:
-      interval: daily
+      interval: "daily"
