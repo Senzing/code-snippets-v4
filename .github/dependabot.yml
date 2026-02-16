@@ -68,7 +68,7 @@ updates:
       all:
         patterns:
           - "*"
-        exclude:
+        exclude-patterns:
           - "Senzing.Sdk"
     ignore:
       - dependency-name: "Senzing.Sdk"
