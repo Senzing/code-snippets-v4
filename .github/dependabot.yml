@@ -17,32 +17,24 @@ updates:
   - package-ecosystem: "docker"
     cooldown:
       default-days: 21
-      exclude-patterns:
-        - "senzing-factory/*"
     directory: "/"
     schedule:
       interval: "daily"
   - package-ecosystem: "pip"
     cooldown:
       default-days: 21
-      exclude-patterns:
-        - "senzing-factory/*"
     directory: "/"
     schedule:
       interval: "daily"
   - package-ecosystem: "maven"
     cooldown:
       default-days: 21
-      exclude-patterns:
-        - "senzing-factory/*"
     directory: "/java/"
     schedule:
       interval: "daily"
   - package-ecosystem: "nuget"
     cooldown:
       default-days: 21
-      exclude-patterns:
-        - "senzing-factory/*"
     directories:
       - /csharp/snippets/configuration/InitDefaultConfig/
       - /csharp/snippets/configuration/RegisterDataSources/
