@@ -5,7 +5,7 @@ updates:
       - "kernelsam"
     cooldown:
       default-days: 21
-      exclude-patterns:
+      exclude:
         - "senzing-factory/*"
     directory: "/"
     groups:
@@ -68,7 +68,7 @@ updates:
       all:
         patterns:
           - "*"
-        exclude-patterns:
+        exclude:
           - "Senzing.Sdk"
     ignore:
       - dependency-name: "Senzing.Sdk"
