@@ -16,9 +16,16 @@ concurrency:
 permissions: {}
 
 jobs:
-  java-linux-snippets:
+
+  sdk-versions:
+    runs-on: ubuntu-latest
     outputs:
-      status: ${{ job.status }}
+      senzingsdk-versions: ${{ steps.cfg.outputs.senzingsdk-versions }}
+    steps:
+      - id: cfg
+        uses: senzing-factory/build-resources/sdk-versions@v4
+  java-linux-snippets:
+    needs: sdk-versions
     permissions:
       contents: read
       pull-requests: write
@@ -28,7 +35,7 @@ jobs:
       matrix:
         java-version: ["17", "21"]
         java-distribution: ["temurin"]
-        senzingsdk-version: [production-v4, staging-v4]
+        senzingsdk-version: ${{ fromJSON(needs.sdk-versions.outputs.senzingsdk-versions) }}
 
     steps:
       - name: checkout repository
@@ -63,10 +70,10 @@ jobs:
 
   slack-notification:
     needs: [java-linux-snippets]
-    if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.java-linux-snippets.outputs.status ) && github.event_name == 'schedule' }}
+    if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.java-linux-snippets.result ) && github.event_name == 'schedule' }}
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v4
     with:
-      job-status: ${{ needs.java-linux-snippets.outputs.status }}
+      job-status: ${{ needs.java-linux-snippets.result }}
