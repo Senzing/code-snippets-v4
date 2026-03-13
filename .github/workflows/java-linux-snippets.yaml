@@ -16,7 +16,6 @@ concurrency:
 permissions: {}
 
 jobs:
-
   sdk-versions:
     runs-on: ubuntu-latest
     outputs:
@@ -24,6 +23,7 @@ jobs:
     steps:
       - id: cfg
         uses: senzing-factory/build-resources/sdk-versions@v4
+
   java-linux-snippets:
     needs: sdk-versions
     permissions:
