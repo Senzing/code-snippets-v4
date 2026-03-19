@@ -38,7 +38,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: install Senzing SDK
-        uses: senzing-factory/github-action-install-senzing-sdk@v3
+        uses: senzing-factory/github-action-install-senzing-sdk@v4
         with:
           senzingsdk-version: ${{ matrix.senzingsdk-version }}
 
@@ -46,7 +46,7 @@ jobs:
         run: |
           SENZING_PATH="${HOME}/senzing"
           {
-            echo "DYLD_LIBRARY_PATH=${SENZING_PATH}/er/lib"
+            echo "DYLD_LIBRARY_PATH=${SENZING_PATH}/er/lib:${DYLD_LIBRARY_PATH}"
           } >> "$GITHUB_ENV"
 
       - name: configure local nuget repo
