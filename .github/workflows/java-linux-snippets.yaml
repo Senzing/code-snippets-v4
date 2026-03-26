@@ -16,7 +16,16 @@ concurrency:
 permissions: {}
 
 jobs:
+  sdk-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      senzingsdk-versions: ${{ steps.cfg.outputs.senzingsdk-versions }}
+    steps:
+      - id: cfg
+        uses: senzing-factory/build-resources/sdk-versions@v4
+
   java-linux-snippets:
+    needs: sdk-versions
     permissions:
       contents: read
       pull-requests: write
@@ -26,7 +35,7 @@ jobs:
       matrix:
         java-version: ["17", "21"]
         java-distribution: ["temurin"]
-        senzingsdk-version: [production-v4, staging-v4]
+        senzingsdk-version: ${{ fromJSON(needs.sdk-versions.outputs.senzingsdk-versions) }}
 
     steps:
       - name: checkout repository
@@ -40,7 +49,7 @@ jobs:
           distribution: ${{ matrix.java-distribution }}
 
       - name: install Senzing runtime
-        uses: senzing-factory/github-action-install-senzing-sdk@v3
+        uses: senzing-factory/github-action-install-senzing-sdk@v4
         with:
           packages-to-install: "senzingsdk-runtime senzingsdk-setup"
           senzingsdk-version: ${{ matrix.senzingsdk-version }}

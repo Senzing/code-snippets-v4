@@ -15,24 +15,32 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "docker"
+    assignees:
+      - "docktermj"
     cooldown:
       default-days: 21
     directory: "/"
     schedule:
       interval: "daily"
   - package-ecosystem: "pip"
+    assignees:
+      - "antaenc"
     cooldown:
       default-days: 21
     directory: "/"
     schedule:
       interval: "daily"
   - package-ecosystem: "maven"
+    assignees:
+      - "barrycaceres"
     cooldown:
       default-days: 21
     directory: "/java/"
     schedule:
       interval: "daily"
   - package-ecosystem: "nuget"
+    assignees:
+      - "barrycaceres"
     cooldown:
       default-days: 21
       include:
