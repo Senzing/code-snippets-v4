@@ -13,9 +13,16 @@ concurrency:
 permissions: {}
 
 jobs:
-  csharp-darwin-snippets:
+  sdk-versions:
+    runs-on: ubuntu-latest
     outputs:
-      status: ${{ job.status }}
+      senzingsdk-versions: ${{ steps.cfg.outputs.senzingsdk-versions }}
+    steps:
+      - id: cfg
+        uses: senzing-factory/build-resources/sdk-versions@v4
+
+  csharp-darwin-snippets:
+    needs: sdk-versions
     permissions:
       contents: read
       pull-requests: write
@@ -23,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        senzingsdk-version: [production-v4, staging-v4]
+        senzingsdk-version: ${{ fromJSON(needs.sdk-versions.outputs.senzingsdk-versions) }}
         include:
           - dotnet-version: "8"
 
@@ -61,13 +68,11 @@ jobs:
           cd "${GITHUB_WORKSPACE}"/csharp/runner
           dotnet add SnippetRunner package Senzing.Sdk --version 4.0.0-beta
           dotnet run --project SnippetRunner all
-
-  slack-notification:
-    needs: [csharp-darwin-snippets]
-    if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.csharp-darwin-snippets.outputs.status ) && github.event_name == 'schedule' }}
-    secrets:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v4
-    with:
-      job-status: ${{ needs.csharp-darwin-snippets.outputs.status }}
+      - name: Notify Slack on failure
+        if: (failure() || cancelled()) && github.event_name == 'schedule'
+        uses: senzing-factory/build-resources/slack-failure-notification@v4
+        with:
+          job-status: ${{ job.status }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          additional-info: "SDK: ${{ matrix.senzingsdk-version }}"
