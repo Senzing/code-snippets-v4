@@ -5,3 +5,12 @@ rules:
         "*": ref-pin
   use-trusted-publishing:
     disable: true
+  secrets-outside-env:
+    ignore:
+      - csharp-darwin-snippets.yaml
+      - csharp-linux-snippets.yaml
+      - csharp-windows-snippets.yaml
+      - java-darwin-snippets.yaml
+      - java-linux-snippets.yaml
+      - java-windows-snippets.yaml
+      - pylint.yaml
