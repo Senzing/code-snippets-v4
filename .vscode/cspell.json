@@ -76,7 +76,8 @@
     "Xlint",
     "xstream",
     "Yamanaka",
-    "YESPURGESENZING"
+    "YESPURGESENZING",
+    "zizmor"
   ],
   "ignorePaths": [
     ".git/**",

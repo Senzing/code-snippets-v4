@@ -35,6 +35,8 @@ updates:
       - "barrycaceres"
     cooldown:
       default-days: 21
+      exclude:
+        - "com.senzing:*"
     directory: "/java/"
     schedule:
       interval: "daily"
