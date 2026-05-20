@@ -44,10 +44,22 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
+      - name: Mint staging tap token
+        if: matrix.senzingsdk-version != 'production-v4'
+        id: staging-token
+        uses: actions/create-github-app-token@v3.1.1
+        with:
+          client-id: ${{ secrets.SENZINGSDK_STAGING_CLIENT_ID }}
+          private-key: ${{ secrets.SENZINGSDK_STAGING_APP_KEY }}
+          owner: senzing-factory # zizmor: ignore[github-app]
+          repositories: homebrew-senzingsdk-staging
+          permission-contents: read
+
       - name: install Senzing SDK
-        uses: senzing-factory/github-action-install-senzing-sdk@v4
+        uses: senzing-factory/github-action-install-senzing-sdk@v5
         with:
           senzingsdk-version: ${{ matrix.senzingsdk-version }}
+          senzingsdk-token: ${{ steps.staging-token.outputs.token || github.token }}
 
       - name: configure environment
         run: |
