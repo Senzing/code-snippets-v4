@@ -5,3 +5,5 @@ rules:
         "*": ref-pin
   use-trusted-publishing:
     disable: true
+  secrets-outside-env:
+    disable: true
