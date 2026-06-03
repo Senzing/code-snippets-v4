@@ -47,7 +47,7 @@ jobs:
       - name: Mint staging tap token
         if: matrix.senzingsdk-version != 'production-v4'
         id: staging-token
-        uses: actions/create-github-app-token@v3.1.1
+        uses: actions/create-github-app-token@v3.2.0
         with:
           client-id: ${{ secrets.SENZINGSDK_STAGING_CLIENT_ID }}
           private-key: ${{ secrets.SENZINGSDK_STAGING_APP_KEY }}
