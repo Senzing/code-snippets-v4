@@ -13,9 +13,16 @@ concurrency:
 permissions: {}
 
 jobs:
-  java-windows-snippets:
+  sdk-versions:
+    runs-on: ubuntu-latest
     outputs:
-      status: ${{ job.status }}
+      senzingsdk-versions: ${{ steps.cfg.outputs.senzingsdk-versions }}
+    steps:
+      - id: cfg
+        uses: senzing-factory/build-resources/sdk-versions@v4
+
+  java-windows-snippets:
+    needs: sdk-versions
     permissions:
       contents: read
       pull-requests: write
@@ -25,23 +32,35 @@ jobs:
       matrix:
         java-version: ["17", "21"]
         java-distribution: ["temurin"]
-        senzingsdk-version: [production-v4, staging-v4]
+        senzingsdk-version: ${{ fromJSON(needs.sdk-versions.outputs.senzingsdk-versions) }}
 
     steps:
       - name: checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7.0.0
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v5.4.0
         with:
           java-version: ${{ matrix.java-version }}
           distribution: ${{ matrix.java-distribution }}
 
+      - name: Mint staging bucket token
+        if: matrix.senzingsdk-version != 'production-v4'
+        id: staging-token
+        uses: actions/create-github-app-token@v3.2.0
+        with:
+          client-id: ${{ secrets.SENZINGSDK_STAGING_CLIENT_ID }}
+          private-key: ${{ secrets.SENZINGSDK_STAGING_APP_KEY }}
+          owner: senzing-factory # zizmor: ignore[github-app]
+          repositories: scoop-senzingsdk-staging
+          permission-contents: read
+
       - name: install Senzing SDK
-        uses: senzing-factory/github-action-install-senzing-sdk@v3
+        uses: senzing-factory/github-action-install-senzing-sdk@v5
         with:
           senzingsdk-version: ${{ matrix.senzingsdk-version }}
+          senzingsdk-token: ${{ steps.staging-token.outputs.token || github.token }}
 
       - name: build with Maven
         run: |
@@ -58,12 +77,11 @@ jobs:
           cd "${Env:GITHUB_WORKSPACE}/java"
           java -jar target/sz-sdk-snippets.jar all
 
-  slack-notification:
-    needs: [java-windows-snippets]
-    if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.java-windows-snippets.outputs.status ) && github.event_name == 'schedule' }}
-    secrets:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-    uses: senzing-factory/build-resources/.github/workflows/build-failure-slack-notification.yaml@v4
-    with:
-      job-status: ${{ needs.java-windows-snippets.outputs.status }}
+      - name: Notify Slack on failure
+        if: (failure() || cancelled()) && github.event_name == 'schedule'
+        uses: senzing-factory/build-resources/slack-failure-notification@v4
+        with:
+          job-status: ${{ job.status }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          additional-info: "SDK: ${{ matrix.senzingsdk-version }}"
