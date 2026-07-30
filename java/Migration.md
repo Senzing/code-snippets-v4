@@ -359,7 +359,7 @@ method.
 
 At the very basic level, this allows quick cross-referencing in the Javadoc
 documentation to see which flags apply to which methods. From a programmatic level,
-this can be used to verify if flags being specified to a function will have an affect
+this can be used to verify if flags being specified to a function will have an effect
 or simply be ignored or in some cases to help construct user interface elements
 allowing a user to control the level of detail obtained when querying the entity
 repository.
@@ -482,7 +482,7 @@ For example, in version 3.x you would have the following functions on `G2Engine`
 - `int getEntityByEntityID(long entityID, long flags, StringBuffer result)`
 - `int getEntityByRecordID(String dataSource, String recordID, long flags, StringBuffer result)`
 
-In The version 4.0 SDK these are replaced in `SzEngine` by:
+In the version 4.0 SDK these are replaced in `SzEngine` by:
 
 - `String getEntity(long entityId, Set<SzFlag> flags)`
 - `String getEntity(SzRecordKey recordKey, Set<SzFlag> flags)`
@@ -501,7 +501,7 @@ such parameters existed are:
 - `G2Engine.findNetworkByRecordID(...)`
 
 This meant that in order to do something like specify multiple record ID values you would have
-to covert your collection of record ID's into a JSON `String` that might look like:
+to convert your collection of record IDs into a JSON `String` that might look like:
 
 ```json
 {
@@ -522,7 +522,7 @@ to covert your collection of record ID's into a JSON `String` that might look li
 }
 ```
 
-Or similarly, if specifying multiple entity ID's you would format your collection of entity ID's
+Or similarly, if specifying multiple entity IDs you would format your collection of entity IDs
 into a JSON `String` that might look like:
 
 ```json
@@ -617,7 +617,7 @@ In the version 4.0 SDK, the same operation to get the path by record ID would lo
             SzRecordKey.of("CUSTOMERS", "ABC123"),      // starting record key
             SzRecordKey.of("EMPLOYEES", "DEF456"),      // ending record key
             10,                                         // max degrees
-            SzRecordKeys.of("UNDERCOVER", "XYZ789"),    // excluded entities by record key
+            SzRecordKeys.of("UNDERCOVER", "XYZ987"),    // excluded entities by record key
             Set.of("WATCHLIST"),                        // required data sources
             SZ_FIND_PATH_DEFAULT_FLAGS);                // flags
 
@@ -628,7 +628,7 @@ In the version 4.0 SDK, the same operation to get the path by record ID would lo
     }
 ```
 
-Similarly, a call to find an entity network by entity ID's with the version 3.x SDK might look like:
+Similarly, a call to find an entity network by entity IDs with the version 3.x SDK might look like:
 
 ```java
     import static com.senzing.g2.engine.G2Engine.*;
@@ -674,7 +674,7 @@ With the version 4.0 SDK, this would change as follows:
             10,                                         // max degrees
             1,                                          // build-out degrees
             100,                                        // max entities
-            SZ_FIND_NETWORK_DEFAULT_FLAGS,              // flags
+            SZ_FIND_NETWORK_DEFAULT_FLAGS);             // flags
 
         . . .
 
@@ -882,7 +882,7 @@ always the same with two ways to loop over available redo records:
 
 ## Code Snippets
 
-[Version 4.x Java Code Snippets](https://github.com/Senzing/code-snippets-v4/tree/main/python) provide examples of
+[Version 4.x Java Code Snippets](https://github.com/Senzing/code-snippets-v4/tree/main/java) provide examples of
 how to achieve many common tasks using the Version 4.x SDK.
 
 ## Additional Differences

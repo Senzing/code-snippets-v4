@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog] and [CommonMark].
 This project adheres to [Semantic Versioning].
 
+## [Unreleased]
+
+### Added in Unreleased
+
+- Java Migration Guide (`java/Migration.md`) covering the version 3.x to 4.0 SDK changes
+
 ## [0.0.10] - 2025-08-11
 
 ### Added in 0.0.10
