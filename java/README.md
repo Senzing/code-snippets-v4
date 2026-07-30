@@ -2,6 +2,9 @@
 
 The Java snippets are contained in the `snippets` directory under various Java package directories.
 
+If you are upgrading existing code from the version 3.x SDK, see the [Migration Guide](Migration.md) for a
+detailed overview of the changes between the version 3.x and version 4.0 Java SDK.
+
 ## Prerequisites
 
 You will need to set environment variables so the Senzing installation can be located for building and for running the snippets:
