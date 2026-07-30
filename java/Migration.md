@@ -853,7 +853,10 @@ In version 3.x, processing redo records might look like:
 ```
 
 In version 4.0, this is clarified and simplified so that processing redo records is
-always the same with two ways to loop over available redo records:
+always the same, with two ways to loop over available redo records.
+
+The first approach uses `countRedoRecords()` to obtain the number of pending redo
+records and loops over that count:
 
 ```java
     import static com.senzing.sdk.SzFlag.*;
@@ -861,8 +864,6 @@ always the same with two ways to loop over available redo records:
     . . .
 
     long redoCount = engine.countRedoRecords();
-
-    StringBuffer sb = new StringBuffer();
 
     // loop over the redo count
     while (redoCount > 0L) {
@@ -877,7 +878,32 @@ always the same with two ways to loop over available redo records:
     }
 
     . . .
+```
 
+The second approach repeatedly calls `getRedoRecord()` and checks for a `null` result
+to detect when no more redo records are available.  This is useful for a process that
+continuously drains redo records as they become available:
+
+```java
+    import static com.senzing.sdk.SzFlag.*;
+
+    . . .
+
+    // loop until there are no more redo records
+    while (true) {
+        // get the next redo record
+        String redo = engine.getRedoRecord();
+
+        // check if no redo records are available
+        if (redo == null) {
+            break;
+        }
+
+        // process the redo
+        engine.processRedoRecord(redo, SZ_NO_FLAGS);
+    }
+
+    . . .
 ```
 
 ## Code Snippets
