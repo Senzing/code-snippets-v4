@@ -17,7 +17,7 @@ public class EnvironmentAndHubs {
         }
 
         // create a descriptive instance name (can be anything)
-        String instanceName = EnginePriming.class.getSimpleName();
+        String instanceName = EnvironmentAndHubs.class.getSimpleName();
 
         // initialize the Senzing environment
         SzEnvironment env = SzCoreEnvironment.newBuilder()
