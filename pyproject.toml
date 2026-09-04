@@ -42,8 +42,8 @@ development = [
   "pytest==8.4.2; python_version <= '3.11'",
   "pytest==9.1.1; python_version > '3.11'",
   "twine==7.0.0",
-  "virtualenv==21.7.1",
-  "wheel==0.47.0",
+  "virtualenv==21.7.3",
+  "wheel==0.48.0",
 ]
 lint = [
   "bandit==1.8.6; python_version <= '3.11'",
@@ -58,7 +58,7 @@ lint = [
   "pylint-per-file-ignores==2.0.3; python_version <= '3.11'",
   "pylint-per-file-ignores==3.2.1; python_version > '3.11'",
   "pylint==3.3.9; python_version <= '3.11'",
-  "pylint==4.0.6; python_version > '3.11'",
+  "pylint==4.0.7; python_version > '3.11'",
 ]
 test = [
   "pytest==8.4.2; python_version <= '3.11'",
