@@ -26,10 +26,6 @@ def handler(signum, frame):
     sys.exit(0)
 
 
-def responses_message(signum, frame):
-    sys.exit()
-
-
 def mock_logger(level, error, error_record=None):
     print(f"\n{level}: {error.__class__.__name__} - {error}", file=sys.stderr)
     if error_record:
@@ -78,4 +74,4 @@ try:
     process_redo(sz_engine, OUTPUT_FILE)
 except SzError as err:
     mock_logger("CRITICAL", err)
-    responses_message()
+    sys.exit(1)

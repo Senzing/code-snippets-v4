@@ -67,6 +67,9 @@ test = [
   "coverage==7.16.1; python_version > '3.11'",
 ]
 
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]
+
 [tool.setuptools]
 package-dir = { "" = "python" }
 

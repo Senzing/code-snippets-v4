@@ -60,3 +60,4 @@ try:
         add_records_from_file(sz_engine, load_file)
 except SzError as err:
     mock_logger("CRITICAL", err)
+    sys.exit(1)

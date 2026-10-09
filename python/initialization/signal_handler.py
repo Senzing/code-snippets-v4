@@ -3,6 +3,7 @@
 import os
 import signal
 import sys
+import time
 from pathlib import Path
 
 from senzing import SzError
@@ -24,6 +25,8 @@ try:
     sz_engine = sz_abstract_factory.create_engine()
     # Do work...
     print("\nSimulating work, press ctrl-c to exit...")
-    signal.pause()
+    while True:
+        time.sleep(1)
 except SzError as err:
-    print(f"\n{err.__class__.__name__} - {err}")
+    print(f"\n{err.__class__.__name__} - {err}", file=sys.stderr)
+    sys.exit(1)

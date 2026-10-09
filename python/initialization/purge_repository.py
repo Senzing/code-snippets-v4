@@ -29,4 +29,5 @@ try:
     sz_diagnostic.purge_repository()
     print("\nSenzing datastore purged")
 except SzError as err:
-    print(f"\n{err.__class__.__name__} - {err}")
+    print(f"\n{err.__class__.__name__} - {err}", file=sys.stderr)
+    sys.exit(1)

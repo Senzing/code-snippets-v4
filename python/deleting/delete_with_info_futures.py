@@ -84,3 +84,4 @@ try:
     futures_del(sz_engine, INPUT_FILE, OUTPUT_FILE)
 except SzError as err:
     mock_logger("CRITICAL", err)
+    sys.exit(1)
