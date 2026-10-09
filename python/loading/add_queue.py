@@ -13,6 +13,7 @@ from senzing_core import SzAbstractFactoryCore
 
 INPUT_FILE = Path("../../resources/data/load-500.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
+MAX_WORKERS = 8
 SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
@@ -52,9 +53,9 @@ def consumer(engine, record_queue):
     shutdown = False
     success_recs = 0
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = {}
-        while more_records and len(futures) < executor._max_workers:
+        while more_records and len(futures) < MAX_WORKERS:
             more_records = submit_next(executor, engine, record_queue, futures)
 
         while futures:

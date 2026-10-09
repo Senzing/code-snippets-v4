@@ -14,6 +14,7 @@ import json
 import os
 import sqlite3
 import sys
+from contextlib import closing
 from pathlib import Path
 
 from senzing import SzAbstractFactory, SzError
@@ -22,7 +23,7 @@ from senzing_core import SzAbstractFactoryCore
 
 def create_schema(db_file: str, resource_dir: str) -> None:
     schema = Path(resource_dir, "schema", "szcore-schema-sqlite-create.sql").read_text(encoding="utf-8")
-    with sqlite3.connect(db_file) as conn:
+    with closing(sqlite3.connect(db_file)) as conn:
         conn.executescript(schema)
 
 

@@ -66,8 +66,7 @@ def test_snippet(name: str, run_snippet: Callable[[Path, Snippet], Result]) -> N
     result = run_snippet(SNIPPETS_DIR / name, snippet)
 
     output = f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
-    if not result.killed:
-        assert result.returncode == snippet.returncode, output
+    assert result.returncode == snippet.returncode, output
     # Per-record errors are logged to stderr without changing the exit code, so stderr must be clean
     # unless the snippet is expected to report errors
     if snippet.expect_stderr:

@@ -1,9 +1,9 @@
 """
 Fixtures for running each Python snippet as a subprocess against a throwaway SQLite repository.
 
-Senzing install locations use the same environment variables and defaults as the Java SnippetRunner:
+Senzing install locations use the same environment variables as the Java SnippetRunner:
 SENZING_PATH, SENZING_DIR, SENZING_CONFIG_DIR, SENZING_SUPPORT_DIR and SENZING_RESOURCE_DIR.
-PYTHONPATH and LD_LIBRARY_PATH / DYLD_LIBRARY_PATH / PATH are inherited from the calling shell.
+PYTHONPATH and LD_LIBRARY_PATH are inherited from the calling shell.
 """
 
 import importlib.util
@@ -24,7 +24,6 @@ SNIPPETS_DIR = TESTS_DIR.parent
 REPO_ROOT = SNIPPETS_DIR.parent
 DATA_DIR = REPO_ROOT / "resources" / "data"
 SIGINT_GRACE_SECONDS = 30
-WINDOWS = sys.platform == "win32"
 
 
 @dataclass(frozen=True)
@@ -55,17 +54,13 @@ class Result:
     returncode: int
     stdout: str
     stderr: str
-    killed: bool = False
 
 
 def senzing_paths() -> dict[str, str]:
-    linux = sys.platform.startswith("linux")
-    senzing_path = Path(os.getenv("SENZING_PATH", "/opt/senzing" if linux else Path.home() / "senzing"))
+    senzing_path = Path(os.getenv("SENZING_PATH", "/opt/senzing"))
     install_dir = Path(os.getenv("SENZING_DIR", senzing_path / "er"))
-    etc_opt = Path("/etc/opt/senzing")
-    config_dir = etc_opt if linux and etc_opt.is_dir() else install_dir / "etc"
     return {
-        "CONFIGPATH": os.getenv("SENZING_CONFIG_DIR", str(config_dir)),
+        "CONFIGPATH": os.getenv("SENZING_CONFIG_DIR", "/etc/opt/senzing"),
         "RESOURCEPATH": os.getenv("SENZING_RESOURCE_DIR", str(install_dir / "resources")),
         "SUPPORTPATH": os.getenv("SENZING_SUPPORT_DIR", str(senzing_path / "data")),
     }
@@ -76,8 +71,7 @@ def settings_for(db_file: Path) -> str:
 
 
 def snippet_env(db_file: Path) -> dict[str, str]:
-    # UTF-8 so output survives the pipe on Windows, where it otherwise defaults to the ANSI code page
-    return {**os.environ, "SENZING_ENGINE_CONFIGURATION_JSON": settings_for(db_file), "PYTHONIOENCODING": "utf-8"}
+    return {**os.environ, "SENZING_ENGINE_CONFIGURATION_JSON": settings_for(db_file)}
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -124,33 +118,24 @@ def fixture_run_snippet(template_repo: Callable[[Repo], Path], tmp_path: Path) -
             stderr=subprocess.PIPE,
             encoding="utf-8",
         ) as proc:
-            killed = False
             try:
                 if snippet.sigint_after is None:
                     stdout, stderr = proc.communicate(snippet.stdin, timeout=snippet.timeout)
                 else:
-                    stdout, stderr, killed = interrupt_after(proc, snippet.sigint_after)
+                    stdout, stderr = interrupt_after(proc, snippet.sigint_after)
             except subprocess.TimeoutExpired:
                 proc.kill()
                 stdout, stderr = proc.communicate()
                 pytest.fail(f"{path.name} timed out\nstdout:\n{stdout}\nstderr:\n{stderr}")
-        return Result(proc.returncode, stdout, stderr, killed)
+        return Result(proc.returncode, stdout, stderr)
 
     return _run
 
 
-def interrupt_after(proc: subprocess.Popen[str], seconds: float) -> tuple[str, str, bool]:
-    """
-    Let a long-running snippet work for a while, then ctrl-c it like a user would. Windows can't send ctrl-c to a
-    child process, so like the Java runner it's killed instead; returns stdout, stderr and whether it was killed.
-    """
+def interrupt_after(proc: subprocess.Popen[str], seconds: float) -> tuple[str, str]:
+    """Let a long-running snippet work for a while, then ctrl-c it like a user would."""
     try:
-        stdout, stderr = proc.communicate(timeout=seconds)
-        return stdout, stderr, False
+        return proc.communicate(timeout=seconds)
     except subprocess.TimeoutExpired:
-        if WINDOWS:
-            proc.kill()
-        else:
-            proc.send_signal(signal.SIGINT)
-        stdout, stderr = proc.communicate(timeout=SIGINT_GRACE_SECONDS)
-        return stdout, stderr, WINDOWS
+        proc.send_signal(signal.SIGINT)
+        return proc.communicate(timeout=SIGINT_GRACE_SECONDS)

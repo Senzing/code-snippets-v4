@@ -11,6 +11,7 @@ from senzing import SzBadInputError, SzError, SzRetryableError, SzUnrecoverableE
 from senzing_core import SzAbstractFactoryCore
 
 INSTANCE_NAME = Path(__file__).stem
+MAX_WORKERS = 8
 SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
@@ -66,11 +67,11 @@ def futures_redo(engine):
     success_recs = 0
     redo_paused = False
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         while True:
             futures = {
                 executor.submit(process_redo_record, engine, record): record
-                for record in prime_redo_records(engine, executor._max_workers)
+                for record in prime_redo_records(engine, MAX_WORKERS)
             }
             if not futures:
                 redo_pause(success_recs)
@@ -107,7 +108,7 @@ def futures_redo(engine):
                 while not redo_count(engine):
                     redo_pause(success_recs)
                 redo_paused = False
-                while len(futures) < executor._max_workers:
+                while len(futures) < MAX_WORKERS:
                     if record := get_redo_record(engine):
                         futures[executor.submit(process_redo_record, engine, record)] = record
 

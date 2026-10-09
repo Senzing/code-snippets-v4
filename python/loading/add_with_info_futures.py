@@ -18,6 +18,7 @@ from senzing_core import SzAbstractFactoryCore
 
 INPUT_FILE = Path("../../resources/data/load-500-with-errors.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
+MAX_WORKERS = 8
 OUTPUT_FILE = Path("../../resources/output/add_file_with_info.jsonl").resolve()
 SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
@@ -52,10 +53,10 @@ def futures_add(engine, input_file, output_file):
 
     with open(output_file, "w", encoding="utf-8") as out_file:
         with open(input_file, "r", encoding="utf-8") as in_file:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
                 futures = {
                     executor.submit(add_record, engine, record): record
-                    for record in itertools.islice(in_file, executor._max_workers)
+                    for record in itertools.islice(in_file, MAX_WORKERS)
                 }
 
                 while futures:
