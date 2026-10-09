@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning].
 - `redo_with_info_continuous.py` raised a `TypeError` instead of exiting when a Senzing error occurred
 - `add_queue.py` loaded no records but exited successfully on Python 3.14+, and could stop early if the queue was
   momentarily empty
+- `redo_continuous_futures.py` spun calling `get_redo_record()` when fewer redo records than workers were waiting
 
 ## [0.0.10] - 2025-08-11
 

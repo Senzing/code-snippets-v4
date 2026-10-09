@@ -108,9 +108,10 @@ def futures_redo(engine):
                 while not redo_count(engine):
                     redo_pause(success_recs)
                 redo_paused = False
-                while len(futures) < MAX_WORKERS:
-                    if record := get_redo_record(engine):
-                        futures[executor.submit(process_redo_record, engine, record)] = record
+                while len(futures) < MAX_WORKERS and (record := get_redo_record(engine)):
+                    futures[executor.submit(process_redo_record, engine, record)] = record
+                if not futures:
+                    redo_paused = True
 
 
 signal.signal(signal.SIGINT, handler)
