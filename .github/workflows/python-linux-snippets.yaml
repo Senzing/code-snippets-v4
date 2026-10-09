@@ -1,0 +1,74 @@
+name: python linux snippets
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  sdk-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      senzingsdk-versions: ${{ steps.cfg.outputs.senzingsdk-versions }}
+    steps:
+      - id: cfg
+        uses: senzing-factory/build-resources/sdk-versions@v4
+
+  python-linux-snippets:
+    needs: sdk-versions
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        senzingsdk-version: ${{ fromJSON(needs.sdk-versions.outputs.senzingsdk-versions) }}
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --group test
+
+      - name: install Senzing runtime
+        uses: senzing-factory/github-action-install-senzing-sdk@v5
+        with:
+          packages-to-install: "senzingsdk-runtime senzingsdk-setup"
+          senzingsdk-version: ${{ matrix.senzingsdk-version }}
+
+      - name: run python snippets
+        env:
+          LD_LIBRARY_PATH: "/opt/senzing/er/lib"
+          PYTHONPATH: "/opt/senzing/er/sdk/python"
+        run: |
+          python -m pytest -rs
+
+      - name: Notify Slack on failure
+        if: (failure() || cancelled()) && github.event_name == 'schedule'
+        uses: senzing-factory/build-resources/slack-failure-notification@v4
+        with:
+          job-status: ${{ job.status }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          additional-info: "SDK: ${{ matrix.senzingsdk-version }}, Python: ${{ matrix.python-version }}"

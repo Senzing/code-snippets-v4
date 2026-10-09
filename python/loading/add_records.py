@@ -2,6 +2,7 @@
 
 import json
 import os
+import sys
 from pathlib import Path
 
 from senzing import SzError
@@ -88,4 +89,5 @@ try:
         sz_engine.add_record(data_source, record_id, json.dumps(record))
         print(f"Record {record_id} added", flush=True)
 except SzError as err:
-    print(f"\n{err.__class__.__name__} - {err}")
+    print(f"\n{err.__class__.__name__} - {err}", file=sys.stderr)
+    sys.exit(1)

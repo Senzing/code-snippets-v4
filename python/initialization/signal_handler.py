@@ -26,4 +26,5 @@ try:
     print("\nSimulating work, press ctrl-c to exit...")
     signal.pause()
 except SzError as err:
-    print(f"\n{err.__class__.__name__} - {err}")
+    print(f"\n{err.__class__.__name__} - {err}", file=sys.stderr)
+    sys.exit(1)

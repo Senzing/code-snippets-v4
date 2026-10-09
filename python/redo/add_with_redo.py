@@ -92,3 +92,4 @@ try:
         print("\nNo redo records to process")
 except SzError as err:
     mock_logger("CRITICAL", err)
+    sys.exit(1)

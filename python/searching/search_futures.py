@@ -12,6 +12,7 @@ from senzing_core import SzAbstractFactoryCore
 
 INPUT_FILE = Path("../../resources/data/search-50.jsonl").resolve()
 INSTANCE_NAME = Path(__file__).stem
+MAX_WORKERS = 8
 SETTINGS = os.getenv("SENZING_ENGINE_CONFIGURATION_JSON", "{}")
 
 
@@ -31,10 +32,10 @@ def futures_search(engine, input_file):
     success_recs = 0
 
     with open(input_file, "r", encoding="utf-8") as in_file:
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             futures = {
                 executor.submit(search_record, engine, record): record
-                for record in itertools.islice(in_file, executor._max_workers)
+                for record in itertools.islice(in_file, MAX_WORKERS)
             }
 
             while futures:
@@ -73,3 +74,4 @@ try:
     futures_search(sz_engine, INPUT_FILE)
 except SzError as err:
     mock_logger("CRITICAL", err)
+    sys.exit(1)

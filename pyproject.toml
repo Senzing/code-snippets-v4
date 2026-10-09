@@ -1,6 +1,6 @@
 [project]
 name = "code-snippets-v4"
-version = "1.2.8"
+version = "0.0.11"
 description = "Code snippets for Senzing V4"
 authors = [{ name = "senzing", email = "support@senzing.com" }]
 readme = "README.md"
@@ -66,6 +66,9 @@ test = [
   "coverage==7.10.7; python_version <= '3.11'",
   "coverage==7.16.1; python_version > '3.11'",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]
 
 [tool.setuptools]
 package-dir = { "" = "python" }

@@ -5,11 +5,28 @@ All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog] and [CommonMark].
 This project adheres to [Semantic Versioning].
 
-## [Unreleased]
+## [0.0.11] - 2026-10-09
 
-### Added in Unreleased
+### Added in 0.0.11
 
 - Java Migration Guide (`java/Migration.md`) covering the version 3.x to 4.0 SDK changes
+- Python snippet tests (`python/tests`) running every snippet end to end against a temporary SQLite repository
+- GitHub Actions workflow running the Python snippet tests on Linux
+
+### Changed in 0.0.11
+
+- Python snippets exit with status 1 and report to stderr when a Senzing error stops them
+- `resources/output/` is now part of the repository so snippets writing with-info output work on a fresh clone
+- `add_queue.py` uses a producer thread instead of separate processes, matching the Java and C# snippets
+- Python futures and queue snippets set their thread count with `MAX_WORKERS` (8, matching Java) instead of reading the
+  executor's private `_max_workers`
+
+### Fixed in 0.0.11
+
+- `redo_with_info_continuous.py` raised a `TypeError` instead of exiting when a Senzing error occurred
+- `add_queue.py` loaded no records but exited successfully on Python 3.14+, and could stop early if the queue was
+  momentarily empty
+- `redo_continuous_futures.py` spun calling `get_redo_record()` when fewer redo records than workers were waiting
 
 ## [0.0.10] - 2025-08-11
 

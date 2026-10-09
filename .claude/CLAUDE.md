@@ -26,9 +26,20 @@ python python/loading/add_records.py
 black --line-length 120 python/
 isort --profile black python/
 pylint python/
-flake8 python/
+flake8 --max-line-length 120 --extend-ignore E203,E501,E704,W503 python/
 mypy python/
-bandit python/
+bandit -c pyproject.toml -r python/
+```
+
+**Testing:**
+
+`python/tests` runs every snippet end to end, each against its own temporary SQLite repository (`SENZING_ENGINE_CONFIGURATION_JSON` is not used). Snippets needing data, input or ctrl-c get an entry in `SNIPPETS` in `python/tests/test_snippets.py`.
+
+```bash
+export PYTHONPATH=/opt/senzing/er/sdk/python
+export LD_LIBRARY_PATH=/opt/senzing/er/lib
+python -m pytest
+python -m pytest -k loading    # run a subset
 ```
 
 ### Java

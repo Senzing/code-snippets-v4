@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import os
+import sys
 from pathlib import Path
 
 from senzing import SzError
@@ -16,4 +17,5 @@ try:
     sz_engine.prime_engine()
     # Do work...
 except SzError as err:
-    print(f"\n{err.__class__.__name__} - {err}")
+    print(f"\n{err.__class__.__name__} - {err}", file=sys.stderr)
+    sys.exit(1)

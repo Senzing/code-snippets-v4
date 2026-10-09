@@ -58,3 +58,4 @@ try:
     searcher(sz_engine)
 except SzError as err:
     mock_logger("CRITICAL", err)
+    sys.exit(1)

@@ -21,3 +21,4 @@ try:
     print(response)
 except SzError as err:
     print(f"{err.__class__.__name__} - {err}", file=sys.stderr)
+    sys.exit(1)
