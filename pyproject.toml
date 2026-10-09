@@ -1,6 +1,6 @@
 [project]
 name = "code-snippets-v4"
-version = "0.0.10"
+version = "0.0.11"
 description = "Code snippets for Senzing V4"
 authors = [{ name = "senzing", email = "support@senzing.com" }]
 readme = "README.md"
