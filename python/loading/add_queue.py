@@ -34,6 +34,10 @@ def producer(in_file, record_queue):
     try:
         for record in in_file:
             record_queue.put(record, block=True)
+    except ValueError:
+        # The main thread closed the file after a fatal error, there is nothing more to read
+        if not in_file.closed:
+            raise
     finally:
         # None tells the consumer there are no more records
         record_queue.put(None)
