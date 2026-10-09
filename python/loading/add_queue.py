@@ -30,14 +30,15 @@ def add_record(engine, record_to_add):
     engine.add_record(data_source, record_id, record_to_add)
 
 
-def producer(in_file, record_queue):
+def producer(in_file, record_queue, errors):
     try:
         for record in in_file:
             record_queue.put(record, block=True)
-    except ValueError:
-        # The main thread closed the file after a fatal error, there is nothing more to read
+    except Exception as err:
+        # Errors in a thread don't reach the exit code, so hand them to the main thread. Ignore the file being
+        # closed by the main thread after a fatal error, there is nothing more to read
         if not in_file.closed:
-            raise
+            errors.append(err)
     finally:
         # None tells the consumer there are no more records
         record_queue.put(None)
@@ -94,11 +95,16 @@ try:
     sz_engine = sz_factory.create_engine()
 
     input_queue = queue.Queue(maxsize=200)
+    producer_errors = []
     with open(INPUT_FILE, "r", encoding="utf-8") as input_file:
-        producer_thread = threading.Thread(target=producer, args=(input_file, input_queue), daemon=True)
+        producer_thread = threading.Thread(
+            target=producer, args=(input_file, input_queue, producer_errors), daemon=True
+        )
         producer_thread.start()
         consumer(sz_engine, input_queue)
         producer_thread.join()
+    if producer_errors:
+        raise producer_errors[0]
 except SzError as err:
     mock_logger("CRITICAL", err)
     sys.exit(1)
