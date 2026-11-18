@@ -419,9 +419,14 @@ public class InstallLocations {
             // validate the contents of the config directory
             List<String> missingFiles = new LinkedList<>();
 
-            // check if the config directory does not exist
+            // check that the config directory contains the required files
+            // (cfgVariant.json is not required since Senzing 4.5.0 compiles it
+            // into the native library rather than installing it)
             if (configDir != null && configDir.exists()) {
-                String[] requiredFiles = { "cfgVariant.json" };
+                String[] requiredFiles = {
+                    "defaultGNRCP.config", "customGn.txt", "customSn.txt",
+                    "customOn.txt"
+                };
 
                 for (String fileName : requiredFiles) {
                     File configFile = new File(configDir, fileName);

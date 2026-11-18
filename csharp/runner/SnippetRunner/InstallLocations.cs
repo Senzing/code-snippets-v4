@@ -486,12 +486,15 @@ public class InstallLocations
 
         // validate the contents of the config directory
         List<string> missingFiles = new List<string>();
-        string missingFilesString = "";
 
-        // check if the config directory does not exist
+        // check that the config directory contains the required files
+        // (cfgVariant.json is not required since Senzing 4.5.0 compiles it
+        // into the native library rather than installing it)
         if (configDir != null && supportDir != null && configDir.Exists)
         {
-            String[] requiredFiles = ["cfgVariant.json"];
+            string[] requiredFiles = [
+                "defaultGNRCP.config", "customGn.txt", "customSn.txt",
+                "customOn.txt"];
 
             foreach (string fileName in requiredFiles)
             {
@@ -502,8 +505,6 @@ public class InstallLocations
                 if (!configFile.Exists && !supportFile.Exists)
                 {
                     missingFiles.Add(fileName);
-                    missingFilesString = (missingFilesString.Length == 0)
-                        ? fileName : missingFiles + ", " + fileName;
                 }
             }
         }
@@ -563,7 +564,10 @@ public class InstallLocations
 
             throw new InvalidOperationException(
                     "The config directory does not exist or is invalid: " + configDir
-                    + (missingFiles.Count == 0 ? "" : ", missingFiles=[ " + missingFilesString + " ]"));
+                    + (missingFiles.Count == 0
+                        ? ""
+                        : ", missingFiles=[ "
+                            + string.Join(", ", missingFiles) + " ]"));
         }
 
         // construct and initialize the result
