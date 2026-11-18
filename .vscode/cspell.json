@@ -28,6 +28,7 @@
     "findsecbugs",
     "fpvs",
     "glassfish",
+    "GNRCP",
     "ICLA",
     "ipascalcase",
     "isort",
