@@ -13,19 +13,8 @@ permissions: {}
 jobs:
   bandit:
     permissions:
-      security-events: write
-    # PyCQA/bandit-action@v1.0.1 always installs Python 3.9, which ubuntu-26.04 does not provide
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.13"]
-    timeout-minutes: 10
-
-    steps:
-      - name: Run Bandit Scan
-        uses: PyCQA/bandit-action@v1.0.1
-        with:
-          python-version: ${{ matrix.python-version }}
-          configfile: pyproject.toml
-          targets: python
+      contents: read
+    uses: senzing-factory/build-resources/.github/workflows/bandit.yaml@v4
+    with:
+      config-file: pyproject.toml
+      targets: python
