@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog] and [CommonMark].
 This project adheres to [Semantic Versioning].
 
+## [Unreleased]
+
+### Fixed in Unreleased
+
+- Java and C# SnippetRunners no longer require `cfgVariant.json` in the Senzing config directory, since Senzing 4.5.0
+  compiles it into the native library instead of installing it. The config directory must instead contain
+  `defaultGNRCP.config`, `customGn.txt`, `customSn.txt` and `customOn.txt`
+- C# SnippetRunner lists every missing config file in its error message instead of the list's type name
+- Bandit workflow runs on `ubuntu-24.04`, since `PyCQA/bandit-action@v1.0.1` needs Python 3.9, which `ubuntu-26.04` lacks
+
 ## [0.0.11] - 2026-10-09
 
 ### Added in 0.0.11
