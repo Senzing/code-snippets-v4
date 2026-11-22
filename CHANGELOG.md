@@ -7,8 +7,15 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+### Changed in Unreleased
+
+- Python snippets require Python 3.11 or later, since 3.10 reached end of life in October 2026 and its pinned
+  development dependencies carry advisories with no 3.10-compatible fix. CI no longer runs 3.10
+
 ### Fixed in Unreleased
 
+- Dependency scan now audits the installed dependency groups on Python 3.11 and 3.13. It previously ran `pip-audit`
+  against `[project].dependencies`, which this project does not have, so it checked nothing
 - Java and C# SnippetRunners no longer require `cfgVariant.json` in the Senzing config directory, since Senzing 4.5.0
   compiles it into the native library instead of installing it. The config directory must instead contain
   `defaultGNRCP.config`, `customGn.txt`, `customSn.txt` and `customOn.txt`
